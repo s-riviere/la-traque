@@ -16,9 +16,8 @@ SSL_KEY = "/path/to/privkey.pem"
 SSL_CERT = "/path/to/cert.pem"
 ADMIN_PASSWORD = 'admin_password_here'
 MAX_PENALTIES = 3
-ALLOWED_TIME_OUT_OF_ZONE_IN_MINUTES = 10
-ALLOWED_TIME_BETWEEN_POSITION_UPDATE_IN_MINUTES = 10
 ```
+
 Where ADMIN_PASSWORD is the password for the admin user, HOST is the host of the server, PORT is the port of the server, SSL_KEY is the path to the key file and SSL_CERT is the path to the certificate file. 
 The SSL_KEY and SSL_CERT are used for HTTPS and are required for the server to work. This is because the browser will block the GeoLocation API if the connection is not secure.
 MAX_PENALTIES is the maximum number of penalties a user can have before loosing the game.
@@ -47,5 +46,5 @@ https://example.com:3000
 ```
 
 ## Deployment
-Put your certificate and private key in the traque-back/ssl folder. They need to be named `cert.pem` and `privkey.pem`.
+Put your certificate and private key in the proxy/ssl folder. They need to be named `cert.pem` and `privkey.pem`.
 You can then depploy the docker application with `docker compose up`
