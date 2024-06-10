@@ -15,17 +15,12 @@ PORT = 3001
 SSL_KEY = "/path/to/privkey.pem"
 SSL_CERT = "/path/to/cert.pem"
 ADMIN_PASSWORD = 'admin_password_here'
-MAX_PENALTIES = 3
 ```
 
 Where ADMIN_PASSWORD is the password for the admin user, HOST is the host of the server, PORT is the port of the server, SSL_KEY is the path to the key file and SSL_CERT is the path to the certificate file. 
 The SSL_KEY and SSL_CERT are used for HTTPS and are required for the server to work. This is because the browser will block the GeoLocation API if the connection is not secure.
-MAX_PENALTIES is the maximum number of penalties a user can have before loosing the game.
-ALLOWED_TIME_OUT_OF_ZONE_IN_MINUTES is the time a user can be out of the zone before being penalized.
-ALLOWED_TIME_BETWEEN_POSITION_UPDATE_IN_MINUTES is the maximum amount of time a user can wait before updating their position, after this period they will recieve a pennalty.
 
 Note : make sure PORT and NEXT_PUBLIC_SOCKET_PORT are the same
-Note 2 : you need to get a trusted certificate for this to work, you can use letsencrypt for that
 
 ### Running the project
 #### Front end
@@ -48,5 +43,5 @@ https://example.com:3000
 ## Deployment
 Put your certificate and private key in the proxy/ssl folder. They need to be named `cert.pem` and `privkey.pem`.
 You can then depploy the docker application with `docker compose up`
-
+You can change the production environment varialbes for the backend in the docker-compose.yml file. The frontend environment variables can be changed in the .env file in the traque-front directory.
 The reverse proxy is used to get https to the next app on port 3000.
