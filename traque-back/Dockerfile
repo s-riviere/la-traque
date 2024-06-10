@@ -13,8 +13,5 @@ RUN npm install
 # Copy the rest of project files into this image
 COPY . .
 
-# Expose application port
-EXPOSE 3001
-
 # Start the application
 CMD npm start

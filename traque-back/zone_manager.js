@@ -1,3 +1,7 @@
+/*
+This module manages the play area during the game, shrinking it over time based of some settings.
+*/
+
 import { randomCirclePoint } from 'random-location'
 import { isInCircle } from './map_utils.js';
 import { map } from './util.js';
@@ -6,11 +10,9 @@ import { secureAdminBroadcast } from './admin_socket.js';
 
 export default {
     //Setings storing where the zone will start, end and how it should evolve
-    //The zone will start by staying at its mzx value for reductionInterval minutes
+    //The zone will start by staying at its max value for reductionInterval minutes
     //and then reduce during reductionDuration minutes, then wait again...
     //The reduction factor is such that after reductionCount the zone will be the min zone
-    //a call to onZoneUpdate will be made every updateIntervalSeconds when the zone is changing
-    //a call to onNextZoneUpdate will be made when the zone reduction ends and a new next zone is announced
     zoneSettings: {
         min: { center: null, radius: null },
         max: { center: null, radius: null },
@@ -194,11 +196,13 @@ export default {
         }, this.zoneSettings.updateIntervalSeconds * 1000);
     },
 
+    //a call to onNextZoneUpdate will be made when the zone reduction ends and a new next zone is announced
     onNextZoneUpdate(newZone) {
         playersBroadcast("new_zone", newZone)
         secureAdminBroadcast("new_zone", newZone)
-    },
-
+        },
+        
+    //a call to onZoneUpdate will be made every updateIntervalSeconds when the zone is changing
     onZoneUpdate(zone) {
         playersBroadcast("zone", zone)
         secureAdminBroadcast("zone", zone)

@@ -1,3 +1,6 @@
+/*
+This module manages the verification of the game rules and the penalties.
+*/
 import { isInCircle } from "./map_utils.js";
 import { sendUpdatedTeamInformations, teamBroadcast } from "./team_socket.js";
 import { secureAdminBroadcast } from "./admin_socket.js";
@@ -5,15 +8,22 @@ import game, {GameState} from "./game.js";
 import zone from "./zone_manager.js";
 
 export default {
+    // Object mapping team id to the date they left the zone as a UNIX millisecond timestamp
     outOfBoundsSince: {},
+    // Id of the interval checking the rules
     checkIntervalId: null,
     settings: {
+        //Time in minutes before a team is penalized for not updating their position
         allowedTimeOutOfZone: 10,
+        //Time in minutes before a team is penalized for not updating their position
         allowedTimeBetweenPositionUpdate: 10,
         //Number of penalties needed to be eliminated
         maxPenalties: 3
     },
 
+    /**
+     * Start the penalty controller, watch the team positions and apply penalties if necessary
+     */
     start() {
         this.outOfBoundsSince = {};
         if (this.checkIntervalId) {
@@ -28,6 +38,9 @@ export default {
         }, 100);
     },
 
+    /**
+     * Stop the penalty controller
+     */
     stop() {
         this.outOfBoundsSince = {};
         if (this.checkIntervalId) {
@@ -36,6 +49,11 @@ export default {
         }
     },
 
+    /**
+     * Update the penalty controller settings
+     * @param {Object} newSettings the object containing the settings to be udpated, can be partial
+     * @returns true if the settings were updated, false otherwise
+     */
     updateSettings(newSettings) {
         //Sanitize input
         if (newSettings.maxPenalties && (isNaN(parseInt(newSettings.maxPenalties)) || newSettings.maxPenalties < 0)) { return false }
@@ -72,6 +90,10 @@ export default {
         secureAdminBroadcast("teams", game.teams)
     },
 
+    /**
+     * Check if each team has too many penalties and eliminate them if necessary
+     * Also send a socket message to the team and the chased team
+     */
     checkPenalties() {
         for (let team of game.teams) {
             if (team.penalties >= this.settings.maxPenalties) {
@@ -84,6 +106,11 @@ export default {
         }
     },
 
+    /**
+     * Watch the position of each team and apply penalties if necessary
+     * If a team is out of the zone, a warning will be sent to them
+     * A warning is also sent one minute before the penalty is applied
+     */
     watchZone() {
         game.teams.forEach((team) => {
             if (team.captured) { return }
@@ -110,7 +137,10 @@ export default {
         })
     },
 
-
+    /**
+     * Watch the date of the last position update of each team and apply penalties if necessary
+     * Also send a message one minute before the penalty is applied
+     */
     watchPositionUpdate() {
         game.teams.forEach((team) => {
             //If the team has not sent their location for more than the allowed period, automatically send it and add a penalty

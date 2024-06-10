@@ -1,3 +1,6 @@
+/*
+This module manages the main game state, the teams, the settings and the game logic
+*/
 import { secureAdminBroadcast } from "./admin_socket.js";
 import { isInCircle } from "./map_utils.js";
 import { playersBroadcast, sendUpdatedTeamInformations } from "./team_socket.js";
@@ -5,6 +8,9 @@ import { playersBroadcast, sendUpdatedTeamInformations } from "./team_socket.js"
 import penaltyController from "./penalty_controller.js";
 import zoneManager from "./zone_manager.js";
 
+/**
+ * The possible states of the game
+ */
 export const GameState = {
     SETUP: "setup",
     PLACEMENT: "placement",
@@ -13,8 +19,11 @@ export const GameState = {
 }
 
 export default {
+    //List of teams, as objects. To see the fields see the addTeam methods
     teams : [],
+    //Current state of the game
     state : GameState.SETUP,
+    //Settings of the game
     settings : {
         loserEndGameMessage: "",
         winnerEndGameMessage: "",
@@ -22,11 +31,21 @@ export default {
         waitingMessage: "Jeu en préparation, veuillez patienter."
     },
 
+    /**
+     * Update the game settings
+     * @param {Object} newSettings settings to be updated, can be partial
+     * @returns true if the settings are applied
+     */
     changeSettings(newSettings) {
         this.settings = {...this.settings, ...newSettings};
         return true;
     },
 
+    /**
+     * Change the state of the game to newState and start the necessary processes
+     * @param {String} newState 
+     * @returns true if the state has been changed
+     */
     setState(newState) {
         if (Object.values(GameState).indexOf(newState) == -1) {
             return false;
@@ -65,6 +84,10 @@ export default {
         return true;
     },
 
+    /**
+     * Get a new unused team id
+     * @returns a new unique team id
+     */
     getNewTeamId() {
         let id = null;
         while (id === null || this.teams.find(t => t.id === id)) {
@@ -73,10 +96,19 @@ export default {
         return id;
     },
 
+    /**
+     * Return a random capture code
+     * @returns a random 4 digit number
+     */
     createCaptureCode() {
         return Math.floor(Math.random() * 10000)
     },
 
+    /**
+     * Add a new team to the game
+     * @param {String} teamName the name of the team
+     * @returns true if the team has been added
+     */
     addTeam(teamName) {
         let id = this.getNewTeamId();
         this.teams.push({
@@ -100,6 +132,10 @@ export default {
         return true;
     },
 
+    /**
+     * Count the number of teams that are not captured
+     * @returns the number of teams that are not captured
+     */
     playingTeamCount() {
         let res = 0;
         this.teams.forEach((t) => {
@@ -110,6 +146,12 @@ export default {
         return res;
     },
 
+    /**
+     * Update the chasing chain of the teams based of the ordre of the teams array
+     * If there are only 2 teams left, the game will end
+     * This function will update the enemyName, chasing and chased values of each teams
+     * @returns true if successful
+     */
     updateTeamChasing() {
         if (this.playingTeamCount() <= 2) {
             if (this.state == GameState.PLAYING) {
@@ -138,15 +180,31 @@ export default {
         return true;
     },
 
+    /**
+     * Rearrange the order of the teams and update the chasing chain
+     * @param {Array} newOrder An array of teams in the new order
+     * @returns 
+     */
     reorderTeams(newOrder) {
         this.teams = newOrder;
         return this.updateTeamChasing();
     },
 
+    /**
+     * Get a team by its ID
+     * @param {Number} teamId The id of the team
+     * @returns the team object or undefined if not found
+     */
     getTeam(teamId) {
         return this.teams.find(t => t.id === teamId);
     },
 
+    /**
+     * Update a team's values
+     * @param {Number} teamId The id of the team to update
+     * @param {Object} newTeam An object containing the new values of the team, can be partial
+     * @returns true if the team has been updated
+     */
     updateTeam(teamId, newTeam) {
         this.teams = this.teams.map((t) => {
             if (t.id == teamId) {
@@ -160,11 +218,20 @@ export default {
         return true;
     },
 
+    /**
+     * 
+     * @param {Number} teamId The ID of the team which location will be updated
+     * @param {Array} location An array containing in order the latitude and longitude of the new location
+     * @returns true if the location has been updated 
+     */
     updateLocation(teamId, location) {
         let team = this.getTeam(teamId);
+        //The ID does not match any team
         if (team == undefined) {
             return false;
         }
+        //The location sent by the team will be null if the browser call API dooes not succeed
+        //See issue #19
         if(location == null) {
             return false;
         }
@@ -176,8 +243,9 @@ export default {
         return true;
     },
 
-    //Make it so that when a team requests the location of a team that has never sent their locaiton
-    //Their position at the begining of the game is sent
+    /**
+     * Initialize the last sent location of the teams to their starting location
+     */
     initLastSentLocations() {
         for (let team of this.teams) {
             team.lastSentLocation = team.currentLocation;
@@ -186,6 +254,11 @@ export default {
         }
     },
 
+    /**
+     * Get the most recent enemy team's location as well as setting the latest accessible location to the current one
+     * @param {Number} teamId The ID of the team that will send its location
+     * @returns true if the location has been sent
+     */
     sendLocation(teamId) {
         let team = this.getTeam(teamId);
         if (team == undefined) {
@@ -203,6 +276,11 @@ export default {
         return team;
     },
 
+    /**
+     * Remove a team by its ID
+     * @param {Number} teamId The id of the team to remove
+     * @returns true if the team has been deleted
+     */
     removeTeam(teamId) {
         if (this.getTeam(teamId) == undefined) {
             return false;
@@ -254,6 +332,9 @@ export default {
         return zoneManager.udpateSettings(newSettings)
     },
 
+    /**
+     * Set the game state as finished, as well as resetting the zone manager
+     */
     finishGame() {
         this.setState(GameState.FINISHED);
         zoneManager.reset();

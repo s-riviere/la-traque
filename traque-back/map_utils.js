@@ -1,3 +1,10 @@
+/**
+ * Compute the distance between two points givent their longitude and latitude 
+ * @param {Object} pos1 The first position
+ * @param {Object} pos2 The second position
+ * @returns the distance between the two positions in meters
+ * @see https://gist.github.com/miguelmota/10076960
+ */
 export function getDistanceFromLatLon({ lat: lat1, lng: lon1 }, { lat: lat2, lng: lon2 }) {
     var R = 6371; // Radius of the earth in km
     var dLat = deg2rad(lat2 - lat1);  // deg2rad below
@@ -12,10 +19,22 @@ export function getDistanceFromLatLon({ lat: lat1, lng: lon1 }, { lat: lat2, lng
     return d * 1000;
 }
 
+/**
+ * Convert a angle from degree to radian
+ * @param {Number} deg angle in degree
+ * @returns angle in radian
+ */
 function deg2rad(deg) {
     return deg * (Math.PI / 180)
 }
 
+/**
+ * Check if a GPS point is in a circle
+ * @param {Object} position The position to check, an object with lat and lng fields
+ * @param {Object} center The center of the circle, an object with lat and lng fields
+ * @param {Number} radius The radius of the circle in meters
+ * @returns 
+ */
 export function isInCircle(position, center, radius) {
     return getDistanceFromLatLon(position, center) < radius;
 }

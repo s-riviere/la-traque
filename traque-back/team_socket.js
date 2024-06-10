@@ -1,3 +1,8 @@
+/*
+This file manages team access to the server via websocket.
+It receives messages, checks permissions, manages authentication and performs actions by calling functions from other modules.
+This module also exposes functions to send messages via socket to all teams
+*/
 import { secureAdminBroadcast } from "./admin_socket.js";
 import { io} from "./index.js";
 import game from "./game.js";
