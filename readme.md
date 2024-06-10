@@ -48,3 +48,5 @@ https://example.com:3000
 ## Deployment
 Put your certificate and private key in the proxy/ssl folder. They need to be named `cert.pem` and `privkey.pem`.
 You can then depploy the docker application with `docker compose up`
+
+The reverse proxy is used to get https to the next app on port 3000.
