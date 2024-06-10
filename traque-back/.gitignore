@@ -1,3 +1,4 @@
+ssl/*
 uploads/*
 #https dev certificates
 *.pem
