@@ -1,7 +1,8 @@
-import { app, game } from "./index.js";
+import { app } from "./index.js";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
+import game from "./game.js";
 const UPLOAD_DIR = "uploads/"
 const ALLOWED_MIME = [
     "image/png",

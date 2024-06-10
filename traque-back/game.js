@@ -1,8 +1,9 @@
 import { secureAdminBroadcast } from "./admin_socket.js";
-import { penaltyController } from "./index.js";
 import { isInCircle } from "./map_utils.js";
 import { playersBroadcast, sendUpdatedTeamInformations } from "./team_socket.js";
-import { ZoneManager } from "./zone_manager.js";
+
+import penaltyController from "./penalty_controller.js";
+import zoneManager from "./zone_manager.js";
 
 export const GameState = {
     SETUP: "setup",
@@ -11,23 +12,20 @@ export const GameState = {
     FINISHED: "finished"
 }
 
-export default class Game {
-    constructor(onUpdateZone, onUpdateNewZone) {
-        this.teams = [];
-        this.state = GameState.SETUP;
-        this.zone = new ZoneManager(onUpdateZone, onUpdateNewZone)
-        this.settings = {
-            loserEndGameMessage: "",
-            winnerEndGameMessage: "",
-            capturedMessage: "",
-            waitingMessage: "Jeu en préparation, veuillez patienter."
-        }
-    }
+export default {
+    teams : [],
+    state : GameState.SETUP,
+    settings : {
+        loserEndGameMessage: "",
+        winnerEndGameMessage: "",
+        capturedMessage: "",
+        waitingMessage: "Jeu en préparation, veuillez patienter."
+    },
 
     changeSettings(newSettings) {
         this.settings = {...this.settings, ...newSettings};
         return true;
-    }
+    },
 
     setState(newState) {
         if (Object.values(GameState).indexOf(newState) == -1) {
@@ -36,19 +34,19 @@ export default class Game {
         //The game has started
         if (newState == GameState.PLAYING) {
             penaltyController.start();
-            if (!this.zone.ready()) {
+            if (!zoneManager.ready()) {
                 return false;
             }
             this.initLastSentLocations();
-            this.zone.reset()
+            zoneManager.reset()
             //If the zone cannot be setup, reset everything
-            if (!this.zone.start()) {
+            if (!zoneManager.start()) {
                 this.setState(GameState.SETUP);
                 return;
             }
         }
         if (newState != GameState.PLAYING) {
-            this.zone.reset();
+            zoneManager.reset();
             penaltyController.stop();
         }
         //Game reset
@@ -65,7 +63,7 @@ export default class Game {
         }
         this.state = newState;
         return true;
-    }
+    },
 
     getNewTeamId() {
         let id = null;
@@ -73,11 +71,11 @@ export default class Game {
             id = Math.floor(Math.random() * 1_000_000);
         }
         return id;
-    }
+    },
 
     createCaptureCode() {
         return Math.floor(Math.random() * 10000)
-    }
+    },
 
     addTeam(teamName) {
         let id = this.getNewTeamId();
@@ -100,7 +98,7 @@ export default class Game {
         });
         this.updateTeamChasing();
         return true;
-    }
+    },
 
     playingTeamCount() {
         let res = 0;
@@ -110,7 +108,7 @@ export default class Game {
             }
         })
         return res;
-    }
+    },
 
     updateTeamChasing() {
         if (this.playingTeamCount() <= 2) {
@@ -138,16 +136,16 @@ export default class Game {
         this.getTeam(previousTeam).enemyName = this.getTeam(firstTeam).name;
         secureAdminBroadcast("teams", this.teams)
         return true;
-    }
+    },
 
     reorderTeams(newOrder) {
         this.teams = newOrder;
         return this.updateTeamChasing();
-    }
+    },
 
     getTeam(teamId) {
         return this.teams.find(t => t.id === teamId);
-    }
+    },
 
     updateTeam(teamId, newTeam) {
         this.teams = this.teams.map((t) => {
@@ -160,7 +158,7 @@ export default class Game {
         this.updateTeamChasing();
         penaltyController.checkPenalties();
         return true;
-    }
+    },
 
     updateLocation(teamId, location) {
         let team = this.getTeam(teamId);
@@ -176,7 +174,7 @@ export default class Game {
             team.ready = isInCircle({ lat: location[0], lng: location[1] }, team.startingArea.center, team.startingArea.radius)
         }
         return true;
-    }
+    },
 
     //Make it so that when a team requests the location of a team that has never sent their locaiton
     //Their position at the begining of the game is sent
@@ -186,7 +184,7 @@ export default class Game {
             team.locationSendDeadline = Number(new Date()) + penaltyController.settings.allowedTimeBetweenPositionUpdate * 60 * 1000;
             sendUpdatedTeamInformations(team.id);
         }
-    }
+    },
 
     sendLocation(teamId) {
         let team = this.getTeam(teamId);
@@ -203,7 +201,7 @@ export default class Game {
             team.enemyLocation = this.getTeam(team.chasing).lastSentLocation;
         }
         return team;
-    }
+    },
 
     removeTeam(teamId) {
         if (this.getTeam(teamId) == undefined) {
@@ -213,7 +211,7 @@ export default class Game {
         this.teams = this.teams.filter(t => t.id !== teamId);
         this.updateTeamChasing();
         return true;
-    }
+    },
 
     /**
      * Request a capture initiated by the team with id teamId (the one trying to capture)
@@ -231,7 +229,7 @@ export default class Game {
             return true;
         }
         return false;
-    }
+    },
 
     /**
      * Set a team to captured and update the chase chain
@@ -240,7 +238,7 @@ export default class Game {
     capture(teamId) {
         this.getTeam(teamId).captured = true
         this.updateTeamChasing();
-    }
+    },
 
     /**
      * Change the settings of the Zone manager
@@ -253,12 +251,12 @@ export default class Game {
         if (this.state == GameState.PLAYING || this.state == GameState.FINISHED) {
             return false;
         }
-        return this.zone.udpateSettings(newSettings)
-    }
+        return zoneManager.udpateSettings(newSettings)
+    },
 
     finishGame() {
         this.setState(GameState.FINISHED);
-        this.zone.reset();
+        zoneManager.reset();
         playersBroadcast("game_state", this.state);
-    }
+    },
 }

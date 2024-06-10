@@ -1,4 +1,7 @@
-import { io, game, penaltyController } from "./index.js";
+import { io } from "./index.js";
+import game from "./game.js"
+import zone from "./zone_manager.js"
+import penaltyController from "./penalty_controller.js";
 import { playersBroadcast, sendUpdatedTeamInformations } from "./team_socket.js";
 
 import { config } from "dotenv";
@@ -47,11 +50,11 @@ export function initAdminSocketHandler() {
                 //Other settings that need initialization
                 socket.emit("penalty_settings", penaltyController.settings)
                 socket.emit("game_settings", game.settings)
-                socket.emit("zone_settings", game.zone.zoneSettings)
-                socket.emit("zone", game.zone.currentZone)
+                socket.emit("zone_settings", zone.zoneSettings)
+                socket.emit("zone", zone.currentZone)
                 socket.emit("new_zone", {
-                    begin: game.zone.currentStartZone,
-                    end: game.zone.nextZone
+                    begin: zone.currentStartZone,
+                    end: zone.nextZone
                 })
 
             } else {
@@ -79,9 +82,9 @@ export function initAdminSocketHandler() {
             }
             if (!game.setZoneSettings(settings)) {
                 socket.emit("error", "Error changing zone");
-                socket.emit("zone_settings", game.zone.zoneSettings) //Still broadcast the old config to the client who submited an incorrect config to keep the client up to date
+                socket.emit("zone_settings", zone.zoneSettings) //Still broadcast the old config to the client who submited an incorrect config to keep the client up to date
             } else {
-                secureAdminBroadcast("zone_settings", game.zone.zoneSettings)
+                secureAdminBroadcast("zone_settings", zone.zoneSettings)
             }
 
         })

@@ -1,42 +1,40 @@
 import { randomCirclePoint } from 'random-location'
 import { isInCircle } from './map_utils.js';
 import { map } from './util.js';
+import { playersBroadcast } from './team_socket.js';
+import { secureAdminBroadcast } from './admin_socket.js';
 
-export class ZoneManager {
-    constructor(onZoneUpdate, onNextZoneUpdate) {
-        //Setings storing where the zone will start, end and how it should evolve
-        //The zone will start by staying at its mzx value for reductionInterval minutes
-        //and then reduce during reductionDuration minutes, then wait again...
-        //The reduction factor is such that after reductionCount the zone will be the min zone
-        //a call to onZoneUpdate will be made every updateIntervalSeconds when the zone is changing
-        //a call to onNextZoneUpdate will be made when the zone reduction ends and a new next zone is announced
-        this.zoneSettings = {
-            min: { center: null, radius: null },
-            max: { center: null, radius: null },
-            reductionCount: 2,
-            reductionDuration: 1,
-            reductionInterval: 1,
-            updateIntervalSeconds: 1,
-        }
-        this.nextZoneDecrement = null;
-        //Live location of the zone
-        this.currentZone = { center: null, radius: null };
+export default {
+    //Setings storing where the zone will start, end and how it should evolve
+    //The zone will start by staying at its mzx value for reductionInterval minutes
+    //and then reduce during reductionDuration minutes, then wait again...
+    //The reduction factor is such that after reductionCount the zone will be the min zone
+    //a call to onZoneUpdate will be made every updateIntervalSeconds when the zone is changing
+    //a call to onNextZoneUpdate will be made when the zone reduction ends and a new next zone is announced
+    zoneSettings: {
+        min: { center: null, radius: null },
+        max: { center: null, radius: null },
+        reductionCount: 2,
+        reductionDuration: 1,
+        reductionInterval: 1,
+        updateIntervalSeconds: 1,
+    },
 
-        //If the zone is shrinking, this is the target of the current shrinking
-        //If the zone is not shrinking, this will be the target of the next shrinking
-        this.nextZone = { center: null, radius: null };
+    nextZoneDecrement: null,
+    //Live location of the zone
+    currentZone: { center: null, radius: null },
 
-        //Zone at the begining of the shrinking
-        this.currentStartZone = { center: null, radius: null };
+    //If the zone is shrinking, this is the target of the current shrinking
+    //If the zone is not shrinking, this will be the target of the next shrinking
+    nextZone: { center: null, radius: null },
 
-        this.startDate = null;
-        this.started = false;
-        this.updateIntervalId = null;
-        this.nextZoneTimeoutId = null;
+    //Zone at the begining of the shrinking
+    currentStartZone: { center: null, radius: null },
 
-        this.onZoneUpdate = onZoneUpdate;
-        this.onNextZoneUpdate = onNextZoneUpdate
-    }
+    startDate: null,
+    started: false,
+    updateIntervalId: null,
+    nextZoneTimeoutId: null,
 
     /**
      * Test if a given configuration object is valid, i.e if all needed values are well defined
@@ -51,14 +49,14 @@ export class ZoneManager {
         if (settings.max && (typeof settings.max.radius != "number" || typeof settings.max.center.lat != "number" || typeof settings.max.center.lng != "number")) { return false }
         if (settings.min && (typeof settings.min.radius != "number" || typeof settings.min.center.lat != "number" || typeof settings.min.center.lng != "number")) { return false }
         return true;
-    }
+    },
     /**
      *  Test if the zone manager is ready to start 
      * @returns true if the zone manager is ready to be started, false otherwise
      */
     ready() {
         return this.validateSettings(this.zoneSettings);
-    }
+    },
 
     /**
      * Update the settings of the zone, this can be done by passing an object containing the settings to change.
@@ -80,7 +78,7 @@ export class ZoneManager {
         this.zoneSettings = { ...this.zoneSettings, ...newSettings };
         this.nextZoneDecrement = (this.zoneSettings.max.radius - this.zoneSettings.min.radius) / this.zoneSettings.reductionCount;
         return true;
-    }
+    },
 
     /**
      * Reinitialize the object and stop all the tasks
@@ -96,7 +94,7 @@ export class ZoneManager {
             clearTimeout(this.nextZoneTimeoutId);
             this.nextZoneTimeoutId = null;
         }
-    }
+    },
 
     /**
      * Start the zone reduction sequence
@@ -110,7 +108,7 @@ export class ZoneManager {
         this.currentZone = JSON.parse(JSON.stringify(this.zoneSettings.max));
         return this.setNextZone();
 
-    }
+    },
 
     /**
      * Get the center of the next zone, this center need to satisfy two properties
@@ -129,14 +127,14 @@ export class ZoneManager {
             res = randomCirclePoint({ latitude: this.currentZone.center.lat, longitude: this.currentZone.center.lng }, this.currentZone.radius - newRadius);
             ok = (isInCircle({ lat: res.latitude, lng: res.longitude }, this.zoneSettings.min.center, newRadius - this.zoneSettings.min.radius))
         }
-        if(tries>=MAX_TRIES) {
+        if (tries >= MAX_TRIES) {
             return false;
         }
         return {
             lat: res.latitude,
             lng: res.longitude
         }
-    }
+    },
 
     /**
      * Compute the next zone satifying the given settings, update the nextZone and currentStartZone
@@ -156,7 +154,7 @@ export class ZoneManager {
         } else if (this.currentZoneCount < this.zoneSettings.reductionCount) {
             this.nextZone.center = this.getRandomNextCenter(this.nextZone.radius - this.nextZoneDecrement)
             //Next center cannot be found
-            if(this.nextZone.center === false) {
+            if (this.nextZone.center === false) {
                 console.log("no center")
                 return false;
             }
@@ -171,7 +169,7 @@ export class ZoneManager {
             end: JSON.parse(JSON.stringify(this.nextZone))
         })
         return true;
-    }
+    },
 
     /*
      * Start a task that will run periodically updatinng the zone size, and calling the onZoneUpdate callback
@@ -183,8 +181,8 @@ export class ZoneManager {
         this.updateIntervalId = setInterval(() => {
             const completed = ((new Date() - startTime) / (1000 * 60)) / this.zoneSettings.reductionDuration;
             this.currentZone.radius = map(completed, 0, 1, this.currentStartZone.radius, this.nextZone.radius)
-            this.currentZone.center.lat = map(completed,0,1, this.currentStartZone.center.lat, this.nextZone.center.lat)
-            this.currentZone.center.lng = map(completed,0,1, this.currentStartZone.center.lng, this.nextZone.center.lng)
+            this.currentZone.center.lat = map(completed, 0, 1, this.currentStartZone.center.lat, this.nextZone.center.lat)
+            this.currentZone.center.lng = map(completed, 0, 1, this.currentStartZone.center.lng, this.nextZone.center.lng)
             this.onZoneUpdate(JSON.parse(JSON.stringify(this.currentZone)))
             //Zone shrinking is over
             if (completed >= 1) {
@@ -194,6 +192,16 @@ export class ZoneManager {
                 return;
             }
         }, this.zoneSettings.updateIntervalSeconds * 1000);
-    }
+    },
+
+    onNextZoneUpdate(newZone) {
+        playersBroadcast("new_zone", newZone)
+        secureAdminBroadcast("new_zone", newZone)
+    },
+
+    onZoneUpdate(zone) {
+        playersBroadcast("zone", zone)
+        secureAdminBroadcast("zone", zone)
+    },
 
 }

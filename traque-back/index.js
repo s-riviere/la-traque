@@ -2,12 +2,10 @@ import { createServer } from "https";
 import express from "express";
 
 import { Server } from "socket.io";
-import Game from "./game.js";
 import { config } from "dotenv";
 import { readFileSync } from "fs";
-import { initAdminSocketHandler, secureAdminBroadcast } from "./admin_socket.js";
-import { initTeamSocket, playersBroadcast } from "./team_socket.js";
-import { PenaltyController } from "./penalty_controller.js";
+import { initAdminSocketHandler } from "./admin_socket.js";
+import { initTeamSocket } from "./team_socket.js";
 import { initPhotoUpload } from "./photo.js";
 //extract admin password from .env file
 config();
@@ -34,22 +32,6 @@ export const io = new Server(httpsServer, {
     methods: ["GET", "POST"]
   }
 });
-
-//Zone update broadcast function, called by the game object
-function onUpdateNewZone(newZone) {
-  playersBroadcast("new_zone", newZone)
-  secureAdminBroadcast("new_zone", newZone)
-}
-
-function onUpdateZone(zone) {
-  playersBroadcast("zone", zone)
-  secureAdminBroadcast("zone", zone)
-}
-
-
-export const game = new Game(onUpdateZone, onUpdateNewZone);
-export const penaltyController = new PenaltyController();
-
 
 initAdminSocketHandler();
 initTeamSocket();

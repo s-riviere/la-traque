@@ -1,5 +1,7 @@
 import { secureAdminBroadcast } from "./admin_socket.js";
-import { io, game } from "./index.js";
+import { io} from "./index.js";
+import game from "./game.js";
+import zone from "./zone_manager.js";
 
 /**
  * Send a socket message to all the players of a team
@@ -79,10 +81,10 @@ export function initTeamSocket() {
             socket.emit("login_response", true);
             socket.emit("game_state", game.state)
             socket.emit("game_settings", game.settings)
-            socket.emit("zone", game.zone.currentZone)
+            socket.emit("zone", zone.currentZone)
             socket.emit("new_zone", {
-                begin: game.zone.currentStartZone,
-                end: game.zone.nextZone
+                begin: zone.currentStartZone,
+                end: zone.nextZone
             })
         });
 
