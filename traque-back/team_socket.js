@@ -4,7 +4,7 @@ It receives messages, checks permissions, manages authentication and performs ac
 This module also exposes functions to send messages via socket to all teams
 */
 import { secureAdminBroadcast } from "./admin_socket.js";
-import { io} from "./index.js";
+import { io } from "./index.js";
 import game from "./game.js";
 import zone from "./zone_manager.js";
 
@@ -43,7 +43,7 @@ function logoutPlayer(id) {
 
 export function sendUpdatedTeamInformations(teamId) {
     let team = game.getTeam(teamId)
-    if(!team) {
+    if (!team) {
         return false;
     }
     team.sockets.forEach(socketId => {
@@ -106,7 +106,7 @@ export function initTeamSocket() {
                 return;
             }
             let team = game.getTeam(teamId)
-            if(team == undefined) {
+            if (team == undefined) {
                 logoutPlayer(socket.id);
                 return;
             }
@@ -125,8 +125,8 @@ export function initTeamSocket() {
                 return;
             }
             game.updateTeamChasing();
-            teamBroadcast(teamId, "update_team", { enemyLocation: team.enemyLocation,locationSendDeadline: team.locationSendDeadline  });
-            teamBroadcast(teamId,"success", "Position udpated")
+            teamBroadcast(teamId, "update_team", { enemyLocation: team.enemyLocation, locationSendDeadline: team.locationSendDeadline });
+            teamBroadcast(teamId, "success", "Position udpated")
             secureAdminBroadcast("teams", game.teams)
         });
 

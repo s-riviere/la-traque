@@ -20,11 +20,11 @@ export const GameState = {
 
 export default {
     //List of teams, as objects. To see the fields see the addTeam methods
-    teams : [],
+    teams: [],
     //Current state of the game
-    state : GameState.SETUP,
+    state: GameState.SETUP,
     //Settings of the game
-    settings : {
+    settings: {
         loserEndGameMessage: "",
         winnerEndGameMessage: "",
         capturedMessage: "",
@@ -37,7 +37,7 @@ export default {
      * @returns true if the settings are applied
      */
     changeSettings(newSettings) {
-        this.settings = {...this.settings, ...newSettings};
+        this.settings = { ...this.settings, ...newSettings };
         return true;
     },
 
@@ -232,7 +232,7 @@ export default {
         }
         //The location sent by the team will be null if the browser call API dooes not succeed
         //See issue #19
-        if(location == null) {
+        if (location == null) {
             return false;
         }
         team.currentLocation = location;
@@ -264,7 +264,7 @@ export default {
         if (team == undefined) {
             return false;
         }
-        if(team.currentLocation == null) {
+        if (team.currentLocation == null) {
             return false;
         }
 

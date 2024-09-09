@@ -200,8 +200,8 @@ export default {
     onNextZoneUpdate(newZone) {
         playersBroadcast("new_zone", newZone)
         secureAdminBroadcast("new_zone", newZone)
-        },
-        
+    },
+
     //a call to onZoneUpdate will be made every updateIntervalSeconds when the zone is changing
     onZoneUpdate(zone) {
         playersBroadcast("zone", zone)

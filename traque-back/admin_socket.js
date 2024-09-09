@@ -20,9 +20,9 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
  * @param {String} data The data to send
  */
 export function secureAdminBroadcast(event, data) {
-  loggedInSockets.forEach(s => {
-    io.of("admin").to(s).emit(event, data);
-  });
+    loggedInSockets.forEach(s => {
+        io.of("admin").to(s).emit(event, data);
+    });
 }
 
 //Array of logged in sockets
@@ -73,10 +73,10 @@ export function initAdminSocketHandler() {
                 socket.emit("error", "Not logged in");
                 return;
             }
-            if(!game.changeSettings(settings)) {
+            if (!game.changeSettings(settings)) {
                 socket.emit("error", "Invalid settings");
             }
-            secureAdminBroadcast("game_settings",game.settings);
+            secureAdminBroadcast("game_settings", game.settings);
             playersBroadcast("game_settings", game.settings);
         })
 
@@ -99,10 +99,10 @@ export function initAdminSocketHandler() {
                 socket.emit("error", "Not logged in");
                 return;
             }
-            if(!penaltyController.updateSettings(settings)) {
+            if (!penaltyController.updateSettings(settings)) {
                 socket.emit("error", "Invalid settings");
                 socket.emit("penalty_settings", penaltyController.settings)
-            }else {
+            } else {
                 secureAdminBroadcast("penalty_settings", penaltyController.settings)
             }
 
