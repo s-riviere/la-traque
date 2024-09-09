@@ -1,15 +1,8 @@
 services:
   front:
-    build: ./traque-front
-    restart: always
-  
-  reverse_proxy:
-    build: ./proxy
     ports:
-      - "3000:443"
-    volumes:
-    # reusing the ssl files from the backend
-      - ./traque-back/ssl:/etc/nginx/ssl:ro
+        - "3000:3000"
+    build: ./traque-front
     restart: always
 
   back:
