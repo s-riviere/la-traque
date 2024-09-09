@@ -80,17 +80,26 @@ export function ZonePicker({ minZone, setMinZone, maxZone, setMaxZone, editMode,
             minHover(e);
         }
     }
+
     return (
-        <MapContainer  {...props} className='min-h-full w-full ' center={[0, 0]} zoom={0} scrollWheelZoom={true}>
-            <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {minCenter && minRadius && <Circle center={minCenter} radius={minRadius} color="blue" fillColor="blue" />}
-            {maxCenter && maxRadius && <Circle center={maxCenter} radius={maxRadius} color="red" fillColor="red" />}
-            <MapPan center={location} zoom={DEFAULT_ZOOM} />
-            <MapEventListener onClick={handleClick} onMouseMove={handleMouseMove} />
-        </MapContainer>
+        <div>
+            <div className='h-96'>
+            <MapContainer  {...props} className='min-h-full w-full ' center={[0, 0]} zoom={0} scrollWheelZoom={true}>
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                {minCenter && minRadius && <Circle center={minCenter} radius={minRadius} color="blue" fillColor="blue" />}
+                {maxCenter && maxRadius && <Circle center={maxCenter} radius={maxRadius} color="red" fillColor="red" />}
+                <MapPan center={location} zoom={DEFAULT_ZOOM} />
+                <MapEventListener onClick={handleClick} onMouseMove={handleMouseMove} />
+            </MapContainer>
+        </div>
+        { maxCenter && minCenter && typeof maxCenter.distanceTo === 'function' 
+            && maxRadius + maxCenter.distanceTo(minCenter) >= minRadius
+            && <p className="text-red-500">La zone de fin doit être incluse dans celle de départ</p>}
+        </div>
+        
     )
 }
 
