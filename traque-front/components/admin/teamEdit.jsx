@@ -12,8 +12,13 @@ export default function TeamEdit({ selectedTeamId, setSelectedTeamId }) {
     const teamImage = useRef(null);
     const [newTeamName, setNewTeamName] = React.useState('');
     const { updateTeam, getTeamName, removeTeam, getTeam, teams } = useAdmin();
-    const [team, setTeam] = useState({})
-    const SERVER_URL = "https://" + process.env.NEXT_PUBLIC_SOCKET_HOST + ":" + process.env.NEXT_PUBLIC_SOCKET_PORT;
+    const [team, setTeam] = useState({});
+    var protocol = "https://";
+    if (process.env.NEXT_PUBLIC_SOCKET_HOST == "localhost") {
+        protocol = "http://";
+    }
+    const SERVER_URL = protocol + process.env.NEXT_PUBLIC_SOCKET_HOST + "/back";
+    console.log(SERVER_URL);
 
     useEffect(() => {
         let team = getTeam(selectedTeamId);

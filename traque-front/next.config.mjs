@@ -1,8 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    experimental: {
-        outputStandalone: true
-    }
+
+    output: 'standalone',
+
+    async redirects() {
+        return [
+            {
+                source: '/',
+                destination: '/team',
+                permanent: true,
+            },
+        ]
+    },
+
 };
+
+
 
 export default nextConfig;

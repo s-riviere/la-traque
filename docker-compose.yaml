@@ -1,26 +1,18 @@
 services:
-  front:
-    build: ./traque-front
-    restart: always
-  
   reverse_proxy:
     build: ./proxy
     ports:
-      - "3000:443"
-    volumes:
-    # reusing the ssl files from the backend
-      - ./traque-back/ssl:/etc/nginx/ssl:ro
+      - "80:80"
+    restart: always
+
+  front:
+    build: ./traque-front
     restart: always
 
   back:
     build: ./traque-back
-    ports:
-      - "3001:3001"
     restart: always
     environment:
       ADMIN_PASSWORD: 'traquebdsbanger'
       HOST: '0.0.0.0'
       PORT: 3001
-      #Those files need to exist in traque-back/ssl for https to work
-      SSL_KEY: "ssl/privkey.pem"
-      SSL_CERT: "ssl/cert.pem"

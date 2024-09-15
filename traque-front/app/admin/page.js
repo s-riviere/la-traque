@@ -25,12 +25,12 @@ export default function AdminPage() {
                     <h2 className="text-2xl">Game state </h2>
                     <strong className="p-5 bg-gray-900 text-white text-xl rounded">Current : {gameState}</strong>
                     <div className="flex flex-row">
-                    <RedButton onClick={() => changeState(GameState.SETUP)}>Reset game</RedButton>
-                    <GreenButton onClick={() => changeState(GameState.PLACEMENT)}>Start placement</GreenButton>
-                    <BlueButton onClick={() => changeState(GameState.PLAYING)}>Start game</BlueButton>
+                        <RedButton onClick={() => changeState(GameState.SETUP)}>Reset game</RedButton>
+                        <GreenButton onClick={() => changeState(GameState.PLACEMENT)}>Start placement</GreenButton>
+                        <BlueButton onClick={() => changeState(GameState.PLAYING)}>Start game</BlueButton>
                     </div>
                 </div>
-            <GameSettings />
+                <GameSettings />
             </div>
             {gameState == GameState.PLACEMENT && <div className="max-h-5/6"><TeamReady /></div>}
             {(gameState == GameState.SETUP || gameState == GameState.PLACEMENT) && <ZoneSelector />}

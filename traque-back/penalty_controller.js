@@ -4,7 +4,7 @@ This module manages the verification of the game rules and the penalties.
 import { isInCircle } from "./map_utils.js";
 import { sendUpdatedTeamInformations, teamBroadcast } from "./team_socket.js";
 import { secureAdminBroadcast } from "./admin_socket.js";
-import game, {GameState} from "./game.js";
+import game, { GameState } from "./game.js";
 import zone from "./zone_manager.js";
 
 export default {

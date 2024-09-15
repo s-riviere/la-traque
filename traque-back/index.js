@@ -1,4 +1,4 @@
-import { createServer } from "https";
+import { createServer } from "http";
 import express from "express";
 
 import { Server } from "socket.io";
@@ -14,19 +14,16 @@ const PORT = process.env.PORT;
 
 export const app = express()
 
-const httpsServer = createServer({
-  key: readFileSync(process.env.SSL_KEY, 'utf-8'),
-  cert: readFileSync(process.env.SSL_CERT, 'utf-8')
-}, app);
+const httpServer = createServer({}, app);
 
-httpsServer.listen(PORT, HOST, () => {
-  console.log(`Server running`);
+httpServer.listen(PORT, HOST, () => {
+  console.log("Server running on http://" + HOST + ":" + PORT);
 });
 
 
 
 //set cors to allow all origins
-export const io = new Server(httpsServer, {
+export const io = new Server(httpServer, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]

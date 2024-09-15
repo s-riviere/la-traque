@@ -17,7 +17,12 @@ export function EnemyTeamModal({ visible, onClose }) {
         imageRef.current.src = SERVER_URL + "/photo/enemy?team=" + teamId.toString() + "&t=" + new Date().getTime();
     }
 
-    const SERVER_URL = "https://" + process.env.NEXT_PUBLIC_SOCKET_HOST + ":" + process.env.NEXT_PUBLIC_SOCKET_PORT;
+    var protocol = "https://";
+    if (process.env.NEXT_PUBLIC_SOCKET_HOST == "localhost") {
+        protocol = "http://";
+    }
+    const SERVER_URL = protocol + process.env.NEXT_PUBLIC_SOCKET_HOST + "/back";
+    console.log(SERVER_URL);
     return (visible &&
         <>
             <div className='fixed w-screen h-screen bg-black bg-opacity-50 z-10 text-center'></div>

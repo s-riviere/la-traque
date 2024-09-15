@@ -41,9 +41,7 @@ export function ZoneSelector() {
         <h2 className="text-2xl">Edit zones</h2>
         {editMode == EditMode.MIN && <RedButton onClick={() => setEditMode(EditMode.MAX)}>Edit end zone</RedButton>}
         {editMode == EditMode.MAX && <BlueButton onClick={() => setEditMode(EditMode.MIN)}>Edit start zone</BlueButton>}
-        <div className='h-96'>
-            <ZonePicker minZone={minZone} maxZone={maxZone} editMode={editMode} setMinZone={setMinZone} setMaxZone={setMaxZone} />
-        </div>
+        <ZonePicker minZone={minZone} maxZone={maxZone} editMode={editMode} setMinZone={setMinZone} setMaxZone={setMaxZone} />
         <div>
             <p>Number of reductions</p>
             <TextInput value={reductionCount} onChange={(e) => setReductionCount(e.target.value)}></TextInput>

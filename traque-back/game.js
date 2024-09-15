@@ -8,6 +8,8 @@ import { playersBroadcast, sendUpdatedTeamInformations } from "./team_socket.js"
 import penaltyController from "./penalty_controller.js";
 import zoneManager from "./zone_manager.js";
 
+import { getDistanceFromLatLon } from "./map_utils.js";
+
 /**
  * The possible states of the game
  */
@@ -20,11 +22,11 @@ export const GameState = {
 
 export default {
     //List of teams, as objects. To see the fields see the addTeam methods
-    teams : [],
+    teams: [],
     //Current state of the game
-    state : GameState.SETUP,
+    state: GameState.SETUP,
     //Settings of the game
-    settings : {
+    settings: {
         loserEndGameMessage: "",
         winnerEndGameMessage: "",
         capturedMessage: "",
@@ -37,7 +39,7 @@ export default {
      * @returns true if the settings are applied
      */
     changeSettings(newSettings) {
-        this.settings = {...this.settings, ...newSettings};
+        this.settings = { ...this.settings, ...newSettings };
         return true;
     },
 
@@ -232,7 +234,7 @@ export default {
         }
         //The location sent by the team will be null if the browser call API dooes not succeed
         //See issue #19
-        if(location == null) {
+        if (location == null) {
             return false;
         }
         team.currentLocation = location;
@@ -264,7 +266,7 @@ export default {
         if (team == undefined) {
             return false;
         }
-        if(team.currentLocation == null) {
+        if (team.currentLocation == null) {
             return false;
         }
 
@@ -327,6 +329,13 @@ export default {
     setZoneSettings(newSettings) {
         //cannot change zones while playing
         if (this.state == GameState.PLAYING || this.state == GameState.FINISHED) {
+            return false;
+        }
+        var min = newSettings.min;
+        var max = newSettings.max;
+        // The end zone must be included in the start zone
+        var dist = getDistanceFromLatLon(min.center, max.center);
+        if (min.radius + dist >= max.radius) {
             return false;
         }
         return zoneManager.udpateSettings(newSettings)

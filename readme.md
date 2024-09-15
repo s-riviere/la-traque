@@ -1,3 +1,7 @@
+---
+lang: en-GB
+---
+
 # The game
 ## General principle
 La traque is a IRL team game where the goal is to catch another team without being catched by another team.
@@ -63,10 +67,10 @@ https://example.com:3000
 ```
 
 ## Deployment
-Put your certificate and private key in the proxy/ssl folder. They need to be named `cert.pem` and `privkey.pem`.
-You can then depploy the docker application with `docker compose up`.
+Put your certificate and private key in the `proxy/ssl` folder. They need to be named `cert.pem` and `privkey.pem`.
+You can then deploy the docker application with `docker compose up`.
 
-You can change the production environment varialbes for the backend in the docker-compose.yml file. The frontend environment variables can be changed in the .env file in the traque-front directory.
+You can change the production environment variables for the backend in the `docker-compose.yml` file. The frontend environment variables can be changed in the `.env` file in the `traque-front` directory.
 
 # Authors
 - [Quentin Roussel](mailto:quentin.roussel11@gmail.com) (initial version)
