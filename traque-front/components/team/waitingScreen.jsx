@@ -8,7 +8,12 @@ export function WaitingScreen() {
     const { name, teamId  } = useGame();
     const { gameSettings } = useTeamContext();
     const imageRef = useRef(null);
-    const SERVER_URL = "https://" + process.env.NEXT_PUBLIC_SOCKET_HOST + ":" + process.env.NEXT_PUBLIC_SOCKET_PORT;
+    var protocol = "https://";
+    if (process.env.NEXT_PUBLIC_SOCKET_HOST == "localhost") {
+        protocol = "http://";
+    }
+    const SERVER_URL = protocol + process.env.NEXT_PUBLIC_SOCKET_HOST + "/back";
+    console.log(SERVER_URL);
 
     function sendImage() {
         let data = new FormData();
