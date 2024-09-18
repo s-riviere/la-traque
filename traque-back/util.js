@@ -1,3 +1,5 @@
+import { createHash } from "crypto";
+
 /**
  * Scale a value that is known to be in a range to a new range
  * for instance map(50,0,100,1000,2000) will return 1500 as 50 is halfway between 0 and 100 and 1500 is halfway through 1000 and 2000
@@ -10,4 +12,8 @@
  */
 export function map(value, oldMin, oldMax, newMin, newMax) {
     return ((value - oldMin) / (oldMax - oldMin)) * (newMax - newMin) + newMin;
+}
+
+export function sha256(password) {
+    return createHash('sha256').update(password).digest('hex');;
 }

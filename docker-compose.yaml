@@ -13,6 +13,6 @@ services:
     build: ./traque-back
     restart: always
     environment:
-      ADMIN_PASSWORD: 'traquebdsbanger'
+      ADMIN_PASSWORD_HASH: '23e3c6886ff8fcba302deac05c46612ed3af99e40a2a14252810f540f3c186aa'
       HOST: '0.0.0.0'
       PORT: 3001

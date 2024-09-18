@@ -8,11 +8,12 @@ import game from "./game.js"
 import zone from "./zone_manager.js"
 import penaltyController from "./penalty_controller.js";
 import { playersBroadcast, sendUpdatedTeamInformations } from "./team_socket.js";
+import { sha256 } from "./util.js";
 
 import { config } from "dotenv";
 config()
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 
 /**
  * Send a message to all logged in admin sockets
@@ -45,7 +46,8 @@ export function initAdminSocketHandler() {
 
         //User is attempting to log in
         socket.on("login", (password) => {
-            if (password === ADMIN_PASSWORD && !loggedIn) {
+            const hash = sha256(password);
+            if (hash === ADMIN_PASSWORD_HASH && !loggedIn) {
                 //Attempt successful
                 socket.emit("login_response", true);
                 loggedInSockets.push(socket.id);
