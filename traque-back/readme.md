@@ -1,10 +1,8 @@
 # template of the .env file
 ```
-ADMIN_PASSWORD = 'admin password here'
+ADMIN_PASSWORD_HASH = 'admin password SHA256 hash here'
 HOST = 'traque.rezel.net'
 PORT = 3001
-SSL_KEY = "ssl/privkey.pem"
-SSL_CERT = "ssl/cert.pem"
 ```
 # Run dev version
 First install the dependencies
