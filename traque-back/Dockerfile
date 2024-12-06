@@ -13,5 +13,7 @@ RUN npm install
 # Copy the rest of project files into this image
 COPY . .
 
+RUN if [ ! -d uploads ]; then mkdir uploads fi
+
 # Start the application
 CMD npm start
