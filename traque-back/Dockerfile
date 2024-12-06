@@ -15,5 +15,7 @@ COPY . .
 
 RUN if [ ! -d uploads ]; then mkdir uploads; fi
 
+EXPOSE 3001
+
 # Start the application
 CMD npm start
