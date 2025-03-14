@@ -3,6 +3,8 @@ import { RedButton } from "../util/button";
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 
+import { env } from 'next-runtime-env';
+
 export function EnemyTeamModal({ visible, onClose }) {
     const { teamId, enemyName } = useGame();
     const imageRef = useRef(null);
@@ -18,10 +20,11 @@ export function EnemyTeamModal({ visible, onClose }) {
     }
 
     var protocol = "https://";
-    if (process.env.NEXT_PUBLIC_SOCKET_HOST == "localhost") {
+    const NEXT_PUBLIC_SOCKET_HOST = env("NEXT_PUBLIC_SOCKET_HOST");
+    if (NEXT_PUBLIC_SOCKET_HOST == "localhost") {
         protocol = "http://";
     }
-    const SERVER_URL = protocol + process.env.NEXT_PUBLIC_SOCKET_HOST + "/back";
+    const SERVER_URL = protocol + NEXT_PUBLIC_SOCKET_HOST + "/back";
     console.log(SERVER_URL);
     return (visible &&
         <>

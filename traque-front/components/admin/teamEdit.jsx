@@ -4,6 +4,8 @@ import BlueButton, { RedButton } from '../util/button';
 import useAdmin from '@/hook/useAdmin';
 import dynamic from 'next/dynamic';
 
+import { env } from 'next-runtime-env';
+
 const CircularAreaPicker = dynamic(() => import('./mapPicker').then((mod) => mod.CircularAreaPicker), {
     ssr: false
 });
@@ -13,11 +15,12 @@ export default function TeamEdit({ selectedTeamId, setSelectedTeamId }) {
     const [newTeamName, setNewTeamName] = React.useState('');
     const { updateTeam, getTeamName, removeTeam, getTeam, teams } = useAdmin();
     const [team, setTeam] = useState({});
+    const NEXT_PUBLIC_SOCKET_HOST = env("NEXT_PUBLIC_SOCKET_HOST");
     var protocol = "https://";
-    if (process.env.NEXT_PUBLIC_SOCKET_HOST == "localhost") {
+    if (NEXT_PUBLIC_SOCKET_HOST == "localhost") {
         protocol = "http://";
     }
-    const SERVER_URL = protocol + process.env.NEXT_PUBLIC_SOCKET_HOST + "/back";
+    const SERVER_URL = protocol + NEXT_PUBLIC_SOCKET_HOST + "/back";
     console.log(SERVER_URL);
 
     useEffect(() => {

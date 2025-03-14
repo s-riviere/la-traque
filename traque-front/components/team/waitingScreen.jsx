@@ -4,15 +4,18 @@ import { useRef } from "react";
 import Image from "next/image";
 import { useTeamContext } from "@/context/teamContext";
 
+import { env } from 'next-runtime-env';
+
 export function WaitingScreen() {
     const { name, teamId  } = useGame();
     const { gameSettings } = useTeamContext();
     const imageRef = useRef(null);
+    const NEXT_PUBLIC_SOCKET_HOST = env("NEXT_PUBLIC_SOCKET_HOST");
     var protocol = "https://";
-    if (process.env.NEXT_PUBLIC_SOCKET_HOST == "localhost") {
+    if (NEXT_PUBLIC_SOCKET_HOST == "localhost") {
         protocol = "http://";
     }
-    const SERVER_URL = protocol + process.env.NEXT_PUBLIC_SOCKET_HOST + "/back";
+    const SERVER_URL = protocol + NEXT_PUBLIC_SOCKET_HOST + "/back";
     console.log(SERVER_URL);
 
     function sendImage() {

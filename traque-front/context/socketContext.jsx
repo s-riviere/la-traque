@@ -1,13 +1,16 @@
 "use client";
 import { createContext, useContext, useMemo } from "react";
 
+import { env } from 'next-runtime-env';
+
 const { io } = require("socket.io-client");
 
 var proto = "wss://";
-if (process.env.NEXT_PUBLIC_SOCKET_HOST == "localhost") {
+const NEXT_PUBLIC_SOCKET_HOST = env("NEXT_PUBLIC_SOCKET_HOST");
+if (NEXT_PUBLIC_SOCKET_HOST == "localhost") {
     proto = "ws://";
 }
-const SOCKET_URL = proto + process.env.NEXT_PUBLIC_SOCKET_HOST;
+const SOCKET_URL = proto + NEXT_PUBLIC_SOCKET_HOST;
 const USER_SOCKET_URL = SOCKET_URL + "/player";
 const ADMIN_SOCKET_URL = SOCKET_URL + "/admin";
 
