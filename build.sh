@@ -1,6 +1,6 @@
 #/bin/bash
 
-version="0.3.1"
+version="0.3.2"
 repository="git.rezel.net/ludotech"
 
 docker build  -t ${repository}/traque-proxy:latest -t ${repository}/traque-proxy:${version} proxy
