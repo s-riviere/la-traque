@@ -1,12 +1,13 @@
 #/bin/bash
 
-version="0.2"
+version="0.3"
 repository="git.rezel.net/ludotech"
 
-docker build -t ${repository}/traque-proxy:${version} proxy
-docker build -t ${repository}/traque-front:${version} traque-front
-docker build -t ${repository}/traque-back:${version} traque-back
+docker build  -t ${repository}/traque-proxy:latest -t ${repository}/traque-proxy:${version} proxy
+docker build -t ${repository}/traque-front:latest -t ${repository}/traque-front:${version} traque-front
+docker build -t ${repository}/traque-back:latest -t ${repository}/traque-back:${version} traque-back
 
-docker push ${repository}/traque-proxy:${version}
-docker push ${repository}/traque-front:${version}
-docker push ${repository}/traque-back:${version}
+docker push ${repository}/traque-proxy:latest ${repository}/traque-proxy:${version}
+docker push ${repository}/traque-front:latest ${repository}/traque-front:${version}
+docker push ${repository}/traque-back:latest ${repository}/traque-back:${version}
+
