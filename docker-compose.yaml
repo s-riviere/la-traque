@@ -1,16 +1,18 @@
 services:
   reverse_proxy:
-    build: ./proxy
+    image: git.rezel.net/ludotech/traque-proxy:latest
     ports:
       - "80:80"
     restart: always
 
   front:
-    build: ./traque-front
+    image: git.rezel.net/ludotech/traque-front:latest
     restart: always
+    environment:
+      NEXT_PUBLIC_SOCKET_HOST: 'traque.rezel.net'
 
   back:
-    build: ./traque-back
+    image: git.rezel.net/ludotech/traque-back:latest
     restart: always
     ports:
       - "3001:3001"
