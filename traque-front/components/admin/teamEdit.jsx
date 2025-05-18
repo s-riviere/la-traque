@@ -95,7 +95,7 @@ export default function TeamEdit({ selectedTeamId, setSelectedTeamId }) {
                     <CircularAreaPicker area={team.startingArea} setArea={(startingArea) => updateTeam(team.id, { startingArea })} markerPosition={team?.currentLocation} />
                 </div>
                 <div className='w-1/2'>
-                    <img className='self-stretch' ref={teamImage} />
+                    <img className='self-stretch' ref={teamImage} onError={(e) => {e.target.src = "/images/missing_image.jpg"}} />
                 </div>
             </div>
         </div>

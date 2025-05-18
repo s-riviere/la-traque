@@ -41,7 +41,7 @@ export function CircularAreaPicker({ area, setArea, markerPosition, ...props }) 
     const location = useLocation(Infinity);
     const { handleClick, handleMouseMove, center, radius } = useMapCircleDraw(area, setArea);
     return (
-        <MapContainer  {...props} className='min-h-full w-full ' center={[0, 0]} zoom={0} scrollWheelZoom={true}>
+        <MapContainer  {...props} className='min-h-full w-full ' center={[48.7143326, 2.20564757]} zoom={14} scrollWheelZoom={true}>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -84,7 +84,7 @@ export function ZonePicker({ minZone, setMinZone, maxZone, setMaxZone, editMode,
     return (
         <div>
             <div className='h-96'>
-            <MapContainer  {...props} className='min-h-full w-full ' center={[0, 0]} zoom={0} scrollWheelZoom={true}>
+            <MapContainer  {...props} className='min-h-full w-full ' center={[48.7143326, 2.20564757]} zoom={14} scrollWheelZoom={true}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

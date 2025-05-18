@@ -4,11 +4,15 @@ import BlueButton from '../util/button'
 
 export default function TeamAddForm({onAddTeam}) {
     const [teamName, setTeamName] = React.useState('');
+    
     function handleSubmit(e) {
         e.preventDefault();
-        onAddTeam(teamName);
-        setTeamName("")
+        if (teamName !== "") {
+            onAddTeam(teamName);
+            setTeamName("")
+        }
     }
+    
     return (
         <form className='flex flex-row m-y-5' onSubmit={handleSubmit}>
             <div className='w-4/5'>

@@ -61,23 +61,25 @@ export function initPhotoUpload() {
     //App handler for serving the photo of a team given its secret ID
     app.get("/photo/my", (req, res) => {
         let team = game.getTeam(Number(req.query.team));
+        const imagePath = path.join(process.cwd(), UPLOAD_DIR, team.id.toString());
         if (team) {
             res.set("Content-Type", "image/png")
             res.set("Access-Control-Allow-Origin", "*");
-            res.sendFile(process.cwd() + "/" + UPLOAD_DIR + "/" + team.id);
+            res.sendFile(fs.existsSync(imagePath) ? imagePath : path.join(process.cwd(), "images", "missing_image.jpg"));
         } else {
-            res.send(400, "Team not found")
+            res.status(400).send("Team not found")
         }
     })
     //App handler for serving the photo of the team chased by the team given by its secret ID
     app.get("/photo/enemy", (req, res) => {
         let team = game.getTeam(Number(req.query.team));
+        const imagePath = path.join(process.cwd(), UPLOAD_DIR, team.chasing.toString());
         if (team) {
             res.set("Content-Type", "image/png")
             res.set("Access-Control-Allow-Origin", "*");
-            res.sendFile(process.cwd() + "/" + UPLOAD_DIR + "/" + team.chasing);
+            res.sendFile(fs.existsSync(imagePath) ? imagePath : path.join(process.cwd(), "images", "missing_image.jpg"));
         } else {
-            res.send(400, "Team not found")
+            res.status(400).send("Team not found")
         }
     })
 }

@@ -73,24 +73,26 @@ export function initTeamSocket() {
             logoutPlayer(socket.id)
         });
 
-        socket.on("login", (loginTeamId) => {
+        socket.on("login", (loginTeamId, callback) => {
             if (game.getTeam(loginTeamId) === undefined) {
                 socket.emit("login_response", false);
-                return;
+                callback({ isLoggedIn : false, message: "Login denied"});
+            } else {
+                logoutPlayer(socket.id)
+                teamId = loginTeamId;
+                let team = game.getTeam(loginTeamId);
+                team.sockets.push(socket.id);
+                sendUpdatedTeamInformations(loginTeamId);
+                socket.emit("login_response", true);
+                socket.emit("game_state", game.state)
+                socket.emit("game_settings", game.settings)
+                socket.emit("zone", zone.currentZone)
+                socket.emit("new_zone", {
+                    begin: zone.currentStartZone,
+                    end: zone.nextZone
+                })
+                callback({ isLoggedIn : true, message: "Logged in"});
             }
-            logoutPlayer(socket.id)
-            teamId = loginTeamId;
-            let team = game.getTeam(loginTeamId);
-            team.sockets.push(socket.id);
-            sendUpdatedTeamInformations(loginTeamId);
-            socket.emit("login_response", true);
-            socket.emit("game_state", game.state)
-            socket.emit("game_settings", game.settings)
-            socket.emit("zone", zone.currentZone)
-            socket.emit("new_zone", {
-                begin: zone.currentStartZone,
-                end: zone.nextZone
-            })
         });
 
         socket.on("logout", () => {
