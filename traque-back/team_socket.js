@@ -132,14 +132,16 @@ export function initTeamSocket() {
             secureAdminBroadcast("teams", game.teams)
         });
 
-        socket.on('capture', (captureCode) => {
+        socket.on("capture", (captureCode, callback) => {
             let capturedTeam = game.getTeam(teamId)?.chasing
             if (capturedTeam !== undefined && game.requestCapture(teamId, captureCode)) {
-                sendUpdatedTeamInformations(teamId)
-                sendUpdatedTeamInformations(capturedTeam)
+                sendUpdatedTeamInformations(teamId);
+                sendUpdatedTeamInformations(capturedTeam);
                 secureAdminBroadcast("teams", game.teams);
+                callback({ hasCaptured : true, message: "Capture succesful" });
             } else {
-                socket.emit("error", "Incorrect code")
+                socket.emit("error", "Incorrect code");
+                callback({ hasCaptured : false, message: "Capture failed" });
             }
         })
     });
