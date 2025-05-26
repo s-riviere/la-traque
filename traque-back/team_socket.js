@@ -76,7 +76,9 @@ export function initTeamSocket() {
         socket.on("login", (loginTeamId, callback) => {
             if (game.getTeam(loginTeamId) === undefined) {
                 socket.emit("login_response", false);
-                callback({ isLoggedIn : false, message: "Login denied"});
+                if (typeof callback === "function") {
+                    callback({ isLoggedIn: false, message: "Login denied" });
+                }
             } else {
                 logoutPlayer(socket.id)
                 teamId = loginTeamId;
@@ -91,7 +93,9 @@ export function initTeamSocket() {
                     begin: zone.currentStartZone,
                     end: zone.nextZone
                 })
-                callback({ isLoggedIn : true, message: "Logged in"});
+                if (typeof callback === "function") {
+                    callback({ isLoggedIn : true, message: "Logged in"});
+                }
             }
         });
 
@@ -138,10 +142,14 @@ export function initTeamSocket() {
                 sendUpdatedTeamInformations(teamId);
                 sendUpdatedTeamInformations(capturedTeam);
                 secureAdminBroadcast("teams", game.teams);
-                callback({ hasCaptured : true, message: "Capture succesful" });
+                if (typeof callback === "function") {
+                    callback({ hasCaptured : true, message: "Capture succesful" });
+                }
             } else {
                 socket.emit("error", "Incorrect code");
-                callback({ hasCaptured : false, message: "Capture failed" });
+                if (typeof callback === "function") {
+                    callback({ hasCaptured : false, message: "Capture failed" });
+                }
             }
         })
     });
