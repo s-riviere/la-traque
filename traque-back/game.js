@@ -252,6 +252,11 @@ export default {
         for (let team of this.teams) {
             team.lastSentLocation = team.currentLocation;
             team.locationSendDeadline = Number(new Date()) + penaltyController.settings.allowedTimeBetweenPositionUpdate * 60 * 1000;
+            this.getTeam(team.chasing).enemyLocation = team.lastSentLocation;
+            sendUpdatedTeamInformations(team.id);
+        }
+        for (let team of this.teams) {
+            team.enemyLocation = this.getTeam(team.chasing).lastSentLocation;
             sendUpdatedTeamInformations(team.id);
         }
     },

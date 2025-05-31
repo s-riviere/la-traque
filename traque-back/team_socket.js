@@ -131,7 +131,7 @@ export function initTeamSocket() {
                 return;
             }
             game.updateTeamChasing();
-            teamBroadcast(teamId, "update_team", { enemyLocation: team.enemyLocation, locationSendDeadline: team.locationSendDeadline });
+            teamBroadcast(teamId, "update_team", { enemyLocation: team.enemyLocation, locationSendDeadline: team.locationSendDeadline, lastSentLocation: team.lastSentLocation });
             teamBroadcast(teamId, "success", "Position udpated")
             secureAdminBroadcast("teams", game.teams)
         });
