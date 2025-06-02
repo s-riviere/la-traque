@@ -105,30 +105,55 @@ export function ZonePicker({ minZone, setMinZone, maxZone, setMaxZone, editMode,
 
 export function LiveMap() {
     const location = useLocation(Infinity);
-    const { zone, zoneExtremities, teams, getTeamName } = useAdmin();
+    const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
+    const { zone, zoneExtremities, teams, getTeamName, nextZoneDate, isShrinking } = useAdmin();
+
+    // Remaining time before sending position
+    useEffect(() => {
+        const updateTime = () => {
+            setTimeLeftNextZone(Math.max(0, Math.floor((nextZoneDate - Date.now()) / 1000)));
+        };
+    
+        updateTime();
+        const interval = setInterval(updateTime, 1000);
+    
+        return () => clearInterval(interval);
+    }, [nextZoneDate]);
+
+    function formatTime(time) {
+        // time is in seconds
+        if (time < 0) return "00:00";
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        return String(minutes).padStart(2,"0") + ":" + String(seconds).padStart(2,"0");
+    }
+
     return (
-        <MapContainer className='min-h-full w-full ' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
-            <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <MapPan center={location} zoom={DEFAULT_ZOOM} />
-            {zone && <Circle center={zone.center} radius={zone.radius} color="blue" />}
-            {zoneExtremities && <Circle center={zoneExtremities.begin.center} radius={zoneExtremities.begin.radius} color='black' fill={false} />}
-            {zoneExtremities && <Circle center={zoneExtremities.end.center} radius={zoneExtremities.end.radius} color='red' fill={false} />}
-            {teams.map((team) => team.currentLocation && !team.captured && <Marker key={team.id} position={team.currentLocation} icon={new L.Icon({
-                iconUrl: '/icons/location.png',
-                iconSize: [41, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
-            })}>
-                <Popup>
-                    <strong className="text-lg">{team.name}</strong>
-                    <p className="text-md">Chasing : {getTeamName(team.chasing)}</p>
-                    <p className="text-md">Chased by : {getTeamName(team.chased)}</p>
-                </Popup>
-            </Marker>)}
-        </MapContainer>
+        <div className='min-h-full w-full'>
+            <p>{`${isShrinking ? "Fin" : "Début"} du rétrécissement de la zone dans : ${formatTime(timeLeftNextZone)}`}</p>
+            <MapContainer className='min-h-full w-full' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <MapPan center={location} zoom={DEFAULT_ZOOM} />
+                {zone && <Circle center={zone.center} radius={zone.radius} color="blue" />}
+                {zoneExtremities && <Circle center={zoneExtremities.begin.center} radius={zoneExtremities.begin.radius} color='black' fill={false} />}
+                {zoneExtremities && <Circle center={zoneExtremities.end.center} radius={zoneExtremities.end.radius} color='red' fill={false} />}
+                {teams.map((team) => team.currentLocation && !team.captured && <Marker key={team.id} position={team.currentLocation} icon={new L.Icon({
+                    iconUrl: '/icons/location.png',
+                    iconSize: [41, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                })}>
+                    <Popup>
+                        <strong className="text-lg">{team.name}</strong>
+                        <p className="text-md">Chasing : {getTeamName(team.chasing)}</p>
+                        <p className="text-md">Chased by : {getTeamName(team.chased)}</p>
+                    </Popup>
+                </Marker>)}
+            </MapContainer>
+        </div>
     )
 }

@@ -14,6 +14,8 @@ function AdminProvider({ children }) {
     const [gameSettings, setGameSettings] = useState(null);
     const [zone, setZone] = useState(null);
     const [zoneExtremities, setZoneExtremities] = useState(null);
+    const [nextZoneDate, setNextZoneDate] = useState(null);
+    const [isShrinking, setIsShrinking] = useState(false);
     const { adminSocket } = useSocket();
     const { loggedIn } = useAdminConnexion();
     const [gameState, setGameState] = useState(GameState.SETUP);
@@ -24,15 +26,27 @@ function AdminProvider({ children }) {
         adminSocket.emit("get_teams");
     }, [loggedIn]);
 
+    function waiting(data) {
+        setIsShrinking(false);
+        setZoneExtremities({begin: data.begin, end: data.end});
+        setNextZoneDate(data.endDate);
+    }
+
+    function shrinking(data) {
+        setIsShrinking(true);
+        setNextZoneDate(data);
+    }
+
     //Bind listeners to update the team list and the game status on socket message
     useSocketListener(adminSocket, "teams", setTeams);
     useSocketListener(adminSocket, "zone_settings", setZoneSettings);
     useSocketListener(adminSocket, "game_settings", setGameSettings);
     useSocketListener(adminSocket, "penalty_settings", setPenaltySettings);
     useSocketListener(adminSocket, "zone", setZone);
-    useSocketListener(adminSocket, "new_zone", setZoneExtremities);
+    useSocketListener(adminSocket, "zone_start", shrinking);
+    useSocketListener(adminSocket, "new_zone", waiting);
 
-    const value = useMemo(() => ({ zone, zoneExtremities, teams, zoneSettings, penaltySettings, gameSettings, gameState }), [zoneSettings, teams, gameState, zone, zoneExtremities, penaltySettings, gameSettings]);
+    const value = useMemo(() => ({ zone, zoneExtremities, teams, zoneSettings, penaltySettings, gameSettings, gameState, nextZoneDate, isShrinking }), [zoneSettings, teams, gameState, zone, zoneExtremities, penaltySettings, gameSettings, nextZoneDate, isShrinking]);
     return (
         <adminContext.Provider value={value}>
             {children}

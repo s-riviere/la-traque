@@ -38,6 +38,8 @@ export default {
     updateIntervalId: null,
     nextZoneTimeoutId: null,
 
+    nextZoneDate: null,
+
     /**
      * Test if a given configuration object is valid, i.e if all needed values are well defined
      * @param {Object} settings Settings object describing a config of a zone manager
@@ -143,6 +145,7 @@ export default {
      * Wait for the appropriate duration before starting a new zone reduction if needed
      */
     setNextZone() {
+        this.nextZoneDate = Date.now() + this.zoneSettings.reductionInterval * 60 * 1000;
         //At this point, nextZone == currentZone, we need to update the next zone, the raidus decrement, and start a timer before the next shrink
         //last zone
         if (this.currentZoneCount == this.zoneSettings.reductionCount) {
@@ -168,7 +171,8 @@ export default {
         this.onZoneUpdate(JSON.parse(JSON.stringify(this.currentStartZone)))
         this.onNextZoneUpdate({
             begin: JSON.parse(JSON.stringify(this.currentStartZone)),
-            end: JSON.parse(JSON.stringify(this.nextZone))
+            end: JSON.parse(JSON.stringify(this.nextZone)),
+            endDate: JSON.parse(JSON.stringify(this.nextZoneDate)),
         })
         return true;
     },
@@ -179,6 +183,8 @@ export default {
      * If the reduction is over this function will call setNextZone
      */
     startShrinking() {
+        this.nextZoneDate = Date.now() + this.zoneSettings.reductionDuration * 60 * 1000;
+        this.onZoneUpdateStart(JSON.parse(JSON.stringify(this.nextZoneDate)));
         const startTime = new Date();
         this.updateIntervalId = setInterval(() => {
             const completed = ((new Date() - startTime) / (1000 * 60)) / this.zoneSettings.reductionDuration;
@@ -200,6 +206,12 @@ export default {
     onNextZoneUpdate(newZone) {
         playersBroadcast("new_zone", newZone)
         secureAdminBroadcast("new_zone", newZone)
+    },
+
+    //a call to onZoneUpdateStart will be made when the zone reduction starts
+    onZoneUpdateStart(date) {
+        playersBroadcast("zone_start", date)
+        secureAdminBroadcast("zone_start", date)
     },
 
     //a call to onZoneUpdate will be made every updateIntervalSeconds when the zone is changing
