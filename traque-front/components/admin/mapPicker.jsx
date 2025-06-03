@@ -2,9 +2,17 @@
 import { useLocation } from "@/hook/useLocation";
 import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
-import { Circle, MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import { Circle, MapContainer, Marker, TileLayer, useMap, Tooltip, Polyline } from "react-leaflet";
 import { useMapCircleDraw } from "@/hook/mapDrawing";
 import useAdmin from "@/hook/useAdmin";
+
+const positionIcon = new L.Icon({
+    iconUrl: '/icons/location.png',
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    popupAnchor: [0, -15],
+    shadowSize: [30, 30],
+});
 
 function MapPan(props) {
     const map = useMap();
@@ -36,24 +44,19 @@ function MapEventListener({ onClick, onMouseMove }) {
     return null;
 }
 
-const DEFAULT_ZOOM = 17;
+const DEFAULT_ZOOM = 14;
 export function CircularAreaPicker({ area, setArea, markerPosition, ...props }) {
     const location = useLocation(Infinity);
     const { handleClick, handleMouseMove, center, radius } = useMapCircleDraw(area, setArea);
     return (
-        <MapContainer  {...props} className='min-h-full w-full ' center={[48.7143326, 2.20564757]} zoom={14} scrollWheelZoom={true}>
+        <MapContainer  {...props} className='min-h-full w-full ' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {center && radius && <Circle center={center} radius={radius} fillColor="blue" />}
-            {markerPosition && <Marker position={markerPosition} icon={new L.Icon({
-                iconUrl: '/icons/location.png',
-                iconSize: [41, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
-            })}></Marker>}
+            {markerPosition && <Marker position={markerPosition} icon={positionIcon}>
+            </Marker>}
             <MapPan center={location} zoom={DEFAULT_ZOOM} />
             <MapEventListener onClick={handleClick} onMouseMove={handleMouseMove} />
         </MapContainer>)
@@ -84,7 +87,7 @@ export function ZonePicker({ minZone, setMinZone, maxZone, setMaxZone, editMode,
     return (
         <div>
             <div className='h-96'>
-            <MapContainer  {...props} className='min-h-full w-full ' center={[48.7143326, 2.20564757]} zoom={14} scrollWheelZoom={true}>
+            <MapContainer  {...props} className='min-h-full w-full ' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -106,7 +109,7 @@ export function ZonePicker({ minZone, setMinZone, maxZone, setMaxZone, editMode,
 export function LiveMap() {
     const location = useLocation(Infinity);
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
-    const { zone, zoneExtremities, teams, getTeamName, nextZoneDate, isShrinking } = useAdmin();
+    const { zone, zoneExtremities, teams, nextZoneDate, isShrinking , getTeam} = useAdmin();
 
     // Remaining time before sending position
     useEffect(() => {
@@ -128,6 +131,16 @@ export function LiveMap() {
         return String(minutes).padStart(2,"0") + ":" + String(seconds).padStart(2,"0");
     }
 
+    function Arrow({pos1, pos2}) {
+        if (pos1 && pos2) {
+            return (
+                <Polyline positions={[pos1, pos2]} pathOptions={{ color: 'black', weight: 3 }}/>
+            )
+        } else {
+            return null;
+        }
+    }
+
     return (
         <div className='min-h-full w-full'>
             <p>{`${isShrinking ? "Fin" : "Début"} du rétrécissement de la zone dans : ${formatTime(timeLeftNextZone)}`}</p>
@@ -140,19 +153,12 @@ export function LiveMap() {
                 {zone && <Circle center={zone.center} radius={zone.radius} color="blue" />}
                 {zoneExtremities && <Circle center={zoneExtremities.begin.center} radius={zoneExtremities.begin.radius} color='black' fill={false} />}
                 {zoneExtremities && <Circle center={zoneExtremities.end.center} radius={zoneExtremities.end.radius} color='red' fill={false} />}
-                {teams.map((team) => team.currentLocation && !team.captured && <Marker key={team.id} position={team.currentLocation} icon={new L.Icon({
-                    iconUrl: '/icons/location.png',
-                    iconSize: [41, 41],
-                    iconAnchor: [12, 41],
-                    popupAnchor: [1, -34],
-                    shadowSize: [41, 41]
-                })}>
-                    <Popup>
-                        <strong className="text-lg">{team.name}</strong>
-                        <p className="text-md">Chasing : {getTeamName(team.chasing)}</p>
-                        <p className="text-md">Chased by : {getTeamName(team.chased)}</p>
-                    </Popup>
-                </Marker>)}
+                {teams.map((team) => team.currentLocation && !team.captured &&
+                    <Marker key={team.id} position={team.currentLocation} icon={positionIcon}>
+                        <Tooltip permanent direction="top" offset={[0, -5]} className="custom-tooltip">{team.name}</Tooltip>
+                        <Arrow pos1={team.currentLocation} pos2={getTeam(team.chasing).currentLocation}/>
+                    </Marker>
+                )}
             </MapContainer>
         </div>
     )

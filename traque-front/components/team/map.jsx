@@ -7,7 +7,7 @@ import "leaflet/dist/leaflet.css";
 import useGame from '@/hook/useGame';
 import { useTeamContext } from '@/context/teamContext';
 
-const DEFAULT_ZOOM = 17;
+const DEFAULT_ZOOM = 14;
 
 
 // Pan to the center of the map when the position of the user is updated for the first time
@@ -54,10 +54,10 @@ export function LiveMap({ ...props }) {
             />
             {currentPosition && <Marker position={currentPosition} icon={new L.Icon({
                 iconUrl: '/icons/location.png',
-                iconSize: [41, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
+                iconSize: [30, 30],
+                iconAnchor: [15, 15],
+                popupAnchor: [0, -15],
+                shadowSize: [30, 30],
             })}>
                 <Popup>
                     Votre position
@@ -65,10 +65,10 @@ export function LiveMap({ ...props }) {
             </Marker>}
             {enemyPosition && <Marker position={enemyPosition} icon={new L.Icon({
                 iconUrl: '/icons/target.png',
-                iconSize: [41, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
+                iconSize: [30, 30],
+                iconAnchor: [15, 15],
+                popupAnchor: [0, -15],
+                shadowSize: [30, 30],
             })}>
                 <Popup>
                     Position de l&apos;ennemi
@@ -91,10 +91,10 @@ export function PlacementMap({ ...props }) {
             />
             {currentPosition && <Marker position={currentPosition} icon={new L.Icon({
                 iconUrl: '/icons/location.png',
-                iconSize: [41, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
+                iconSize: [30, 30],
+                iconAnchor: [15, 15],
+                popupAnchor: [0, -15],
+                shadowSize: [30, 30],
             })}>
                 <Popup>
                     Votre position
