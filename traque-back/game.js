@@ -9,6 +9,7 @@ import penaltyController from "./penalty_controller.js";
 import zoneManager from "./zone_manager.js";
 
 import { getDistanceFromLatLon } from "./map_utils.js";
+import { writePosition, writeCapture, writeSeePosition } from "./trajectory.js";
 
 /**
  * The possible states of the game
@@ -237,6 +238,7 @@ export default {
         if (location == null) {
             return false;
         }
+        writePosition(Date.now(), teamId, location[0], location[1]);
         team.currentLocation = location;
         //Update the team ready status if they are in their starting area
         if (this.state == GameState.PLACEMENT && team.startingArea && team.startingArea && location) {
@@ -274,7 +276,7 @@ export default {
         if (team.currentLocation == null) {
             return false;
         }
-
+        writeSeePosition(Date.now(), teamId, team.chasing);
         team.locationSendDeadline = Number(new Date()) + penaltyController.settings.allowedTimeBetweenPositionUpdate * 60 * 1000;
         team.lastSentLocation = team.currentLocation;
         if (this.getTeam(team.chasing) != null) {
@@ -309,6 +311,7 @@ export default {
     requestCapture(teamId, captureCode) {
         let enemyTeam = this.getTeam(this.getTeam(teamId).chasing)
         if (enemyTeam && enemyTeam.captureCode == captureCode) {
+            writeCapture(Date.now(), teamId, enemyTeam.id);
             this.capture(enemyTeam.id);
             this.updateTeamChasing();
             return true;

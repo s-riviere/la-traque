@@ -15,6 +15,8 @@ COPY . .
 
 RUN if [ ! -d uploads ]; then mkdir uploads; fi
 
+RUN if [ ! -d trajectories ]; then mkdir trajectories; fi
+
 EXPOSE 3001
 
 # Start the application
