@@ -5,6 +5,7 @@ import { secureAdminBroadcast } from "./admin_socket.js";
 import { isInCircle } from "./map_utils.js";
 import { playersBroadcast, sendUpdatedTeamInformations } from "./team_socket.js";
 
+import timeoutHandler from "./timeoutHandler.js";
 import penaltyController from "./penalty_controller.js";
 import zoneManager from "./zone_manager.js";
 
@@ -70,6 +71,7 @@ export default {
         if (newState != GameState.PLAYING) {
             zoneManager.reset();
             penaltyController.stop();
+            timeoutHandler.endAllSendPositionTimeout();
         }
         //Game reset
         if (newState == GameState.SETUP) {
@@ -253,7 +255,8 @@ export default {
     initLastSentLocations() {
         for (let team of this.teams) {
             team.lastSentLocation = team.currentLocation;
-            team.locationSendDeadline = Number(new Date()) + penaltyController.settings.allowedTimeBetweenPositionUpdate * 60 * 1000;
+            team.locationSendDeadline = Date.now() + penaltyController.settings.allowedTimeBetweenPositionUpdate * 60 * 1000;
+            timeoutHandler.setSendPositionTimeout(team.id, team.locationSendDeadline);
             this.getTeam(team.chasing).enemyLocation = team.lastSentLocation;
             sendUpdatedTeamInformations(team.id);
         }
@@ -277,11 +280,13 @@ export default {
             return false;
         }
         writeSeePosition(Date.now(), teamId, team.chasing);
-        team.locationSendDeadline = Number(new Date()) + penaltyController.settings.allowedTimeBetweenPositionUpdate * 60 * 1000;
+        team.locationSendDeadline = Date.now() + penaltyController.settings.allowedTimeBetweenPositionUpdate * 60 * 1000;
+        timeoutHandler.setSendPositionTimeout(team.id, team.locationSendDeadline);
         team.lastSentLocation = team.currentLocation;
         if (this.getTeam(team.chasing) != null) {
             team.enemyLocation = this.getTeam(team.chasing).lastSentLocation;
         }
+        sendUpdatedTeamInformations(team.id);
         return team;
     },
 
@@ -297,6 +302,7 @@ export default {
         //remove the team from the list
         this.teams = this.teams.filter(t => t.id !== teamId);
         this.updateTeamChasing();
+        timeoutHandler.endSendPositionTimeout(team.id);
         return true;
     },
 
@@ -325,6 +331,7 @@ export default {
      */
     capture(teamId) {
         this.getTeam(teamId).captured = true
+        timeoutHandler.endSendPositionTimeout(teamId);
         this.updateTeamChasing();
     },
 
@@ -355,6 +362,7 @@ export default {
     finishGame() {
         this.setState(GameState.FINISHED);
         zoneManager.reset();
+        timeoutHandler.endAllSendPositionTimeout()
         playersBroadcast("game_state", this.state);
     },
 }

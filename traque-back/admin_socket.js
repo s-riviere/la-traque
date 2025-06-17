@@ -32,10 +32,11 @@ export function initAdminSocketHandler() {
     //Admin namespace
     io.of("admin").on("connection", (socket) => {
         //Flag to check if the user is logged in, defined for each socket
+        console.log("Connection of an admin");
         let loggedIn = false;
 
         socket.on("disconnect", () => {
-            console.log("user disconnected");
+            console.log("Disconnection of an admin");
             //Remove the socket from the logged in sockets array
             loggedInSockets = loggedInSockets.filter(s => s !== socket.id);
         });

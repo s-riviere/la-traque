@@ -62,28 +62,28 @@ export function sendUpdatedTeamInformations(teamId) {
         })
     })
 }
-export function initTeamSocket() {
 
+export function initTeamSocket() {
     io.of("player").on("connection", (socket) => {
+        console.log("Connection of a player");
         let teamId = null;
-        console.log("a user connected");
 
         socket.on("disconnect", () => {
-            console.log("user disconnected");
+            console.log("Disconnection of a player");
             logoutPlayer(socket.id)
         });
 
         socket.on("login", (loginTeamId, callback) => {
-            if (game.getTeam(loginTeamId) === undefined) {
+            let team = game.getTeam(loginTeamId);
+            if (team === undefined) {
                 socket.emit("login_response", false);
                 if (typeof callback === "function") {
                     callback({ isLoggedIn: false, message: "Login denied" });
                 }
             } else {
                 logoutPlayer(socket.id)
-                teamId = loginTeamId;
-                let team = game.getTeam(loginTeamId);
                 team.sockets.push(socket.id);
+                teamId = loginTeamId;
                 sendUpdatedTeamInformations(loginTeamId);
                 socket.emit("login_response", true);
                 socket.emit("game_state", game.state)
@@ -132,18 +132,17 @@ export function initTeamSocket() {
             }
             game.updateTeamChasing();
             teamBroadcast(teamId, "update_team", { enemyLocation: team.enemyLocation, locationSendDeadline: team.locationSendDeadline, lastSentLocation: team.lastSentLocation });
-            teamBroadcast(teamId, "success", "Position udpated")
             secureAdminBroadcast("teams", game.teams)
         });
 
         socket.on("capture", (captureCode, callback) => {
-            let capturedTeam = game.getTeam(teamId)?.chasing
+            let capturedTeam = game.getTeam(teamId)?.chasing;
             if (capturedTeam !== undefined && game.requestCapture(teamId, captureCode)) {
                 sendUpdatedTeamInformations(teamId);
                 sendUpdatedTeamInformations(capturedTeam);
                 secureAdminBroadcast("teams", game.teams);
                 if (typeof callback === "function") {
-                    callback({ hasCaptured : true, message: "Capture succesful" });
+                    callback({ hasCaptured : true, message: "Capture successful" });
                 }
             } else {
                 socket.emit("error", "Incorrect code");

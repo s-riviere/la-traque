@@ -32,7 +32,7 @@ export default {
         //Watch periodically if all teams need are following the rules
         this.checkIntervalId = setInterval(() => {
             if (game.state == GameState.PLAYING) {
-                this.watchPositionUpdate();
+                //this.watchPositionUpdate();
                 this.watchZone();
             }
         }, 100);
