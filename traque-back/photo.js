@@ -13,7 +13,7 @@ const ALLOWED_MIME = [
     "image/gif"
 ]
 
-//Setup multer (the file upload middleware)
+// Setup multer (the file upload middleware)
 const storage = multer.diskStorage({
     // Save the file in the uploads directory
     destination: function (req, file, callback) {
@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage,
-    //Only upload the file if it is a valid mime type and the team POST parameter is a valid team
+    // Only upload the file if it is a valid mime type and the team POST parameter is a valid team
     fileFilter: function (req, file, callback) {
         if (ALLOWED_MIME.indexOf(file.mimetype) == -1) {
             callback(null, false);
@@ -39,8 +39,7 @@ const upload = multer({
     }
 })
 
-
-//Clean the uploads directory
+// Clean the uploads directory
 function clean() {
     const files = fs.readdirSync(UPLOAD_DIR);
     for (const file of files) {
@@ -48,7 +47,6 @@ function clean() {
         fs.unlinkSync(filePath);
     }
 }
-
 
 export function initPhotoUpload() {
     clean();

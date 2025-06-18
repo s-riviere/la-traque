@@ -8,11 +8,10 @@ import game from "./game.js"
 import zone from "./zone_manager.js"
 import penaltyController from "./penalty_controller.js";
 import { playersBroadcast, sendUpdatedTeamInformations } from "./team_socket.js";
-import { sha256 } from "./util.js";
-
+import { createHash } from "crypto";
 import { config } from "dotenv";
-config()
 
+config();
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 
 /**
@@ -26,18 +25,18 @@ export function secureAdminBroadcast(event, data) {
     });
 }
 
-//Array of logged in sockets
+// Array of logged in sockets
 let loggedInSockets = [];
 export function initAdminSocketHandler() {
-    //Admin namespace
+    // Admin namespace
     io.of("admin").on("connection", (socket) => {
-        //Flag to check if the user is logged in, defined for each socket
+        // Flag to check if the user is logged in, defined for each socket
         console.log("Connection of an admin");
         let loggedIn = false;
 
         socket.on("disconnect", () => {
             console.log("Disconnection of an admin");
-            //Remove the socket from the logged in sockets array
+            // Remove the socket from the logged in sockets array
             loggedInSockets = loggedInSockets.filter(s => s !== socket.id);
         });
 
@@ -45,17 +44,17 @@ export function initAdminSocketHandler() {
             loggedInSockets = loggedInSockets.filter(s => s !== socket.id);
         })
 
-        //User is attempting to log in
+        // User is attempting to log in
         socket.on("login", (password) => {
-            const hash = sha256(password);
+            const hash = createHash('sha256').update(password).digest('hex');
             if (hash === ADMIN_PASSWORD_HASH && !loggedIn) {
-                //Attempt successful
+                // Attempt successful
                 socket.emit("login_response", true);
                 loggedInSockets.push(socket.id);
                 loggedIn = true;
-                //Send the current state
+                // Send the current state
                 socket.emit("game_state", game.state)
-                //Other settings that need initialization
+                // Other settings that need initialization
                 socket.emit("penalty_settings", penaltyController.settings)
                 socket.emit("game_settings", game.settings)
                 socket.emit("zone_settings", zone.zoneSettings)
@@ -64,9 +63,8 @@ export function initAdminSocketHandler() {
                     begin: zone.currentStartZone,
                     end: zone.nextZone
                 })
-
             } else {
-                //Attempt unsuccessful
+                // Attempt unsuccessful
                 socket.emit("login_response", false);
             }
         });
@@ -90,7 +88,7 @@ export function initAdminSocketHandler() {
             }
             if (!game.setZoneSettings(settings)) {
                 socket.emit("error", "Error changing zone");
-                socket.emit("zone_settings", zone.zoneSettings) //Still broadcast the old config to the client who submited an incorrect config to keep the client up to date
+                socket.emit("zone_settings", zone.zoneSettings) // Still broadcast the old config to the client who submited an incorrect config to keep the client up to date
             } else {
                 secureAdminBroadcast("zone_settings", zone.zoneSettings)
             }
@@ -111,7 +109,7 @@ export function initAdminSocketHandler() {
 
         })
 
-        //User is attempting to add a new team
+        // User is attempting to add a new team
         socket.on("add_team", (teamName) => {
             if (!loggedIn) {
                 socket.emit("error", "Not logged in");
@@ -124,7 +122,7 @@ export function initAdminSocketHandler() {
             }
         });
 
-        //User is attempting to remove a team
+        // User is attempting to remove a team
         socket.on("remove_team", (teamId) => {
             if (!loggedIn) {
                 socket.emit("error", "Not logged in");
@@ -137,7 +135,7 @@ export function initAdminSocketHandler() {
             }
         });
 
-        //User is attempting to change the game state
+        // User is attempting to change the game state
         socket.on("change_state", (state) => {
             if (!loggedIn) {
                 socket.emit("error", "Not logged in");
@@ -151,9 +149,9 @@ export function initAdminSocketHandler() {
             }
         });
 
-        //Use is sending a new list containing the new order of the teams
-        //Note that we never check if the new order contains the same teams as the old order, so it behaves more like a setTeams function
-        //But the frontend should always send the same teams in a different order
+        // Use is sending a new list containing the new order of the teams
+        // Note that we never check if the new order contains the same teams as the old order, so it behaves more like a setTeams function
+        // But the frontend should always send the same teams in a different order
         socket.on("reorder_teams", (newOrder) => {
             if (!loggedIn) {
                 socket.emit("error", "Not logged in");
@@ -179,8 +177,8 @@ export function initAdminSocketHandler() {
             }
         })
 
-        //Request an update of the team list
-        //We only reply to the sender to prevent spam
+        // Request an update of the team list
+        // We only reply to the sender to prevent spam
         socket.on("get_teams", () => {
             if (!loggedIn) {
                 socket.emit("error", "Not logged in");
@@ -188,8 +186,5 @@ export function initAdminSocketHandler() {
             }
             socket.emit("teams", game.teams);
         });
-
     });
-
-
 }

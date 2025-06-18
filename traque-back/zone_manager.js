@@ -1,12 +1,24 @@
 /*
 This module manages the play area during the game, shrinking it over time based of some settings.
 */
-
 import { randomCirclePoint } from 'random-location'
 import { isInCircle } from './map_utils.js';
-import { map } from './util.js';
 import { playersBroadcast } from './team_socket.js';
 import { secureAdminBroadcast } from './admin_socket.js';
+
+/**
+ * Scale a value that is known to be in a range to a new range
+ * for instance map(50,0,100,1000,2000) will return 1500 as 50 is halfway between 0 and 100 and 1500 is halfway through 1000 and 2000
+ * @param {Number} value value to map 
+ * @param {Number} oldMin minimum value of the number 
+ * @param {Number} oldMax maximum value of the number
+ * @param {Number} newMin minimum value of the output
+ * @param {Number} newMax maximum value of the output
+ * @returns 
+ */
+function map(value, oldMin, oldMax, newMin, newMax) {
+    return ((value - oldMin) / (oldMax - oldMin)) * (newMax - newMin) + newMin;
+}
 
 export default {
     //Setings storing where the zone will start, end and how it should evolve

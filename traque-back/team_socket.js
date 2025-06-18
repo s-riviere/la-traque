@@ -15,8 +15,8 @@ import zone from "./zone_manager.js";
  * @param {*} data The payload
  */
 export function teamBroadcast(teamId, event, data) {
-    for (let socketId of game.getTeam(teamId).sockets) {
-        io.of("player").to(socketId).emit(event, data)
+    for (const socketId of game.getTeam(teamId).sockets) {
+        io.of("player").to(socketId).emit(event, data);
     }
 }
 
@@ -26,25 +26,19 @@ export function teamBroadcast(teamId, event, data) {
  * @param {String} data payload
  */
 export function playersBroadcast(event, data) {
-    for (let team of game.teams) {
+    for (const team of game.teams) {
         teamBroadcast(team.id, event, data);
     }
 }
 
 /**
- * Remove a player from the list of logged in players
- * @param {Number} id The id of the player to log out
+ * Send a socket message to all the players of a team
+ * @param {String} teamId The team that will receive the message
  */
-function logoutPlayer(id) {
-    for (let team of game.teams) {
-        team.sockets = team.sockets.filter((sid) => sid != id);
-    }
-}
-
 export function sendUpdatedTeamInformations(teamId) {
-    let team = game.getTeam(teamId)
+    const team = game.getTeam(teamId);
     if (!team) {
-        return false;
+        return;
     }
     team.sockets.forEach(socketId => {
         io.of("player").to(socketId).emit("update_team", {
@@ -61,6 +55,17 @@ export function sendUpdatedTeamInformations(teamId) {
             penalties: team.penalties,
         })
     })
+    secureAdminBroadcast("teams", game.teams);
+}
+
+/**
+ * Remove a player from the list of logged in players
+ * @param {Number} id The id of the player to log out
+ */
+function logoutPlayer(id) {
+    for (const team of game.teams) {
+        team.sockets = team.sockets.filter((sid) => sid != id);
+    }
 }
 
 export function initTeamSocket() {
@@ -70,37 +75,33 @@ export function initTeamSocket() {
 
         socket.on("disconnect", () => {
             console.log("Disconnection of a player");
-            logoutPlayer(socket.id)
+            logoutPlayer(socket.id);
         });
 
         socket.on("login", (loginTeamId, callback) => {
-            let team = game.getTeam(loginTeamId);
-            if (team === undefined) {
-                socket.emit("login_response", false);
-                if (typeof callback === "function") {
-                    callback({ isLoggedIn: false, message: "Login denied" });
-                }
-            } else {
-                logoutPlayer(socket.id)
-                team.sockets.push(socket.id);
-                teamId = loginTeamId;
-                sendUpdatedTeamInformations(loginTeamId);
-                socket.emit("login_response", true);
-                socket.emit("game_state", game.state)
-                socket.emit("game_settings", game.settings)
-                socket.emit("zone", zone.currentZone)
-                socket.emit("new_zone", {
-                    begin: zone.currentStartZone,
-                    end: zone.nextZone
-                })
-                if (typeof callback === "function") {
-                    callback({ isLoggedIn : true, message: "Logged in"});
-                }
+            const team = game.getTeam(loginTeamId);
+            if (!team) {
+                callback({ isLoggedIn: false, message: "Login denied" });
+                return;
             }
+            logoutPlayer(socket.id);
+            team.sockets.push(socket.id);
+            teamId = loginTeamId;
+            sendUpdatedTeamInformations(loginTeamId);
+            socket.emit("login_response", true);
+            socket.emit("game_state", game.state);
+            socket.emit("game_settings", game.settings);
+            socket.emit("zone", zone.currentZone);
+            socket.emit("new_zone", {
+                begin: zone.currentStartZone,
+                end: zone.nextZone
+            })
+            callback({ isLoggedIn : true, message: "Logged in"});
         });
 
         socket.on("logout", () => {
             logoutPlayer(socket.id);
+            teamId = null;
         })
 
         socket.on("update_position", (position) => {
@@ -108,48 +109,30 @@ export function initTeamSocket() {
             // This is done to prevent multiple clients from sending slightly different prosition back and forth
             // Making the point jitter on the map
             if (!teamId) {
-                socket.emit("error", "not logged in yet");
                 return;
             }
-            let team = game.getTeam(teamId)
-            if (team == undefined) {
-                logoutPlayer(socket.id);
-                return;
-            }
+            const team = game.getTeam(teamId);
             if (team.sockets.indexOf(socket.id) == 0) {
                 game.updateLocation(teamId, position);
-                teamBroadcast(teamId, "update_team", { currentLocation: team.currentLocation, ready: team.ready });
-                secureAdminBroadcast("teams", game.teams);
             }
         });
 
         socket.on("send_position", () => {
-            game.sendLocation(teamId);
-            let team = game.getTeam(teamId);
-            if (team === undefined) {
-                socket.emit("error", "Team not found");
+            if (!teamId) {
                 return;
             }
-            game.updateTeamChasing();
-            teamBroadcast(teamId, "update_team", { enemyLocation: team.enemyLocation, locationSendDeadline: team.locationSendDeadline, lastSentLocation: team.lastSentLocation });
-            secureAdminBroadcast("teams", game.teams)
+            game.sendLocation(teamId);
         });
 
         socket.on("capture", (captureCode, callback) => {
-            let capturedTeam = game.getTeam(teamId)?.chasing;
-            if (capturedTeam !== undefined && game.requestCapture(teamId, captureCode)) {
-                sendUpdatedTeamInformations(teamId);
-                sendUpdatedTeamInformations(capturedTeam);
-                secureAdminBroadcast("teams", game.teams);
-                if (typeof callback === "function") {
-                    callback({ hasCaptured : true, message: "Capture successful" });
-                }
-            } else {
-                socket.emit("error", "Incorrect code");
-                if (typeof callback === "function") {
-                    callback({ hasCaptured : false, message: "Capture failed" });
-                }
+            if (!teamId) {
+                return;
             }
+            if (!game.requestCapture(teamId, captureCode)) {
+                callback({ hasCaptured : false, message: "Capture failed" });
+                return;
+            }
+            callback({ hasCaptured : true, message: "Capture successful" });
         })
     });
 }

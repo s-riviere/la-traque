@@ -1,31 +1,31 @@
 /**
+ * Convert a angle from degree to radian
+ * @param {Number} deg angle in degree
+ * @returns angle in radian
+ */
+function degToRad(deg) {
+    return deg * (Math.PI / 180);
+}
+
+/**
  * Compute the distance between two points givent their longitude and latitude 
  * @param {Object} pos1 The first position
  * @param {Object} pos2 The second position
  * @returns the distance between the two positions in meters
  * @see https://gist.github.com/miguelmota/10076960
  */
-export function getDistanceFromLatLon({ lat: lat1, lng: lon1 }, { lat: lat2, lng: lon2 }) {
+function getDistanceFromLatLon({ lat: lat1, lng: lon1 }, { lat: lat2, lng: lon2 }) {
     var R = 6371; // Radius of the earth in km
-    var dLat = deg2rad(lat2 - lat1);  // deg2rad below
-    var dLon = deg2rad(lon2 - lon1);
+    var dLat = degToRad(lat2 - lat1);
+    var dLon = degToRad(lon2 - lon1);
     var a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) *
         Math.sin(dLon / 2) * Math.sin(dLon / 2)
         ;
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     var d = R * c; // Distance in km
     return d * 1000;
-}
-
-/**
- * Convert a angle from degree to radian
- * @param {Number} deg angle in degree
- * @returns angle in radian
- */
-function deg2rad(deg) {
-    return deg * (Math.PI / 180)
 }
 
 /**
