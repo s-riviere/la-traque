@@ -12,16 +12,9 @@ const reorder = (list, startIndex, endIndex) => {
 };
 
 function TeamListItem({ team, index, onSelected, itemSelected }) {
-    let bgColor;
-    if(itemSelected) {
-        bgColor = "bg-blue-400";
-    }else if(team.captured) {
-        bgColor = "bg-red-400";
-    }
-    else {
-        bgColor = "bg-gray-100";
-    }
-    const classNames = 'w-full p-3 my-3 shadow ' + (bgColor);
+    const bgColor = team.captured ? " bg-red-400" : " bg-gray-300";
+    const border = " border border-4 " + (itemSelected ? "border-black" : team.captured ? "border-red-400" : "border-gray-300");
+    const classNames = 'w-full p-3 my-3' + (bgColor) + (border);
     return (
         <Draggable draggableId={team.id.toString()} index={index} onClick={() => onSelected(team.id)}>
             {provided => (

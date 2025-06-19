@@ -70,19 +70,17 @@ export default function TeamEdit({ selectedTeamId, setSelectedTeamId }) {
                 <div className='flex w-1/2 flex-col space-y-2 h-min self-start'>
                     <h2 className='text-2xl text-center'>Team details</h2>
                     <div>
-                        <p>Secret : {String(team.id).padStart(6, '0')}</p>
-                        <p>Name : {team.name}</p>
+                        <p>Secret : {String(team.id).padStart(6, '0').replace(/(\d{3})(\d{3})/, '$1 $2')}</p>
+                        <p>Capture code : {String(team.captureCode).padStart(4, '0')}</p>
                         <p>Chasing : {getTeamName(team.chasing)}</p>
                         <p>Chased by : {getTeamName(team.chased)}</p>
-                        <p>Capture code : {String(team.captureCode).padStart(4, '0')}</p>
-                        <p>Captured : {team.captured ? "Yes" : "No"}</p>
-                        <p>Has to send location before {new Date(team.locationSendDeadline).toTimeString()}</p>
                         <div className='flex flex-row'>
                             <p>Penalties :</p>
                             <button className='w-7 h-7 mx-4 bg-blue-600 hover:bg-blue-500 text-md ease-out duration-200 text-white shadow-sm rounded' onClick={() => handleAddPenalty(-1)}>-</button>
                             <p>{team.penalties}</p>
                             <button className='w-7 h-7 mx-4 bg-blue-600 hover:bg-blue-500 text-md ease-out duration-200 text-white shadow-sm rounded' onClick={() => handleAddPenalty(1)}>+</button>
                         </div>
+                        <br/>
                     </div>
                 </div>
             </div>

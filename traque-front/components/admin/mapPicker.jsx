@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import { Circle, MapContainer, Marker, TileLayer, useMap, Tooltip, Polyline } from "react-leaflet";
 import { useMapCircleDraw } from "@/hook/mapDrawing";
 import useAdmin from "@/hook/useAdmin";
+import { GameState } from "@/util/gameState";
 
 const positionIcon = new L.Icon({
     iconUrl: '/icons/location.png',
@@ -109,7 +110,7 @@ export function ZonePicker({ minZone, setMinZone, maxZone, setMaxZone, editMode,
 export function LiveMap() {
     const location = useLocation(Infinity);
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
-    const { zone, zoneExtremities, teams, nextZoneDate, isShrinking , getTeam} = useAdmin();
+    const { zone, zoneExtremities, teams, nextZoneDate, isShrinking , getTeam, gameState } = useAdmin();
 
     // Remaining time before sending position
     useEffect(() => {
@@ -143,16 +144,16 @@ export function LiveMap() {
 
     return (
         <div className='min-h-full w-full'>
-            <p>{`${isShrinking ? "Fin" : "Début"} du rétrécissement de la zone dans : ${formatTime(timeLeftNextZone)}`}</p>
+            {gameState == GameState.PLAYING && <p>{`${isShrinking ? "Fin" : "Début"} du rétrécissement de la zone dans : ${formatTime(timeLeftNextZone)}`}</p>}
             <MapContainer className='min-h-full w-full' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 <MapPan center={location} zoom={DEFAULT_ZOOM} />
-                {zone && <Circle center={zone.center} radius={zone.radius} color="blue" />}
-                {zoneExtremities && <Circle center={zoneExtremities.begin.center} radius={zoneExtremities.begin.radius} color='black' fill={false} />}
-                {zoneExtremities && <Circle center={zoneExtremities.end.center} radius={zoneExtremities.end.radius} color='red' fill={false} />}
+                {gameState == GameState.PLAYING && zone && <Circle center={zone.center} radius={zone.radius} color="blue" />}
+                {gameState == GameState.PLAYING && zoneExtremities && <Circle center={zoneExtremities.begin.center} radius={zoneExtremities.begin.radius} color='black' fill={false} />}
+                {gameState == GameState.PLAYING && zoneExtremities && <Circle center={zoneExtremities.end.center} radius={zoneExtremities.end.radius} color='red' fill={false} />}
                 {teams.map((team) => team.currentLocation && !team.captured &&
                     <Marker key={team.id} position={team.currentLocation} icon={positionIcon}>
                         <Tooltip permanent direction="top" offset={[0, -5]} className="custom-tooltip">{team.name}</Tooltip>

@@ -76,9 +76,11 @@ export function initAdminSocketHandler() {
             }
             if (!game.changeSettings(settings)) {
                 socket.emit("error", "Invalid settings");
+                socket.emit("game_settings", penaltyController.settings)
+            } else {
+                secureAdminBroadcast("game_settings", game.settings);
+                playersBroadcast("game_settings", game.settings);
             }
-            secureAdminBroadcast("game_settings", game.settings);
-            playersBroadcast("game_settings", game.settings);
         })
 
         socket.on("set_zone_settings", (settings) => {

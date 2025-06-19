@@ -297,7 +297,7 @@ export default {
         }
         this.teams = this.teams.filter(t => t.id !== teamId);
         this.updateTeamChasing();
-        timeoutHandler.endSendPositionTimeout(team.id);
+        timeoutHandler.endSendPositionTimeout(teamId);
         return true;
     },
 
@@ -342,17 +342,23 @@ export default {
      * @returns false if failed
      */
     setZoneSettings(newSettings) {
-        //cannot change zones while playing
+        if ('min' in newSettings || 'max' in newSettings) {
+            const min = newSettings.min ?? zoneManager.zoneSettings.min;
+            const max = newSettings.max ?? zoneManager.zoneSettings.max;
+            // The end zone must be included in the start zone
+            if (!isInCircle(min.center, max.center, max.radius-min.radius)) {
+                return false;
+            }
+        }
+        zoneManager.udpateSettings(newSettings);
         if (this.state == GameState.PLAYING || this.state == GameState.FINISHED) {
-            return false;
+            zoneManager.reset()
+            if (!zoneManager.start()) {
+                this.setState(GameState.SETUP);
+                return false;
+            }
         }
-        var min = newSettings.min;
-        var max = newSettings.max;
-        // The end zone must be included in the start zone
-        if (!isInCircle(min.center, max.center, max.radius-min.radius)) {
-            return false;
-        }
-        return zoneManager.udpateSettings(newSettings);
+        return true;
     },
 
     /**

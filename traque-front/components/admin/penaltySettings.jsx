@@ -18,7 +18,14 @@ export const PenaltySettings = () => {
     }, [penaltySettings]);
 
     function applySettings() {
-        changePenaltySettings({maxPenalties: Number(maxPenalties), allowedTimeOutOfZone: Number(allowedTimeOutOfZone), allowedTimeBetweenPositionUpdate: Number(allowedTimeBetweenUpdates)});
+        const newSettings = {maxPenalties: Number(maxPenalties), allowedTimeOutOfZone: Number(allowedTimeOutOfZone), allowedTimeBetweenPositionUpdate: Number(allowedTimeBetweenUpdates)};
+        const changingSettings = {};
+        for (const key in newSettings) {
+            if (newSettings[key] != penaltySettings[key]) {
+                changingSettings[key] = newSettings[key];
+            }
+        }
+        changePenaltySettings(changingSettings);
     }
 
     return (

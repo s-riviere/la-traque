@@ -24,7 +24,14 @@ export function ZoneSelector() {
     }, [zoneSettings]);
 
     function handleSettingsSubmit() {
-        changeZoneSettings({min:minZone, max:maxZone, reductionCount: Number(reductionCount), reductionDuration: Number(reductionDuration), reductionInterval: Number(reductionInterval)});
+        const newSettings = {min:minZone, max:maxZone, reductionCount: Number(reductionCount), reductionDuration: Number(reductionDuration), reductionInterval: Number(reductionInterval)};
+        const changingSettings = {};
+        for (const key in newSettings) {
+            if (newSettings[key] != zoneSettings[key]) {
+                changingSettings[key] = newSettings[key];
+            }
+        }
+        changeZoneSettings(changingSettings);
     }
 
     //When the user set one zone, switch to the other
@@ -39,8 +46,8 @@ export function ZoneSelector() {
 
     return <div className='w-2/5 h-full gap-1 bg-white p-10 flex flex-col text-center shadow-2xl overflow-y-scroll'>
         <h2 className="text-2xl">Edit zones</h2>
-        {editMode == EditMode.MIN && <RedButton onClick={() => setEditMode(EditMode.MAX)}>Edit end zone</RedButton>}
-        {editMode == EditMode.MAX && <BlueButton onClick={() => setEditMode(EditMode.MIN)}>Edit start zone</BlueButton>}
+        {editMode == EditMode.MIN && <BlueButton onClick={() => setEditMode(EditMode.MAX)}>Click to edit first zone</BlueButton>}
+        {editMode == EditMode.MAX && <RedButton onClick={() => setEditMode(EditMode.MIN)}>Click to edit last zone</RedButton>}
         <ZonePicker minZone={minZone} maxZone={maxZone} editMode={editMode} setMinZone={setMinZone} setMaxZone={setMaxZone} />
         <div>
             <p>Number of reductions</p>
