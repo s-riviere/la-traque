@@ -45,7 +45,6 @@ export function sendUpdatedTeamInformations(teamId) {
             name: team.name,
             enemyLocation: team.enemyLocation,
             enemyName: team.enemyName,
-            currentLocation: team.currentLocation,
             lastSentLocation: team.lastSentLocation,
             locationSendDeadline: team.locationSendDeadline,
             captureCode: team.captureCode,
@@ -53,6 +52,13 @@ export function sendUpdatedTeamInformations(teamId) {
             ready: team.ready,
             captured: team.captured,
             penalties: team.penalties,
+            outOfZone: team.outOfZone,
+            outOfZoneDeadline: team.outOfZoneDeadline,
+            distance: team.distance,
+            startDate: game.startDate,
+            finishDate: team.finishDate,
+            nCaptures: team.nCaptures,
+            nSentLocation: team.nSentLocation,
         })
     })
     secureAdminBroadcast("teams", game.teams);
@@ -94,7 +100,8 @@ export function initTeamSocket() {
             socket.emit("zone", zone.currentZone);
             socket.emit("new_zone", {
                 begin: zone.currentStartZone,
-                end: zone.nextZone
+                end: zone.nextZone,
+                endDate: zone.nextZoneDate,
             })
             callback({ isLoggedIn : true, message: "Logged in"});
         });
@@ -133,6 +140,29 @@ export function initTeamSocket() {
                 return;
             }
             callback({ hasCaptured : true, message: "Capture successful" });
-        })
+        });
+
+        socket.on("deviceInfo", (infos) => {
+            if (!teamId) {
+                return;
+            }
+            const team = game.getTeam(teamId);
+            // Only the first socket shares its infos since he is the one whose location is tracked
+            if (team.sockets.indexOf(socket.id) == 0) {
+                team.phoneModel = infos.model;
+                team.phoneName = infos.name;
+            }
+        });
+
+        socket.on("batteryUpdate", (batteryLevel) => {
+            if (!teamId) {
+                return;
+            }
+            const team = game.getTeam(teamId);
+            // Only the first socket shares its infos since he is the one whose location is tracked
+            if (team.sockets.indexOf(socket.id) == 0) {
+                team.battery = batteryLevel;
+            }
+        });
     });
 }

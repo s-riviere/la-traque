@@ -5,7 +5,6 @@ import { config } from "dotenv";
 import { initAdminSocketHandler } from "./admin_socket.js";
 import { initTeamSocket } from "./team_socket.js";
 import { initPhotoUpload } from "./photo.js";
-import { initTrajectories } from "./trajectory.js";
 
 config();
 const HOST = process.env.HOST;
@@ -29,4 +28,3 @@ export const io = new Server(httpServer, {
 initAdminSocketHandler();
 initTeamSocket();
 initPhotoUpload();
-initTrajectories();

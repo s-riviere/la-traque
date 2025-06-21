@@ -43,23 +43,48 @@ function addLineToFile(teamID, line) {
     }
 }
 
-// Export functions
-
-export async function initTrajectories() {
+function initTrajectories() {
     const files = fs.readdirSync(UPLOAD_DIR);
     for (const file of files) fs.unlinkSync(path.join(UPLOAD_DIR, file));
 }
 
-export function writePosition(date, teamID, lon, lat) {
-    addLineToFile(teamID, dataToLine(date, "position", lon, lat));
-}
+// Export functions
 
-export function writeCapture(date, teamID, capturedTeamID) {
-    addLineToFile(teamID, dataToLine(date, "capture", capturedTeamID));
-    addLineToFile(capturedTeamID, dataToLine(date, "captured", teamID));
-}
+export default {
+    isRecording: false,
 
-export function writeSeePosition(date, teamID, seenTeamID) {
-    addLineToFile(teamID, dataToLine(date, "see"));
-    addLineToFile(seenTeamID, dataToLine(date, "seen"));
+    start() {
+        initTrajectories();
+        this.isRecording = true;
+    },
+
+    stop() {
+        this.isRecording = false;
+    },
+
+    writePosition(date, teamID, lon, lat) {
+        if (this.isRecording) {
+            addLineToFile(teamID, dataToLine(date, "position", lon, lat));
+        }
+    },
+
+    writeCapture(date, teamID, capturedTeamID) {
+        if (this.isRecording) {
+            addLineToFile(teamID, dataToLine(date, "capture", capturedTeamID));
+            addLineToFile(capturedTeamID, dataToLine(date, "captured", teamID));
+        }
+    },
+
+    writeSeePosition(date, teamID, seenTeamID) {
+        if (this.isRecording) {
+            addLineToFile(teamID, dataToLine(date, "see"));
+            addLineToFile(seenTeamID, dataToLine(date, "seen"));
+        }
+    },
+
+    writeOutOfZone(date, teamID, isOutOfZone) {
+        if (this.isRecording) {
+            addLineToFile(teamID, dataToLine(date, "zone", isOutOfZone));
+        }
+    },
 }

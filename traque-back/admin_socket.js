@@ -53,7 +53,7 @@ export function initAdminSocketHandler() {
                 loggedInSockets.push(socket.id);
                 loggedIn = true;
                 // Send the current state
-                socket.emit("game_state", game.state)
+                socket.emit("game_state", {state: game.state, startDate: game.startDate})
                 // Other settings that need initialization
                 socket.emit("penalty_settings", penaltyController.settings)
                 socket.emit("game_settings", game.settings)
@@ -61,7 +61,8 @@ export function initAdminSocketHandler() {
                 socket.emit("zone", zone.currentZone)
                 socket.emit("new_zone", {
                     begin: zone.currentStartZone,
-                    end: zone.nextZone
+                    end: zone.nextZone,
+                    endDate: zone.nextZoneDate,
                 })
             } else {
                 // Attempt unsuccessful
@@ -143,10 +144,7 @@ export function initAdminSocketHandler() {
                 socket.emit("error", "Not logged in");
                 return;
             }
-            if (game.setState(state)) {
-                secureAdminBroadcast("game_state", game.state);
-                playersBroadcast("game_state", game.state)
-            } else {
+            if (!game.setState(state)) {
                 socket.emit("error", "Error setting state");
             }
         });

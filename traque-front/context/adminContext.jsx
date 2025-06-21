@@ -19,8 +19,9 @@ function AdminProvider({ children }) {
     const { adminSocket } = useSocket();
     const { loggedIn } = useAdminConnexion();
     const [gameState, setGameState] = useState(GameState.SETUP);
+    const [startDate, setStartDate] = useState(null);
 
-    useSocketListener(adminSocket, "game_state", setGameState);
+    useSocketListener(adminSocket, "game_state", (data) => {setGameState(data.state); setStartDate(data.startDate)});
     //Send a request to get the teams when the user logs in
     useEffect(() => {
         adminSocket.emit("get_teams");
@@ -46,7 +47,7 @@ function AdminProvider({ children }) {
     useSocketListener(adminSocket, "zone_start", shrinking);
     useSocketListener(adminSocket, "new_zone", waiting);
 
-    const value = useMemo(() => ({ zone, zoneExtremities, teams, zoneSettings, penaltySettings, gameSettings, gameState, nextZoneDate, isShrinking }), [zoneSettings, teams, gameState, zone, zoneExtremities, penaltySettings, gameSettings, nextZoneDate, isShrinking]);
+    const value = useMemo(() => ({ zone, zoneExtremities, teams, zoneSettings, penaltySettings, gameSettings, gameState, nextZoneDate, isShrinking, startDate }), [zoneSettings, teams, gameState, zone, zoneExtremities, penaltySettings, gameSettings, nextZoneDate, isShrinking, startDate]);
     return (
         <adminContext.Provider value={value}>
             {children}

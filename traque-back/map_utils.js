@@ -14,7 +14,7 @@ function degToRad(deg) {
  * @returns the distance between the two positions in meters
  * @see https://gist.github.com/miguelmota/10076960
  */
-function getDistanceFromLatLon({ lat: lat1, lng: lon1 }, { lat: lat2, lng: lon2 }) {
+export function getDistanceFromLatLon({ lat: lat1, lng: lon1 }, { lat: lat2, lng: lon2 }) {
     var R = 6371; // Radius of the earth in km
     var dLat = degToRad(lat2 - lat1);
     var dLon = degToRad(lon2 - lon1);

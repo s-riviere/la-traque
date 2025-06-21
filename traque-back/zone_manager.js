@@ -116,6 +116,8 @@ export default {
      * Start the zone reduction sequence
     */
     start() {
+        if (!this.ready()) return false;
+        this.reset();
         this.started = true;
         this.startDate = new Date();
         //initialize the zone to its max value

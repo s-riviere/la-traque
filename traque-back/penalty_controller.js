@@ -121,17 +121,21 @@ export default {
             if (!isInCircle({ lat: team.currentLocation[0], lng: team.currentLocation[1] }, zone.currentZone.center, zone.currentZone.radius)) {
                 //The team was not previously out of the zone
                 if (!this.outOfBoundsSince[team.id]) {
-                    this.outOfBoundsSince[team.id] = new Date();
-                    teamBroadcast(team.id, "warning", `You left the zone, you have ${this.settings.allowedTimeOutOfZone} minutes to get back in the marked area.`)
-                } else if (new Date() - this.outOfBoundsSince[team.id] > this.settings.allowedTimeOutOfZone * 60 * 1000) {
-                    this.addPenalty(team.id)
-                    this.outOfBoundsSince[team.id] = new Date();
-                } else if (Math.abs(new Date() - this.outOfBoundsSince[team.id] - (this.settings.allowedTimeOutOfZone - 1) * 60 * 1000) < 100) {
-                    teamBroadcast(team.id, "warning", `You left the zone, you have 1 minutes to get back in the marked area.`)
+                    this.outOfBoundsSince[team.id] = Date.now();
+                    team.outOfZone = true;
+                    team.outOfZoneDeadline = this.outOfBoundsSince[team.id] + this.settings.allowedTimeOutOfZone * 60 * 1000;
+                    secureAdminBroadcast("teams", game.teams)
+                } else if (Date.now() - this.outOfBoundsSince[team.id] > this.settings.allowedTimeOutOfZone * 60 * 1000) {
+                    this.addPenalty(team.id);
+                    this.outOfBoundsSince[team.id] = Date.now();
+                    team.outOfZoneDeadline = this.outOfBoundsSince[team.id] + this.settings.allowedTimeOutOfZone * 60 * 1000;
+                    secureAdminBroadcast("teams", game.teams)
                 }
             } else {
                 if (this.outOfBoundsSince[team.id]) {
+                    team.outOfZone = false;
                     delete this.outOfBoundsSince[team.id];
+                    secureAdminBroadcast("teams", game.teams)
                 }
             }
         })
@@ -146,15 +150,15 @@ export default {
             //If the team has not sent their location for more than the allowed period, automatically send it and add a penalty
             if (team.captured) { return }
             if (team.locationSendDeadline == null) {
-                team.locationSendDeadline = Number(new Date()) + this.settings.allowedTimeBetweenPositionUpdate * 60 * 1000;
+                team.locationSendDeadline = Number(Date.now()) + this.settings.allowedTimeBetweenPositionUpdate * 60 * 1000;
                 return;
             }
-            if (new Date() > team.locationSendDeadline) {
+            if (Date.now() > team.locationSendDeadline) {
                 this.addPenalty(team.id);
                 game.sendLocation(team.id);
                 sendUpdatedTeamInformations(team.id);
                 secureAdminBroadcast("teams", game.teams)
-            } else if (Math.abs(new Date() - team.locationSendDeadline - 60 * 1000) < 100) {
+            } else if (Math.abs(Date.now() - team.locationSendDeadline - 60 * 1000) < 100) {
                 teamBroadcast(team.id, "warning", `You have one minute left to udpate your location.`)
             }
         })
