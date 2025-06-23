@@ -1,23 +1,18 @@
 services:
   reverse_proxy:
-    #image: git.rezel.net/ludotech/traque-proxy:latest
-    build: ./proxy
+    image: git.rezel.net/ludotech/traque-proxy:latest
     ports:
       - "80:80"
     restart: always
 
   front:
-    #image: git.rezel.net/ludotech/traque-front:latest
-    build: ./traque-front
+    image: git.rezel.net/ludotech/traque-front:latest
     restart: always
     environment:
-      NEXT_PUBLIC_SOCKET_HOST: 'localhost'
-      NEXT_PUBLIC_SOCKET_PORT: 3001
-      #NEXT_PUBLIC_SOCKET_HOST: 'traque.rezel.net'
+      NEXT_PUBLIC_SOCKET_HOST: 'traque.rezel.net'
 
   back:
-    #image: git.rezel.net/ludotech/traque-back:latest
-    build: ./traque-back
+    image: git.rezel.net/ludotech/traque-back:latest
     restart: always
     ports:
       - "3001:3001"
@@ -25,5 +20,3 @@ services:
       ADMIN_PASSWORD_HASH: '23e3c6886ff8fcba302deac05c46612ed3af99e40a2a14252810f540f3c186aa'
       HOST: '0.0.0.0'
       PORT: 3001
-
-

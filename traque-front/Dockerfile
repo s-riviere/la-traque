@@ -1,3 +1,4 @@
+# Use Node 22 alpine as parent image
 FROM node:22-alpine AS base
 
 # Install dependencies only when needed

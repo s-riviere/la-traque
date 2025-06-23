@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "author": "Quentin Roussel",
   "license": "ISC",
@@ -16,5 +17,8 @@
     "multer": "^1.4.5-lts.1",
     "random-location": "^1.1.3",
     "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }

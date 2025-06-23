@@ -1,0 +1,32 @@
+services:
+  reverse_proxy:
+    build: ./proxy
+    restart: always
+    ports:
+      - "80:80"
+
+  front:
+    build:
+      context: ./traque-front
+      dockerfile: Dockerfile.dev
+    restart: always
+    volumes:
+      - ./traque-front:/app
+      - /app/node_modules
+    environment:
+      NEXT_PUBLIC_SOCKET_HOST: 'localhost'
+
+  back:
+    build:
+      context: ./traque-back
+      dockerfile: Dockerfile.dev
+    restart: always
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./traque-back:/app
+      - /app/node_modules
+    environment:
+      ADMIN_PASSWORD_HASH: '23e3c6886ff8fcba302deac05c46612ed3af99e40a2a14252810f540f3c186aa'
+      HOST: '0.0.0.0'
+      PORT: 3001
