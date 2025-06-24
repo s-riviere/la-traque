@@ -143,7 +143,7 @@ export function LiveMap() {
     }
 
     return (
-        <div className='min-h-full w-full'>
+        <div className='h-full w-full'>
             {gameState == GameState.PLAYING && <p>{`${isShrinking ? "Fin" : "Début"} du rétrécissement de la zone dans : ${formatTime(timeLeftNextZone)}`}</p>}
             <MapContainer className='min-h-full w-full' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
                 <TileLayer

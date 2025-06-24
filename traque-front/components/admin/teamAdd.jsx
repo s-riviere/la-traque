@@ -1,6 +1,4 @@
 import React from 'react'
-import TextInput from '../util/textInput'
-import BlueButton from '../util/button'
 
 export default function TeamAddForm({onAddTeam}) {
     const [teamName, setTeamName] = React.useState('');
@@ -14,12 +12,12 @@ export default function TeamAddForm({onAddTeam}) {
     }
     
     return (
-        <form className='flex flex-row m-y-5' onSubmit={handleSubmit}>
+        <form className='flex flex-row m-y-5 mb-3' onSubmit={handleSubmit}>
             <div className='w-4/5'>
-                <TextInput name="teamName" label='Team name' value={teamName} onChange={(e) => setTeamName(e.target.value)}/>
+                <input name="teamName" label='Team name' value={teamName} onChange={(e) => setTeamName(e.target.value)} type="text" className="block w-full h-full p-4 text-center ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400" />
             </div>
             <div className='w-1/5'>
-                <BlueButton type="submit" className="w-5">+</BlueButton>
+                <button type="submit" className="w-5 w-full h-full bg-blue-400 hover:bg-blue-500 transition text-3xl font-bold">+</button>
             </div>
         </form>
     )

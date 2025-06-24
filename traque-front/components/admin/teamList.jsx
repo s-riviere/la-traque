@@ -11,15 +11,23 @@ const reorder = (list, startIndex, endIndex) => {
   return result;
 };
 
-function TeamListItem({ team, index, onSelected, itemSelected }) {
-    const bgColor = team.captured ? " bg-red-400" : " bg-gray-300";
-    const border = " border border-4 " + (itemSelected ? "border-black" : team.captured ? "border-red-400" : "border-gray-300");
-    const classNames = 'w-full p-3 my-3' + (bgColor) + (border);
+function TeamListItem({ team, index, onSelected, itemSelected }) {;
     return (
         <Draggable draggableId={team.id.toString()} index={index} onClick={() => onSelected(team.id)}>
             {provided => (
-                <div className={classNames} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
-                    <p className='text-center'>{team.name}</p>
+                <div className='w-full p-2 bg-white border-2 border-gray-300 flex flex-row items-center text-3xl gap-3 font-bold' {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+                    <div className="w-12 h-12 grid grid-cols-2 grid-rows-2 gap-1">
+                        <img src="/icons/greendude.png" className="w-6 h-6 object-contain" />
+                        <img src="/icons/greenlocation.png" className="w-6 h-6 object-contain" />
+                        <img src="/icons/greenconnection.png" className="w-6 h-6 object-contain" />
+                        <img src="/icons/greenbattery.png" className="w-6 h-6 object-contain" />
+                    </div>
+                    <div className='flex-1 w-full h-full flex flex-row items-center justify-between'>
+                        <p className='text-center'>{team.name}</p>
+                        <p className={`text-center ${team.state === "En jeu" ? "text-green-600" : "text-red-600"}`}>
+                            {team.state === team.captured ? "En jeu" : "Capturé"}
+                        </p>
+                    </div>
                 </div>
 
             )}
