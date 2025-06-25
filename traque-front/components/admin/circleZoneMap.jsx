@@ -15,14 +15,22 @@ const EditMode = {
 }
 
 function CircleDrawings({ minZone, setMinZone, maxZone, setMaxZone, editMode }) {
-    const { handleClick: maxClick, handleMouseMove: maxHover, center: maxCenter, radius: maxRadius } = useMapCircleDraw(minZone, setMinZone);
-    const { handleClick: minClick, handleMouseMove: minHover, center: minCenter, radius: minRadius } = useMapCircleDraw(maxZone, setMaxZone);
+    const { center: maxCenter, radius: maxRadius, handleLeftClick: maxLeftClick, handleRightClick: maxRightClick, handleMouseMove: maxHover } = useMapCircleDraw(maxZone, setMaxZone);
+    const { center: minCenter, radius: minRadius, handleLeftClick: minLeftClick, handleRightClick: minRightClick, handleMouseMove: minHover } = useMapCircleDraw(minZone, setMinZone);
     
     function handleLeftClick(e) {
         if (editMode == EditMode.MAX) {
-            maxClick(e);
+            maxLeftClick(e);
         } else {
-            minClick(e);
+            minLeftClick(e);
+        }
+    }
+    
+    function handleRightClick(e) {
+        if (editMode == EditMode.MAX) {
+            maxRightClick(e);
+        } else {
+            minRightClick(e);
         }
     }
     
@@ -38,7 +46,7 @@ function CircleDrawings({ minZone, setMinZone, maxZone, setMaxZone, editMode }) 
         <div>
             {minCenter && minRadius && <Circle center={minCenter} radius={minRadius} color="blue" fillColor="blue" />}
             {maxCenter && maxRadius && <Circle center={maxCenter} radius={maxRadius} color="red" fillColor="red" />}
-            <MapEventListener onLeftClick={handleLeftClick}  onRightClick={() => {}} onMouseMove={handleMouseMove} />
+            <MapEventListener onLeftClick={handleLeftClick}  onRightClick={handleRightClick} onMouseMove={handleMouseMove} />
         </div>
     );
 }

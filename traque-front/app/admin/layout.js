@@ -20,5 +20,5 @@ export default function AdminLayout({ children }) {
                 </div>
             </AdminProvider>
         </AdminConnexionProvider>
-    )
+    );
 }

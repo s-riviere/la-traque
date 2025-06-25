@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 export default function usePasswordProtect(loginPath, redirectPath, loading, loggedIn) {
     const path = usePathname();
+    
     useEffect(() => {
         if (!loggedIn && !loading && path !== loginPath) {
             redirect(loginPath);

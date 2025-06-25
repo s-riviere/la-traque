@@ -12,7 +12,7 @@ export default function useMapCircleDraw(area, setArea) {
         setRadius(area?.radius || null);
     }, [area])
 
-    function handleClick(e) {
+    function handleLeftClick(e) {
         if (!drawing) {
             setCenter(e.latlng);
             setRadius(null);
@@ -23,11 +23,21 @@ export default function useMapCircleDraw(area, setArea) {
         }
     }
 
+    function handleRightClick(e) {
+        if (drawing) {
+            setDrawing(false);
+            setCenter(area?.center || null);
+            setRadius(area?.radius || null);
+        } else {
+            setArea(null);
+        }
+    }
+
     function handleMouseMove(e) {
         if (drawing) {
             setRadius(e.latlng.distanceTo(center));
         }
     }
 
-    return { handleClick, handleMouseMove, center, radius };
+    return { center, radius, handleLeftClick, handleRightClick, handleMouseMove };
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMap } from "react-leaflet";
 
 export default function useMapPolygonDraw(polygons, addPolygon, removePolygon) {
@@ -8,6 +8,11 @@ export default function useMapPolygonDraw(polygons, addPolygon, removePolygon) {
     const nodeHighlightDistance = 30; // px
     const [currentPolygon, setCurrentPolygon] = useState([]);
     const [highlightNodes, setHighlightNodes] = useState([]);
+
+    useEffect(() => {
+        setCurrentPolygon([]);
+        setHighlightNodes([]);
+    }, [polygons])
 
     function latlngEqual(latlng1, latlng2, epsilon = 1e-9) {
         return Math.abs(latlng1.lat - latlng2.lat) < epsilon && Math.abs(latlng1.lng - latlng2.lng) < epsilon;

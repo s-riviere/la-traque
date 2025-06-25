@@ -15,7 +15,7 @@ const positionIcon = new L.Icon({
 
 export default function CircularAreaPicker({ area, setArea, markerPosition, ...props }) {
     const location = useLocation(Infinity);
-    const { handleClick, handleMouseMove, center, radius } = useMapCircleDraw(area, setArea);
+    const { center, radius, handleLeftClick, handleRightClick, handleMouseMove } = useMapCircleDraw(area, setArea);
 
     return (
         <MapContainer  {...props} className='min-h-full w-full ' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
@@ -24,10 +24,9 @@ export default function CircularAreaPicker({ area, setArea, markerPosition, ...p
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {center && radius && <Circle center={center} radius={radius} fillColor="blue" />}
-            {markerPosition && <Marker position={markerPosition} icon={positionIcon}>
-            </Marker>}
+            {markerPosition && <Marker position={markerPosition} icon={positionIcon} />}
             <MapPan center={location} zoom={DEFAULT_ZOOM} />
-            <MapEventListener onLeftClick={handleClick} onRightClick={() => {}} onMouseMove={handleMouseMove} />
+            <MapEventListener onLeftClick={handleLeftClick} onRightClick={handleRightClick} onMouseMove={handleMouseMove} />
         </MapContainer>
     );
 }

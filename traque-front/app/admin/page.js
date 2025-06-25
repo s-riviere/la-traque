@@ -12,7 +12,9 @@ const LiveMap = dynamic(() => import('@/components/admin/liveMap'), { ssr: false
 export default function AdminPage() {
     const { useProtect } = useAdminConnexion();
     const { gameState, changeState } = useAdmin();
+
     useProtect();
+    
     return (
         <div className='min-h-full bg-gray-200 p-10 flex flex-row content-start gap-5'>
             <div className="h-full w-2/6">

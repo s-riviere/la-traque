@@ -16,20 +16,5 @@ export default function useGame() {
         teamSocket.emit("capture", captureCode);
     }
 
-    return {
-        sendCurrentPosition,
-        capture,
-        enemyPosition: teamInfos?.enemyLocation || null,
-        enemyName: teamInfos?.enemyName || null,
-        currentPosition: teamInfos?.currentLocation || null,
-        startingArea: teamInfos?.startingArea || null,
-        captureCode: teamInfos?.captureCode || null,
-        name: teamInfos?.name || null,
-        ready: teamInfos?.ready || false,
-        captured: teamInfos?.captured || false,
-        locationSendDeadline: teamInfos?.locationSendDeadline || null,
-        penalties: teamInfos?.penalties || 0,
-        teamId,
-        gameState,
-    };
+    return {...teamInfos, sendCurrentPosition, capture, teamId, gameState};
 }

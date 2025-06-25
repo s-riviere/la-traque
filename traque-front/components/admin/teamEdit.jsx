@@ -15,13 +15,9 @@ export default function TeamEdit({ selectedTeamId, setSelectedTeamId }) {
     const [newTeamName, setNewTeamName] = React.useState('');
     const { updateTeam, getTeamName, removeTeam, getTeam, teams, gameState, startDate } = useAdmin();
     const [team, setTeam] = useState({});
+
     const NEXT_PUBLIC_SOCKET_HOST = env("NEXT_PUBLIC_SOCKET_HOST");
-    var protocol = "https://";
-    if (NEXT_PUBLIC_SOCKET_HOST == "localhost") {
-        protocol = "http://";
-    }
-    const SERVER_URL = protocol + NEXT_PUBLIC_SOCKET_HOST + "/back";
-    console.log(SERVER_URL);
+    const SERVER_URL = (NEXT_PUBLIC_SOCKET_HOST == "localhost" ? "http://" : "https://") + NEXT_PUBLIC_SOCKET_HOST + "/back";
 
     useEffect(() => {
         let team = getTeam(selectedTeamId);
@@ -122,5 +118,5 @@ export default function TeamEdit({ selectedTeamId, setSelectedTeamId }) {
                 </div>
             </div>
         </div>
-    )
+    );
 }

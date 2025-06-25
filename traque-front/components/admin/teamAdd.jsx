@@ -1,9 +1,9 @@
-import React from 'react'
+import { useState } from 'react'
 import { TextInput } from '../util/textInput'
 import { BlueButton } from '../util/button'
 
 export default function TeamAddForm({onAddTeam}) {
-    const [teamName, setTeamName] = React.useState('');
+    const [teamName, setTeamName] = useState('');
     
     function handleSubmit(e) {
         e.preventDefault();
@@ -22,5 +22,5 @@ export default function TeamAddForm({onAddTeam}) {
                 <BlueButton type="submit" className="w-5">+</BlueButton>
             </div>
         </form>
-    )
+    );
 }

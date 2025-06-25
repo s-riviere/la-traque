@@ -7,11 +7,11 @@ import useAdmin from '@/hook/useAdmin';
 import React, { useState } from 'react'
 
 export default function TeamAdminPage() {
-    const [selectedTeamId, setSelectedTeamId] = useState(null);
-    const { addTeam } = useAdmin();
-    const { useProtect }  = useAdminConnexion();
-    useProtect();
+  const [selectedTeamId, setSelectedTeamId] = useState(null);
+  const { addTeam } = useAdmin();
+  const { useProtect }  = useAdminConnexion();
 
+  useProtect();
 
   return (
       <div className='h-full bg-gray-200 p-10 flex flex-row justify-between'> 

@@ -33,17 +33,17 @@ export default function PenaltySettings() {
             <h2 className="text-2xl">Penalties</h2>
             <div>
                 <p>Maximum Penalties</p>
-                <TextInput value={maxPenalties} onChange={(e) => setMaxPenalties(e.target.value)}></TextInput>
+                <TextInput value={maxPenalties} onChange={(e) => setMaxPenalties(e.target.value)} />
             </div>
             <div>
                 <p>Time out of the zone before a penalty</p>
-                <TextInput value={allowedTimeOutOfZone} onChange={(e) => setAllowedTimeOutOfZone(e.target.value)}></TextInput>
+                <TextInput value={allowedTimeOutOfZone} onChange={(e) => setAllowedTimeOutOfZone(e.target.value)} />
             </div>
             <div>
                 <p>Allowed time between position updates</p>
-                <TextInput value={allowedTimeBetweenUpdates} onChange={(e) => setAllowedTimeBetweenUpdates(e.target.value)}></TextInput>
+                <TextInput value={allowedTimeBetweenUpdates} onChange={(e) => setAllowedTimeBetweenUpdates(e.target.value)} />
             </div>
             <GreenButton onClick={applySettings}>Apply</GreenButton>
         </div>
-    )
+    );
 }

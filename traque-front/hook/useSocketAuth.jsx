@@ -49,5 +49,5 @@ export default function useSocketAuth(socket, passwordName) {
     }, [waitingForResponse, savedPasswordLoading, savedPassword]);
 
 
-    return {login,logout,password: savedPassword, loggedIn, loading};
+    return {login, logout, password: savedPassword, loggedIn, loading};
 }

@@ -29,20 +29,9 @@ export default function TeamList({selectedTeamId, onSelected}) {
     const {teams, reorderTeams} = useAdmin();
 
     function onDragEnd(result) {
-        if (!result.destination) {
-            return;
-        }
-
-        if (result.destination.index === result.source.index) {
-            return;
-        }
-
-        const newTeams = reorder(
-            teams,
-            result.source.index,
-            result.destination.index
-        );
-
+        if (!result.destination) return;
+        if (result.destination.index === result.source.index) return;
+        const newTeams = reorder(teams, result.source.index, result.destination.index);
         reorderTeams(newTeams);
     }
 
@@ -50,7 +39,7 @@ export default function TeamList({selectedTeamId, onSelected}) {
         <DragDropContext onDragEnd={onDragEnd} >
             <Droppable droppableId='team-list'>
                 {provided => (
-                    <ul  ref={provided.innerRef} {...provided.droppableProps}>
+                    <ul ref={provided.innerRef} {...provided.droppableProps}>
                         {teams.map((team, i) => (
                             <li key={team.id} onClick={() => onSelected(team.id)}>
                                 <TeamListItem onSelected={onSelected} index={i} itemSelected={selectedTeamId === team.id} team={team} />
