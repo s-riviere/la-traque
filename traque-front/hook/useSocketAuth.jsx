@@ -1,13 +1,13 @@
-import {useEffect, useState} from 'react';
-import { useSocketListener } from './useSocketListener';
-import { useLocalStorage } from './useLocalStorage';
-import { usePathname } from 'next/navigation';
+"use client";
+import { useEffect, useState } from 'react';
+import useSocketListener from './useSocketListener';
+import useLocalStorage from './useLocalStorage';
 
 const LOGIN_MESSAGE = "login";
 const LOGOUT_MESSAGE = "logout";
 const LOGIN_RESPONSE_MESSAGE = "login_response";
 
-export function useSocketAuth(socket, passwordName) {
+export default function useSocketAuth(socket, passwordName) {
     const [loggedIn, setLoggedIn] = useState(false);
     const [loading, setLoading] = useState(true);
     const [waitingForResponse, setWaitingForResponse] = useState(true);

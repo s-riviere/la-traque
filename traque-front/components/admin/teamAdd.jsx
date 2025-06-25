@@ -1,6 +1,6 @@
 import React from 'react'
-import TextInput from '../util/textInput'
-import BlueButton from '../util/button'
+import { TextInput } from '../util/textInput'
+import { BlueButton } from '../util/button'
 
 export default function TeamAddForm({onAddTeam}) {
     const [teamName, setTeamName] = React.useState('');

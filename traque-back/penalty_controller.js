@@ -1,11 +1,10 @@
 /*
 This module manages the verification of the game rules and the penalties.
 */
-import { isInCircle } from "./map_utils.js";
 import { sendUpdatedTeamInformations, teamBroadcast } from "./team_socket.js";
 import { secureAdminBroadcast } from "./admin_socket.js";
 import game, { GameState } from "./game.js";
-import zone from "./zone_manager.js";
+import zoneManager from "./zone_manager.js";
 
 export default {
     // Object mapping team id to the date they left the zone as a UNIX millisecond timestamp
@@ -115,10 +114,10 @@ export default {
         game.teams.forEach((team) => {
             if (team.captured) { return }
             //All the informations are not ready yet
-            if (team.currentLocation == null || zone.currentZone == null) {
+            if (team.currentLocation == null || !zoneManager.isRunning) {
                 return;
             }
-            if (!isInCircle({ lat: team.currentLocation[0], lng: team.currentLocation[1] }, zone.currentZone.center, zone.currentZone.radius)) {
+            if (!zoneManager.isInCircle({ lat: team.currentLocation[0], lng: team.currentLocation[1] })) {
                 //The team was not previously out of the zone
                 if (!this.outOfBoundsSince[team.id]) {
                     this.outOfBoundsSince[team.id] = Date.now();

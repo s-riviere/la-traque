@@ -1,9 +1,9 @@
 import useAdmin from "@/hook/useAdmin";
-import TextInput from "../util/textInput";
+import { TextInput } from "../util/textInput";
 import { GreenButton } from "../util/button";
 import { useEffect, useState } from "react";
 
-export const PenaltySettings = () => {
+export default function PenaltySettings() {
     const {penaltySettings, changePenaltySettings} = useAdmin();
     const [maxPenalties, setMaxPenalties] = useState("");
     const [allowedTimeOutOfZone, setAllowedTimeOutOfZone] = useState("");

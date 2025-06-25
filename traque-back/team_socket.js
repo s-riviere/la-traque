@@ -6,7 +6,7 @@ This module also exposes functions to send messages via socket to all teams
 import { secureAdminBroadcast } from "./admin_socket.js";
 import { io } from "./index.js";
 import game from "./game.js";
-import zone from "./zone_manager.js";
+import zoneManager from "./zone_manager.js";
 
 /**
  * Send a socket message to all the players of a team
@@ -97,11 +97,10 @@ export function initTeamSocket() {
             socket.emit("login_response", true);
             socket.emit("game_state", game.state);
             socket.emit("game_settings", game.settings);
-            socket.emit("zone", zone.currentZone);
-            socket.emit("new_zone", {
-                begin: zone.currentStartZone,
-                end: zone.nextZone,
-                endDate: zone.nextZoneDate,
+            socket.emit("zone", {
+                begin: zoneManager.getCurrentZone(),
+                end: zoneManager.getNextZone(),
+                endDate: zoneManager.currentZoneEndDate,
             })
             callback({ isLoggedIn : true, message: "Logged in"});
         });

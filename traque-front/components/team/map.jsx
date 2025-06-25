@@ -1,14 +1,12 @@
-'use client';
 import React, { useEffect, useState } from 'react'
 import { Circle, MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import "leaflet-defaulticon-compatibility";
 import "leaflet/dist/leaflet.css";
 import useGame from '@/hook/useGame';
-import { useTeamContext } from '@/context/teamContext';
+import useTeamContext from '@/context/teamContext';
 
 const DEFAULT_ZOOM = 14;
-
 
 // Pan to the center of the map when the position of the user is updated for the first time
 function MapPan(props) {

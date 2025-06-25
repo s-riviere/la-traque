@@ -1,6 +1,7 @@
+"use client";
 import { useEffect, useState } from "react";
 
-export function useMapCircleDraw(area, setArea) {
+export default function useMapCircleDraw(area, setArea) {
     const [drawing, setDrawing] = useState(false);
     const [center, setCenter] = useState(area?.center || null);
     const [radius, setRadius] = useState(area?.radius || null);
@@ -12,7 +13,7 @@ export function useMapCircleDraw(area, setArea) {
     }, [area])
 
     function handleClick(e) {
-        if(!drawing) {
+        if (!drawing) {
             setCenter(e.latlng);
             setRadius(null);
             setDrawing(true);
@@ -23,14 +24,10 @@ export function useMapCircleDraw(area, setArea) {
     }
 
     function handleMouseMove(e) {
-        if(drawing) {
+        if (drawing) {
             setRadius(e.latlng.distanceTo(center));
         }
     }
-    return {
-        handleClick,
-        handleMouseMove,
-        center,
-        radius,
-    }
+
+    return { handleClick, handleMouseMove, center, radius };
 }

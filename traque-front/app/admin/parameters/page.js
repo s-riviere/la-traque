@@ -1,12 +1,12 @@
 "use client";
-import { GameSettings } from "@/components/admin/gameSettings";
-import { PenaltySettings } from "@/components/admin/penaltySettings";
+import GameSettings from "@/components/admin/gameSettings";
+import PenaltySettings from "@/components/admin/penaltySettings";
 import { useAdminConnexion } from "@/context/adminConnexionContext";
 import dynamic from "next/dynamic";
 
-const ZoneSelector = dynamic(() => import('@/components/admin/zoneSelector').then((mod) => mod.ZoneSelector), {
-    ssr: false
-});
+// Imported at runtime and not at compile time
+const ZoneSelector = dynamic(() => import('@/components/admin/polygonZoneMap'), { ssr: false });
+
 export default function AdminPage() {
     const { useProtect } = useAdminConnexion();
     useProtect();

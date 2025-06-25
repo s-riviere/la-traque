@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
-export function useLocalStorage(key, initialValue) {
+export default function useLocalStorage(key, initialValue) {
     const [storedValue, setStoredValue] = useState(initialValue);
     const [loading, setLoading] = useState(true);
 

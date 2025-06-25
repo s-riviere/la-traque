@@ -1,15 +1,14 @@
 "use client";
-import { TeamReady } from "@/components/admin/teamReady";
-import BlueButton, { GreenButton, RedButton } from "@/components/util/button";
+import TeamReady from "@/components/admin/teamReady";
+import { BlueButton, GreenButton, RedButton } from "@/components/util/button";
 import { useAdminConnexion } from "@/context/adminConnexionContext";
 import useAdmin from "@/hook/useAdmin";
 import { GameState } from "@/util/gameState";
 import dynamic from "next/dynamic";
-import { TeamListFixed } from '@/components/admin/teamList';
 
-const LiveMap = dynamic(() => import('@/components/admin/mapPicker').then((mod) => mod.LiveMap), {
-    ssr: false
-});
+// Imported at runtime and not at compile time
+const LiveMap = dynamic(() => import('@/components/admin/liveMap'), { ssr: false });
+
 export default function AdminPage() {
     const { useProtect } = useAdminConnexion();
     const { gameState, changeState } = useAdmin();

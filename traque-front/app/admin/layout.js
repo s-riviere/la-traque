@@ -1,8 +1,8 @@
-import { AdminConnexionProvider} from "@/context/adminConnexionContext";
+import { AdminConnexionProvider } from "@/context/adminConnexionContext";
 import { AdminProvider } from "@/context/adminContext";
 import Link from "next/link";
 
-export default function AdminLayout({ children}) {
+export default function AdminLayout({ children }) {
     return (
         <AdminConnexionProvider>
             <AdminProvider>

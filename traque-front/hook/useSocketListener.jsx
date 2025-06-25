@@ -1,6 +1,7 @@
-import { useEffect} from "react";
+"use client";
+import { useEffect } from "react";
 
-export function useSocketListener(socket, event, callback) {
+export default function useSocketListener(socket, event, callback) {
     useEffect(() => {
         socket.on(event,callback);
         return () => {

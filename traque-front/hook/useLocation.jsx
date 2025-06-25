@@ -5,11 +5,10 @@ import { useEffect, useState } from "react";
  * A hook that returns the location of the user and updates it periodically
  * @returns {Object} The location of the user
  */
-export function useLocation(interval) {
+export default function useLocation(interval) {
     const [location, setLocation] = useState();
     useEffect(() => {
         function update() {
-            console.log('Updating location');
             navigator.geolocation.getCurrentPosition((position) => {
                 setLocation([position.coords.latitude, position.coords.longitude]);
                 if(interval != Infinity) {

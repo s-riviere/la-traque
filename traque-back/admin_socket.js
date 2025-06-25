@@ -5,7 +5,7 @@ This module also exposes functions to send messages via socket to all admins
 */
 import { io } from "./index.js";
 import game from "./game.js"
-import zone from "./zone_manager.js"
+import zoneManager from "./zone_manager.js"
 import penaltyController from "./penalty_controller.js";
 import { playersBroadcast, sendUpdatedTeamInformations } from "./team_socket.js";
 import { createHash } from "crypto";
@@ -57,12 +57,11 @@ export function initAdminSocketHandler() {
                 // Other settings that need initialization
                 socket.emit("penalty_settings", penaltyController.settings)
                 socket.emit("game_settings", game.settings)
-                socket.emit("zone_settings", zone.zoneSettings)
-                socket.emit("zone", zone.currentZone)
-                socket.emit("new_zone", {
-                    begin: zone.currentStartZone,
-                    end: zone.nextZone,
-                    endDate: zone.nextZoneDate,
+                socket.emit("zone_settings", zoneManager.settings)
+                socket.emit("current_zone", {
+                    begin: zoneManager.getCurrentZone(),
+                    end: zoneManager.getNextZone(),
+                    endDate: zoneManager.currentZoneEndDate,
                 })
             } else {
                 // Attempt unsuccessful
@@ -89,11 +88,11 @@ export function initAdminSocketHandler() {
                 socket.emit("error", "Not logged in");
                 return;
             }
-            if (!game.setZoneSettings(settings)) {
+            if (!zoneManager.changeSettings(settings)) {
                 socket.emit("error", "Error changing zone");
-                socket.emit("zone_settings", zone.zoneSettings) // Still broadcast the old config to the client who submited an incorrect config to keep the client up to date
+                socket.emit("zone_settings", zoneManager.settings)
             } else {
-                secureAdminBroadcast("zone_settings", zone.zoneSettings)
+                secureAdminBroadcast("zone_settings", zoneManager.settings)
             }
 
         })

@@ -1,10 +1,9 @@
 import useGame from "@/hook/useGame";
 import { useEffect, useState } from "react"
-import BlueButton, { GreenButton, RedButton } from "../util/button";
-import TextInput from "../util/textInput";
-import { useTeamConnexion } from "@/context/teamConnexionContext";
-import { EnemyTeamModal } from "./enemyTeamModal";
-import Image from "next/image";
+import { BlueButton, GreenButton } from "../util/button";
+import { TextInput } from "../util/textInput";
+import useTeamConnexion from "@/context/teamConnexionContext";
+import EnemyTeamModal from "./enemyTeamModal";
 
 export default function ActionDrawer() {
     const [visible, setVisible] = useState(false);

@@ -1,237 +1,230 @@
-/*
-This module manages the play area during the game, shrinking it over time based of some settings.
-*/
-import { randomCirclePoint } from 'random-location'
-import { isInCircle } from './map_utils.js';
 import { playersBroadcast } from './team_socket.js';
 import { secureAdminBroadcast } from './admin_socket.js';
 
-/**
- * Scale a value that is known to be in a range to a new range
- * for instance map(50,0,100,1000,2000) will return 1500 as 50 is halfway between 0 and 100 and 1500 is halfway through 1000 and 2000
- * @param {Number} value value to map 
- * @param {Number} oldMin minimum value of the number 
- * @param {Number} oldMax maximum value of the number
- * @param {Number} newMin minimum value of the output
- * @param {Number} newMax maximum value of the output
- * @returns 
- */
-function map(value, oldMin, oldMax, newMin, newMax) {
-    return ((value - oldMin) / (oldMax - oldMin)) * (newMax - newMin) + newMin;
+
+/* -------------------------------- Useful functions and constants -------------------------------- */
+
+const EARTH_RADIUS = 6_371_000; // Radius of the earth in m
+
+function haversine_distance({ lat: lat1, lng: lon1 }, { lat: lat2, lng: lon2 }) {
+    const degToRad = (deg) => deg * (Math.PI / 180);
+    const dLat = degToRad(lat2 - lat1);
+    const dLon = degToRad(lon2 - lon1);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return c * EARTH_RADIUS;
 }
 
+function latlngEqual(latlng1, latlng2, epsilon = 1e-9) {
+    return Math.abs(latlng1.lat - latlng2.lat) < epsilon && Math.abs(latlng1.lng - latlng2.lng) < epsilon;
+}
+
+
+/* -------------------------------- Polygon zones -------------------------------- */
+
+const defaultPolygonSettings = { polygons: [], durations: [] };
+
+function polygonZone(points, duration) {
+    return {
+        points: points,
+        duration: duration,
+
+        isInZone(location) {
+            const {lat: x, lng: y} = location;
+            let inside = false;
+
+            for (let i = 0, j = this.points.length - 1; i < this.points.length; j = i++) {
+                const {lat: xi, lng: yi} = this.points[i];
+                const {lat: xj, lng: yj} = this.points[j];
+
+                const intersects = ((yi > y) !== (yj > y)) && (x < ((xj - xi) * (y - yi)) / (yj - yi) + xi);
+
+                if (intersects) inside = !inside;
+            }
+
+            return inside;
+        }
+    }
+}
+
+function mergePolygons(poly1, poly2) {
+    // poly1 and poly2 are clockwise, not overlaping and touching polygons. If those two polygons were on a map, they would be
+    // one against each other, and the merge would make a new clockwise polygon out of the outer border of the two polygons.
+    // If it happens that poly1 and poly2 are not touching, poly1 would be returned untouched.
+    // Basically because polygons are clockwise, the alogorithm starts from a point A in poly1 not shared by poly2, and
+    // when a point is shared by poly1 and poly2, the algorithm continues in poly2, and so on until point A.
+
+    const getPointIndex = (point, array) => {
+        for (let i = 0; i < array.length; i++) {
+            if (latlngEqual(array[i], point)) return i;
+        }
+        return -1;
+    }
+
+    // Find the index of the first point of poly1 that doesn't belong to merge (it exists)
+    let i = 0;
+    while (getPointIndex(poly1[i], poly2) != -1) i++;
+    // Starting the merge from that point
+    const merge = [poly1[i]];
+    i = (i + 1) % poly1.length;
+    let currentArray = poly1;
+    let otherArray = poly2;
+    while (!latlngEqual(currentArray[i], merge[0])) {
+        const j = getPointIndex(currentArray[i], otherArray);
+        if (j != -1) {
+            [currentArray, otherArray] = [otherArray, currentArray];
+            i = j;
+        }
+        merge.push(currentArray[i]);
+        i = (i + 1) % currentArray.length;
+    }
+    return merge;
+}
+
+function polygonSettingsToZones(settings) {
+    const { polygons, durations } = settings;
+    const reversedPolygons = polygons.slice().reverse();
+    const reversedDurations = durations.slice().reverse();
+
+    const zones = [];
+
+    for (let i = 0; i < reversedPolygons.length; i++) {
+        const polygon =reversedPolygons[i];
+        const duration = reversedDurations[i];
+        const length = zones.length;
+
+        if (length == 0) {
+            zones.push(polygonZone(
+                polygon,
+                duration
+            ));
+        } else {
+            zones.push(polygonZone(
+                mergePolygons(zones[length-1].points, polygon),
+                duration
+            ));
+        }
+    }
+
+    return zones.slice().reverse();
+}
+
+
+/* -------------------------------- Circle zones -------------------------------- */
+
+const defaultCircleSettings = { min: null, max: null, reductionCount: 4, duration: 1 };
+
+function circleZone(center, radius, duration) {
+    return {
+        center: center,
+        radius: radius,
+        duration: duration,
+
+        isInZone(location) {
+            return haversine_distance(center, location) < this.radius;
+        }
+    }
+}
+
+function circleSettingsToZones(settings) {
+    const {min, max, reductionCount, duration} = settings;
+    if (haversine_distance(max.center, min.center) > max.radius - min.radius) {
+        return null;
+    }
+    const zones = [circleZone(max.center, max.radius, duration)];
+    const radiusReductionLength = (max.radius - min.radius) / reductionCount;
+    let center = max.center;
+    let radius = max.radius;
+    for (let i = 1; i < reductionCount; i++) {
+        radius -= radiusReductionLength;
+        let new_center = null;
+        while (!new_center || haversine_distance(new_center, min.center) > radius - min.radius) {
+            const angle = Math.random() * 2 * Math.PI;
+            const angularDistance = Math.sqrt(Math.random()) * radiusReductionLength / EARTH_RADIUS;
+            const lat0Rad = center.lat * Math.PI / 180;
+            const lon0Rad = center.lng * Math.PI / 180;
+            const latRad = Math.asin(
+                Math.sin(lat0Rad) * Math.cos(angularDistance) +
+                Math.cos(lat0Rad) * Math.sin(angularDistance) * Math.cos(angle)
+            );
+
+            const lonRad = lon0Rad + Math.atan2(
+                Math.sin(angle) * Math.sin(angularDistance) * Math.cos(lat0Rad),
+                Math.cos(angularDistance) - Math.sin(lat0Rad) * Math.sin(latRad)
+            );
+            new_center = {lat: latRad * 180 / Math.PI, lng: lonRad * 180 / Math.PI};
+        }
+        center = new_center;
+        zones.push(circleZone(center, radius, duration))
+    }
+    zones.push(circleZone(min.center, min.radius, 0));
+    return zones;
+}
+
+
+/* -------------------------------- Zone manager -------------------------------- */
+
 export default {
-    //Setings storing where the zone will start, end and how it should evolve
-    //The zone will start by staying at its max value for reductionInterval minutes
-    //and then reduce during reductionDuration minutes, then wait again...
-    //The reduction factor is such that after reductionCount the zone will be the min zone
-    zoneSettings: {
-        min: { center: null, radius: null },
-        max: { center: null, radius: null },
-        reductionCount: 2,
-        reductionDuration: 1,
-        reductionInterval: 1,
-        updateIntervalSeconds: 1,
-    },
+    isRunning: false,
+    zones: [], // A zone has to be connected space that doesn't contain an earth pole
+    currentZone: { id: 0, timeoutId: null, endDate: null },
+    settings: defaultPolygonSettings,
 
-    nextZoneDecrement: null,
-    //Live location of the zone
-    currentZone: { center: null, radius: null },
-
-    //If the zone is shrinking, this is the target of the current shrinking
-    //If the zone is not shrinking, this will be the target of the next shrinking
-    nextZone: { center: null, radius: null },
-
-    //Zone at the begining of the shrinking
-    currentStartZone: { center: null, radius: null },
-
-    startDate: null,
-    started: false,
-    updateIntervalId: null,
-    nextZoneTimeoutId: null,
-
-    nextZoneDate: null,
-
-    /**
-     * Test if a given configuration object is valid, i.e if all needed values are well defined
-     * @param {Object} settings Settings object describing a config of a zone manager
-     * @returns if the config is correct
-     */
-    validateSettings(settings) {
-        if (settings.reductionCount && (typeof settings.reductionCount != "number" || settings.reductionCount <= 0)) { return false }
-        if (settings.reductionDuration && (typeof settings.reductionDuration != "number" || settings.reductionDuration < 0)) { return false }
-        if (settings.reductionInterval && (typeof settings.reductionInterval != "number" || settings.reductionInterval < 0)) { return false }
-        if (settings.updateIntervalSeconds && (typeof settings.updateIntervalSeconds != "number" || settings.updateIntervalSeconds <= 0)) { return false }
-        if (settings.max && (typeof settings.max.radius != "number" || typeof settings.max.center.lat != "number" || typeof settings.max.center.lng != "number")) { return false }
-        if (settings.min && (typeof settings.min.radius != "number" || typeof settings.min.center.lat != "number" || typeof settings.min.center.lng != "number")) { return false }
-        return true;
-    },
-    /**
-     *  Test if the zone manager is ready to start 
-     * @returns true if the zone manager is ready to be started, false otherwise
-     */
-    ready() {
-        return this.validateSettings(this.zoneSettings);
-    },
-
-    /**
-     * Update the settings of the zone, this can be done by passing an object containing the settings to change.
-     * Unless specified, the durations are in minutes
-     * Default config :
-     * `this.zoneSettings = {
-     *      min: {center: null, radius: null},
-     *      max: {center: null, radius: null},
-     *      reductionCount: 2,
-     *      reductionDuration: 10,
-     *      reductionInterval: 10,
-     *      updateIntervalSeconds: 10,
-     *  }`
-     * @param {Object} newSettings The fields of the settings to udpate
-     * @returns 
-     */
-    udpateSettings(newSettings) {
-        //validate settings
-        this.zoneSettings = { ...this.zoneSettings, ...newSettings };
-        this.nextZoneDecrement = (this.zoneSettings.max.radius - this.zoneSettings.min.radius) / this.zoneSettings.reductionCount;
-        return true;
-    },
-
-    /**
-     * Reinitialize the object and stop all the tasks
-     */
-    reset() {
-        this.currentZoneCount = 0;
-        this.started = false;
-        if (this.updateIntervalId != null) {
-            clearInterval(this.updateIntervalId);
-            this.updateIntervalId = null;
-        }
-        if (this.nextZoneTimeoutId != null) {
-            clearTimeout(this.nextZoneTimeoutId);
-            this.nextZoneTimeoutId = null;
-        }
-    },
-
-    /**
-     * Start the zone reduction sequence
-    */
     start() {
-        if (!this.ready()) return false;
-        this.reset();
-        this.started = true;
-        this.startDate = new Date();
-        //initialize the zone to its max value
-        this.nextZone = JSON.parse(JSON.stringify(this.zoneSettings.max));
-        this.currentStartZone = JSON.parse(JSON.stringify(this.zoneSettings.max));
-        this.currentZone = JSON.parse(JSON.stringify(this.zoneSettings.max));
-        return this.setNextZone();
-
+        this.isRunning = true;
+        this.currentZone.id = -1;
+        this.goNextZone();
     },
 
-    /**
-     * Get the center of the next zone, this center need to satisfy two properties
-     * - it needs to be included in the current zone, this means that this new point should lie in the circle of center currentZone.center and radius currentZone.radius - newRadius
-     * - it needs to include the last zone, which means that the center must lie in the center of center min.center and of radius newRadius - min.radius 
-     * @param newRadius the radius that the new zone will have
-     * @returns the coordinates of the new center as an object with lat and long fields
-     */
-    getRandomNextCenter(newRadius) {
-        let ok = false;
-        let res = null
-        let tries = 0;
-        const MAX_TRIES = 100000
-        //take a random point satisfying both conditions
-        while (tries++ < MAX_TRIES && !ok) {
-            res = randomCirclePoint({ latitude: this.currentZone.center.lat, longitude: this.currentZone.center.lng }, this.currentZone.radius - newRadius);
-            ok = (isInCircle({ lat: res.latitude, lng: res.longitude }, this.zoneSettings.min.center, newRadius - this.zoneSettings.min.radius))
-        }
-        if (tries >= MAX_TRIES) {
-            return false;
-        }
-        return {
-            lat: res.latitude,
-            lng: res.longitude
+    stop() {
+        this.isRunning = false;
+        clearTimeout(this.currentZone.timeoutId);
+    },
+
+    goNextZone() {
+        this.currentZone.id++;
+        if (this.currentZone.id >= this.zones.length) return;
+        this.currentZone.timeoutId = setTimeout(() => this.goNextZone(), this.getCurrentZone().duration * 60 * 1000);
+        this.currentZone.endDate = Date.now() + this.getCurrentZone().duration * 60 * 1000;
+        this.zoneBroadcast();
+    },
+
+    getCurrentZone() {
+        return this.zones[this.currentZone.id];
+    },
+
+    getNextZone() {
+        if (this.currentZone.id + 1 < this.zones.length) {
+            return this.zones[this.currentZone.id + 1];
+        } else {
+            return this.zones[this.currentZone.id];
         }
     },
 
-    /**
-     * Compute the next zone satifying the given settings, update the nextZone and currentStartZone
-     * Wait for the appropriate duration before starting a new zone reduction if needed
-     */
-    setNextZone() {
-        this.nextZoneDate = Date.now() + this.zoneSettings.reductionInterval * 60 * 1000;
-        //At this point, nextZone == currentZone, we need to update the next zone, the raidus decrement, and start a timer before the next shrink
-        //last zone
-        if (this.currentZoneCount == this.zoneSettings.reductionCount) {
-            this.nextZone = JSON.parse(JSON.stringify(this.zoneSettings.min))
-            this.currentStartZone = JSON.parse(JSON.stringify(this.zoneSettings.min))
-        } else if (this.currentZoneCount == this.zoneSettings.reductionCount - 1) {
-            this.currentStartZone = JSON.parse(JSON.stringify(this.currentZone))
-            this.nextZone = JSON.parse(JSON.stringify(this.zoneSettings.min))
-            this.nextZoneTimeoutId = setTimeout(() => this.startShrinking(), 1000 * 60 * this.zoneSettings.reductionInterval)
-            this.currentZoneCount++;
-        } else if (this.currentZoneCount < this.zoneSettings.reductionCount) {
-            this.nextZone.center = this.getRandomNextCenter(this.nextZone.radius - this.nextZoneDecrement)
-            //Next center cannot be found
-            if (this.nextZone.center === false) {
-                console.log("no center")
-                return false;
-            }
-            this.nextZone.radius -= this.nextZoneDecrement;
-            this.currentStartZone = JSON.parse(JSON.stringify(this.currentZone))
-            this.nextZoneTimeoutId = setTimeout(() => this.startShrinking(), 1000 * 60 * this.zoneSettings.reductionInterval)
-            this.currentZoneCount++;
+    isInZone(location) {
+        if (this.zones.length == 0) {
+            return true;
+        } else {
+            return this.getCurrentZone().isInZone(location);
         }
-        this.onZoneUpdate(JSON.parse(JSON.stringify(this.currentStartZone)))
-        this.onNextZoneUpdate({
-            begin: JSON.parse(JSON.stringify(this.currentStartZone)),
-            end: JSON.parse(JSON.stringify(this.nextZone)),
-            endDate: JSON.parse(JSON.stringify(this.nextZoneDate)),
-        })
+    },
+
+    changeSettings(settings) {
+        const zones = polygonSettingsToZones(settings);
+        if (!zones) return false;
+        this.zones = zones;
+        this.settings = settings;
+        this.zoneBroadcast();
         return true;
     },
-
-    /*
-     * Start a task that will run periodically updatinng the zone size, and calling the onZoneUpdate callback
-     * This will also periodically check if the reduction is over or not
-     * If the reduction is over this function will call setNextZone
-     */
-    startShrinking() {
-        this.nextZoneDate = Date.now() + this.zoneSettings.reductionDuration * 60 * 1000;
-        this.onZoneUpdateStart(JSON.parse(JSON.stringify(this.nextZoneDate)));
-        const startTime = new Date();
-        this.updateIntervalId = setInterval(() => {
-            const completed = ((new Date() - startTime) / (1000 * 60)) / this.zoneSettings.reductionDuration;
-            this.currentZone.radius = map(completed, 0, 1, this.currentStartZone.radius, this.nextZone.radius)
-            this.currentZone.center.lat = map(completed, 0, 1, this.currentStartZone.center.lat, this.nextZone.center.lat)
-            this.currentZone.center.lng = map(completed, 0, 1, this.currentStartZone.center.lng, this.nextZone.center.lng)
-            this.onZoneUpdate(JSON.parse(JSON.stringify(this.currentZone)))
-            //Zone shrinking is over
-            if (completed >= 1) {
-                clearInterval(this.updateIntervalId);
-                this.updateIntervalId = null;
-                this.setNextZone();
-                return;
-            }
-        }, this.zoneSettings.updateIntervalSeconds * 1000);
+    
+    zoneBroadcast() {
+        const zone = {
+            begin: this.getCurrentZone(),
+            end: this.getNextZone(),
+            endDate:this.currentZone.endDate,
+        };
+        playersBroadcast("current_zone", zone);
+        secureAdminBroadcast("current_zone", zone);
     },
-
-    //a call to onNextZoneUpdate will be made when the zone reduction ends and a new next zone is announced
-    onNextZoneUpdate(newZone) {
-        playersBroadcast("new_zone", newZone)
-        secureAdminBroadcast("new_zone", newZone)
-    },
-
-    //a call to onZoneUpdateStart will be made when the zone reduction starts
-    onZoneUpdateStart(date) {
-        playersBroadcast("zone_start", date)
-        secureAdminBroadcast("zone_start", date)
-    },
-
-    //a call to onZoneUpdate will be made every updateIntervalSeconds when the zone is changing
-    onZoneUpdate(zone) {
-        playersBroadcast("zone", zone)
-        secureAdminBroadcast("zone", zone)
-    },
-
 }

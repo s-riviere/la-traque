@@ -3,11 +3,43 @@ This module manages the main game state, the teams, the settings and the game lo
 */
 import { secureAdminBroadcast } from "./admin_socket.js";
 import { playersBroadcast, sendUpdatedTeamInformations } from "./team_socket.js";
-import { isInCircle, getDistanceFromLatLon } from "./map_utils.js";
 import timeoutHandler from "./timeoutHandler.js";
 import penaltyController from "./penalty_controller.js";
 import zoneManager from "./zone_manager.js";
 import trajectory from "./trajectory.js";
+
+/**
+ * Compute the distance between two points givent their longitude and latitude 
+ * @param {Object} pos1 The first position
+ * @param {Object} pos2 The second position
+ * @returns the distance between the two positions in meters
+ * @see https://gist.github.com/miguelmota/10076960
+ */
+function getDistanceFromLatLon({ lat: lat1, lng: lon1 }, { lat: lat2, lng: lon2 }) {
+    const degToRad = (deg) => deg * (Math.PI / 180);
+    var R = 6371; // Radius of the earth in km
+    var dLat = degToRad(lat2 - lat1);
+    var dLon = degToRad(lon2 - lon1);
+    var a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+        ;
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var d = R * c; // Distance in km
+    return d * 1000;
+}
+
+/**
+ * Check if a GPS point is in a circle
+ * @param {Object} position The position to check, an object with lat and lng fields
+ * @param {Object} center The center of the circle, an object with lat and lng fields
+ * @param {Number} radius The radius of the circle in meters
+ * @returns 
+ */
+function isInCircle(position, center, radius) {
+    return getDistanceFromLatLon(position, center) < radius;
+}
 
 /**
  * The possible states of the game
@@ -56,7 +88,7 @@ export default {
         switch (newState) {
             case GameState.SETUP:
                 trajectory.stop();
-                zoneManager.reset();
+                zoneManager.stop();
                 penaltyController.stop();
                 timeoutHandler.endAllSendPositionTimeout();
                 for (let team of this.teams) {
@@ -77,28 +109,38 @@ export default {
                 this.updateTeamChasing();
                 break;
             case GameState.PLACEMENT:
+                if (this.teams.length < 3) {
+                    secureAdminBroadcast("game_state", {state: this.state, startDate: this.startDate});
+                    return false;
+                }
                 trajectory.stop();
-                zoneManager.reset();
+                zoneManager.stop();
                 penaltyController.stop();
                 timeoutHandler.endAllSendPositionTimeout();
                 this.startDate = null;
                 break;
             case GameState.PLAYING:
-                if (!zoneManager.start()) {
+                if (this.teams.length < 3) {
+                    secureAdminBroadcast("game_state", {state: this.state, startDate: this.startDate});
                     return false;
                 }
                 trajectory.start();
+                zoneManager.start();
                 penaltyController.start();
                 this.initLastSentLocations();
                 this.startDate = Date.now();
                 break;
             case GameState.FINISHED:
+                if (this.state != GameState.PLAYING) {
+                    secureAdminBroadcast("game_state", {state: this.state, startDate: this.startDate});
+                    return false;
+                }
                 for (const team of this.teams) {
                     if (!team.finishDate) team.finishDate = Date.now();
                 }
                 trajectory.stop();
+                zoneManager.stop();
                 penaltyController.stop();
-                zoneManager.reset();
                 timeoutHandler.endAllSendPositionTimeout();
                 break;
         }
@@ -379,28 +421,4 @@ export default {
         timeoutHandler.endSendPositionTimeout(teamId);
         this.updateTeamChasing();
     },
-
-    /**
-     * Change the settings of the Zone manager
-     * The game should not be in PLAYING or FINISHED state
-     * @param {Object} newSettings The object containing the settings to be changed
-     * @returns false if failed
-     */
-    setZoneSettings(newSettings) {
-        if ('min' in newSettings || 'max' in newSettings) {
-            const min = newSettings.min ?? zoneManager.zoneSettings.min;
-            const max = newSettings.max ?? zoneManager.zoneSettings.max;
-            // The end zone must be included in the start zone
-            if (!isInCircle(min.center, max.center, max.radius-min.radius)) {
-                return false;
-            }
-        }
-        zoneManager.udpateSettings(newSettings);
-        if (this.state == GameState.PLAYING || this.state == GameState.FINISHED) {
-            if (!zoneManager.start()) {
-                return false;
-            }
-        }
-        return true;
-    }
 }

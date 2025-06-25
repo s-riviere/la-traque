@@ -3,7 +3,7 @@ import { TextArea } from "../util/textInput";
 import { GreenButton } from "../util/button";
 import { useEffect, useState } from "react";
 
-export const GameSettings = () => {
+export default function GameSettings() {
     const {gameSettings, changeGameSettings} = useAdmin();
     const [capturedMessage, setCapturedMessage] = useState("");
     const [winnerEndMessage, setWinnerEndMessage] = useState("");
@@ -11,7 +11,6 @@ export const GameSettings = () => {
     const [waitingMessage, setWaitingMessage] = useState("");
 
     useEffect(() => {
-        console.log({gameSettings})
         if (gameSettings) {
             setCapturedMessage(gameSettings.capturedMessage);
             setWinnerEndMessage(gameSettings.winnerEndGameMessage);

@@ -1,8 +1,8 @@
 "use client";
 import ActionDrawer from '@/components/team/actionDrawer';
-import { Notification } from '@/components/team/notification';
+import Notification from '@/components/team/notification';
 import PlacementOverlay from '@/components/team/placementOverlay';
-import { WaitingScreen } from '@/components/team/waitingScreen';
+import WaitingScreen from '@/components/team/waitingScreen';
 import { LogoutButton } from '@/components/util/button';
 import { useSocket } from '@/context/socketContext';
 import { useTeamConnexion } from '@/context/teamConnexionContext';

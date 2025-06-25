@@ -1,11 +1,9 @@
 import useGame from "@/hook/useGame";
 import { RedButton } from "../util/button";
 import { useEffect, useRef } from "react";
-import Image from "next/image";
-
 import { env } from 'next-runtime-env';
 
-export function EnemyTeamModal({ visible, onClose }) {
+export default function EnemyTeamModal({ visible, onClose }) {
     const { teamId, enemyName } = useGame();
     const imageRef = useRef(null);
 

@@ -1,15 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react'
-import TextInput from '../util/textInput'
-import BlueButton, { RedButton } from '../util/button';
+import { TextInput } from '../util/textInput'
+import { BlueButton, RedButton } from '../util/button';
 import useAdmin from '@/hook/useAdmin';
 import dynamic from 'next/dynamic';
-
 import { env } from 'next-runtime-env';
 import { GameState } from '@/util/gameState';
 
-const CircularAreaPicker = dynamic(() => import('./mapPicker').then((mod) => mod.CircularAreaPicker), {
-    ssr: false
-});
+// Imported at runtime and not at compile time
+const PlacementMap = dynamic(() => import('./placementMap'), { ssr: false });
 
 export default function TeamEdit({ selectedTeamId, setSelectedTeamId }) {
     const teamImage = useRef(null);
@@ -84,7 +82,7 @@ export default function TeamEdit({ selectedTeamId, setSelectedTeamId }) {
                     <RedButton onClick={handleRemove}>Remove</RedButton>
                 </div>
                 <p className='text-2xl text-center w-full'>Starting zone</p>
-                <CircularAreaPicker area={team.startingArea} setArea={(startingArea) => updateTeam(team.id, { startingArea })} markerPosition={team?.currentLocation} />
+                <PlacementMap area={team.startingArea} setArea={(startingArea) => updateTeam(team.id, { startingArea })} markerPosition={team?.currentLocation} />
             </div>
             <div className='flex w-1/2 flex-col h-min gap-2 items-center'>
                 <h2 className='text-2xl text-center'>Team details</h2>

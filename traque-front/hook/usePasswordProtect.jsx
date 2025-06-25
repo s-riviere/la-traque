@@ -2,7 +2,7 @@
 import { redirect, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-export function usePasswordProtect(loginPath, redirectPath, loading, loggedIn) {
+export default function usePasswordProtect(loginPath, redirectPath, loading, loggedIn) {
     const path = usePathname();
     useEffect(() => {
         if (!loggedIn && !loading && path !== loginPath) {

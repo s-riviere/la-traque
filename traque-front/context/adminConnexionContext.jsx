@@ -1,11 +1,12 @@
 "use client";
-import { createContext, useContext,  useMemo, } from "react";
+import { createContext, useContext,  useMemo } from "react";
 import { useSocket } from "./socketContext";
-import { useSocketAuth } from "@/hook/useSocketAuth";
-import { usePasswordProtect } from "@/hook/usePasswordProtect";
+import useSocketAuth from "@/hook/useSocketAuth";
+import usePasswordProtect from "@/hook/usePasswordProtect";
 
 const adminConnexionContext = createContext();
-const AdminConnexionProvider = ({ children }) => {
+
+export function AdminConnexionProvider({ children }) {
     const { adminSocket } = useSocket();
     const { login, loggedIn, loading } = useSocketAuth(adminSocket, "admin_password");
     const useProtect = () => usePasswordProtect("/admin/login", "/admin", loading, loggedIn);
@@ -19,9 +20,6 @@ const AdminConnexionProvider = ({ children }) => {
     );
 }
 
-function useAdminConnexion() {
+export function useAdminConnexion() {
     return useContext(adminConnexionContext);
 }
-
-export { AdminConnexionProvider, useAdminConnexion };
-

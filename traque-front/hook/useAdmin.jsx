@@ -1,3 +1,4 @@
+"use client";
 import { useAdminContext } from "@/context/adminContext";
 import { useSocket } from "@/context/socketContext";
 

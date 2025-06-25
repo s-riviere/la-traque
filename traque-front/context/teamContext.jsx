@@ -1,14 +1,14 @@
 "use client";
-import { useLocation } from "@/hook/useLocation";
-import { useSocketListener } from "@/hook/useSocketListener";
-import { createContext, use, useContext, useEffect, useMemo, useRef, useState } from "react";
+import useLocation from "@/hook/useLocation";
+import useSocketListener from "@/hook/useSocketListener";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useSocket } from "./socketContext";
 import { useTeamConnexion } from "./teamConnexionContext";
 import { GameState } from "@/util/gameState";
 
+const teamContext = createContext();
 
-const teamContext = createContext()
-function TeamProvider({children}) {
+export function TeamProvider({children}) {
     const [teamInfos, setTeamInfos] = useState({});
     const [gameState, setGameState] = useState(GameState.SETUP);
     const [gameSettings, setGameSettings] = useState(null);
@@ -21,16 +21,11 @@ function TeamProvider({children}) {
 
     teamInfosRef.current = teamInfos;
 
-    useSocketListener(teamSocket, "update_team", (newTeamInfos) => {
-        setTeamInfos({...teamInfosRef.current, ...newTeamInfos});
-    });
-    
+    useSocketListener(teamSocket, "update_team", (newTeamInfos) => setTeamInfos({...teamInfosRef.current, ...newTeamInfos}) );
     useSocketListener(teamSocket, "game_state", setGameState);
     useSocketListener(teamSocket, "zone", setZone);
     useSocketListener(teamSocket, "new_zone", setZoneExtremities);
     useSocketListener(teamSocket, "game_settings", setGameSettings);
-
-
 
     //Send the current position to the server when the user is logged in
     useEffect(() => {
@@ -48,8 +43,6 @@ function TeamProvider({children}) {
     );
 }
 
-function useTeamContext() {
+export function useTeamContext() {
     return useContext(teamContext);
 }
-
-export { TeamProvider, useTeamContext };

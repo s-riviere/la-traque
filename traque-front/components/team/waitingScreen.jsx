@@ -1,12 +1,10 @@
 import useGame from "@/hook/useGame"
 import { GreenButton, LogoutButton } from "../util/button";
 import { useRef } from "react";
-import Image from "next/image";
-import { useTeamContext } from "@/context/teamContext";
-
+import useTeamContext from "@/context/teamContext";
 import { env } from 'next-runtime-env';
 
-export function WaitingScreen() {
+export default function WaitingScreen() {
     const { name, teamId  } = useGame();
     const { gameSettings } = useTeamContext();
     const imageRef = useRef(null);
