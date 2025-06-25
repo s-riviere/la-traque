@@ -1,11 +1,41 @@
 "use client";
 import { useLocation } from "@/hook/useLocation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import "leaflet/dist/leaflet.css";
 import { Circle, MapContainer, Marker, TileLayer, useMap, Tooltip, Polyline } from "react-leaflet";
 import { useMapCircleDraw } from "@/hook/mapDrawing";
 import useAdmin from "@/hook/useAdmin";
 import { GameState } from "@/util/gameState";
+import L from "leaflet";
+
+
+function MapActionControl({ onClick, children }) {
+    const map = useMap();
+
+    useEffect(() => {
+        const controlDiv = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+        controlDiv.style.background = 'rgba(0,0,0,0.5)';
+        controlDiv.style.borderRadius = '9999px';
+        controlDiv.style.padding = '8px';
+        controlDiv.title = "Plein écran";
+        controlDiv.style.display = "flex";
+        controlDiv.style.alignItems = "center";
+        controlDiv.style.justifyContent = "center";
+        controlDiv.style.width = "56px";
+        controlDiv.style.height = "56px";
+        controlDiv.onclick = onClick;
+        controlDiv.innerHTML = `<img src="./icons/fullscreen.png" alt="" style="width:36px;height:36px;" />`;
+        const customControl = L.control({ position: 'bottomleft' });
+        customControl.onAdd = () => controlDiv;
+        customControl.addTo(map);
+
+        return () => {
+            customControl.remove();
+        };
+    }, [map, onClick, children]);
+
+    return null;
+}
 
 const positionIcon = new L.Icon({
     iconUrl: '/icons/location.png',
@@ -112,6 +142,18 @@ export function LiveMap() {
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
     const { zone, zoneExtremities, teams, nextZoneDate, isShrinking , getTeam, gameState } = useAdmin();
 
+    const mapWrapperRef = useRef(null);
+
+    const handleFullscreen = useCallback(() => {
+        const el = mapWrapperRef.current;
+        if (!el) return;
+        if (!document.fullscreenElement) {
+            el.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    }, []);
+
     // Remaining time before sending position
     useEffect(() => {
         const updateTime = () => {
@@ -143,7 +185,7 @@ export function LiveMap() {
     }
 
     return (
-        <div className='h-full w-full'>
+        <div className='h-full w-full' ref ={mapWrapperRef}>
             {gameState == GameState.PLAYING && <p>{`${isShrinking ? "Fin" : "Début"} du rétrécissement de la zone dans : ${formatTime(timeLeftNextZone)}`}</p>}
             <MapContainer className='min-h-full w-full' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
                 <TileLayer
@@ -160,6 +202,7 @@ export function LiveMap() {
                         <Arrow pos1={team.currentLocation} pos2={getTeam(team.chasing).currentLocation}/>
                     </Marker>
                 )}
+                <MapActionControl onClick={handleFullscreen}/>
             </MapContainer>
         </div>
     )
