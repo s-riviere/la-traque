@@ -7,6 +7,7 @@ import React, { useState } from 'react'
 import TeamEdit from '@/components/admin/teamEdit';
 import TeamAddForm from '@/components/admin/teamAdd';
 import Link from "next/link";
+import TeamInformation from "@/components/admin/teamInformation";
 
 const LiveMap = dynamic(() => import('@/components/admin/mapPicker').then((mod) => mod.LiveMap), {
     ssr: false
@@ -29,7 +30,7 @@ export default function AdminPage() {
                     </div>
                     <div className="flex flex-row justify-between items-center px-6 py-3">
                         <Link 
-                            href="/admin/teams"
+                            href="/admin/parameters"
                             className="w-[4.5rem] h-[4.5rem] bg-blue-400 rounded-lg hover:bg-blue-500 transition flex items-center justify-center" 
                             title="Accéder aux paramètres du jeu">
                             <img src="/icons/parameters.png" className="w-10 h-10" />
@@ -61,16 +62,15 @@ export default function AdminPage() {
                         <h2 className="text-2xl">Équipes</h2>
                     </div>
                     <div className="items-center px-6 py-3">
-                        <TeamAddForm onAddTeam={addTeam}/>
                         <TeamList selectedTeamId={selectedTeamId} onSelected={setSelectedTeamId}/>
                     </div>
                 </div>
             </div>
             <div className='grow flex-1 flex flex-col bg-white p-5 shadow-2xl relative'>
-                <div className="flex-1 flex items-center justify-center bg-gray-200 mb-5">
-                    <LiveMap/>
+                <div className="flex-1 flex items-center justify-center bg-gray-200 mb-5 relative">
+                    <LiveMap selectedTeamId={selectedTeamId} setSelectedTeamId={setSelectedTeamId} />
                 </div>
-                <div className='w-full flex flex-row gap-10 items-center px-6'>
+                <div className='w-full flex flex-row gap-10 items-center px-6 relative'>
                     <button 
                         className="w-16 h-16 bg-blue-400 rounded-full hover:bg-blue-500 transition flex items-center justify-center"
                         title ="Changer le style de la carte">

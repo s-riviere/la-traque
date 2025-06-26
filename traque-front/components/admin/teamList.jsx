@@ -2,6 +2,7 @@
 import useAdmin from '@/hook/useAdmin';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import React from 'react'
+import { useFormStatus } from 'react-dom';
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -11,7 +12,16 @@ const reorder = (list, startIndex, endIndex) => {
   return result;
 };
 
-function TeamListItem({ team, index, onSelected, itemSelected }) {;
+const TEAM_STATUS = {
+  playing:    { label: "En jeu",           color: "text-custom-green" },
+  captured:   { label: "Capturée",        color: "text-custom-red" },
+  outofzone:  { label: "Hors zone",       color: "text-custom-orange" },
+  ready:      { label: "Prête",           color: "text-custom-blue" },
+  notready:   { label: "En préparation",  color: "text-custom-grey" },
+};
+
+function TeamListItem({ team, index, onSelected, itemSelected }) {
+    const status = TEAM_STATUS.captured; //Il faudrait ici implementer la logique, ce qui est normalement pas trop difficile
     return (
         <Draggable draggableId={team.id.toString()} index={index} onClick={() => onSelected(team.id)}>
             {provided => (
@@ -24,8 +34,8 @@ function TeamListItem({ team, index, onSelected, itemSelected }) {;
                     </div>
                     <div className='flex-1 w-full h-full flex flex-row items-center justify-between'>
                         <p className='text-center'>{team.name}</p>
-                        <p className={`text-center ${team.state === "En jeu" ? "text-green-600" : "text-red-600"}`}>
-                            {team.state === team.captured ? "En jeu" : "Capturé"}
+                        <p className={`text-center ${status.color}`}>
+                            {status.label}
                         </p>
                     </div>
                 </div>

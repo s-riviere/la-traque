@@ -7,6 +7,8 @@ import { useMapCircleDraw } from "@/hook/mapDrawing";
 import useAdmin from "@/hook/useAdmin";
 import { GameState } from "@/util/gameState";
 import L from "leaflet";
+import { createPortal } from "react-dom";
+import TeamInformation from "@/components/admin/teamInformation";
 
 
 function MapActionControl({ onClick, children }) {
@@ -36,6 +38,50 @@ function MapActionControl({ onClick, children }) {
     }, [map, onClick, children]);
 
     return null;
+}
+
+function LeafletSidePanel({ show, onClose, children }) {
+    const map = useMap();
+    const panelRef = useRef(document.createElement("div"));
+
+    useEffect(() => {
+        const panelDiv = panelRef.current;
+        panelDiv.className = "leaflet-control leaflet-control-custom";
+
+
+        const control = L.control({ position: "topright" });
+        control.onAdd = () => panelDiv;
+        if (show) control.addTo(map);
+
+        return () => {
+            control.remove();
+        };
+    }, [map, show]);
+
+    if (!show) return null;
+
+    return createPortal(
+        <>
+            <button
+                style={{
+                    position: "absolute",
+                    top: "1rem",
+                    right: "1rem",
+                    fontSize: "3rem",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#888"
+                }}
+                onClick={onClose}
+                title="Fermer"
+            >
+                ×
+            </button>
+            {children}
+        </>,
+        panelRef.current
+    );
 }
 
 const positionIcon = new L.Icon({
@@ -138,10 +184,14 @@ export function ZonePicker({ minZone, setMinZone, maxZone, setMaxZone, editMode,
     )
 }
 
-export function LiveMap() {
+export function LiveMap({ selectedTeamId, setSelectedTeamId }) {
     const location = useLocation(Infinity);
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
     const { zone, zoneExtremities, teams, nextZoneDate, isShrinking , getTeam, gameState } = useAdmin();
+
+    function handleMarkerClick(teamId) {
+        setSelectedTeamId(teamId);
+    }
 
     const mapWrapperRef = useRef(null);
 
@@ -204,6 +254,14 @@ export function LiveMap() {
                     </Marker>
                 )}
                 <MapActionControl onClick={handleFullscreen}/>
+            {selectedTeamId && (
+                <LeafletSidePanel show={true} onClose={() => setSelectedTeamId(null)}>
+                    <TeamInformation
+                        selectedTeamId={selectedTeamId}
+                        onClose={() => setSelectedTeamId(null)}
+                    />
+                </LeafletSidePanel>
+            )}
             </MapContainer>
         </div>
     )
