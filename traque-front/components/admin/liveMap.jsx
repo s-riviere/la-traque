@@ -54,15 +54,15 @@ export default function LiveMap() {
 
     return (
         <div className='min-h-full w-full'>
-            {gameState == GameState.PLAYING && timeLeftNextZone && <p>{`Next zone in : ${formatTime(timeLeftNextZone)}`}</p>}
+            {gameState == GameState.PLAYING && <p>{`Next zone in : ${formatTime(timeLeftNextZone)}`}</p>}
             <MapContainer className='min-h-full w-full' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 <MapPan center={location} zoom={DEFAULT_ZOOM} />
-                {gameState == GameState.PLAYING && zoneExtremities.begin && <Polygon positions={zoneExtremities.begin.points} pathOptions={{ color: 'blue', fillColor: 'blue', fillOpacity: '0.2', weight: 3 }} />}
-                {gameState == GameState.PLAYING && zoneExtremities.end && <Polygon positions={zoneExtremities.end.points} pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: '0', weight: 3 }} />}
+                {gameState == GameState.PLAYING && zoneExtremities.begin && <Polygon positions={zoneExtremities.begin.points} pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: '0.1', weight: 3 }} />}
+                {gameState == GameState.PLAYING && zoneExtremities.end && <Polygon positions={zoneExtremities.end.points} pathOptions={{ color: 'green', fillColor: 'green', fillOpacity: '0.1', weight: 3 }} />}
                 {teams.map((team) => team.currentLocation && !team.captured &&
                     <Marker key={team.id} position={team.currentLocation} icon={positionIcon}>
                         <Tooltip permanent direction="top" offset={[0, -5]} className="custom-tooltip">{team.name}</Tooltip>

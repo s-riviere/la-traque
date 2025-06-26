@@ -183,9 +183,12 @@ export default {
 
     goNextZone() {
         this.currentZone.id++;
-        if (this.currentZone.id >= this.zones.length) return;
-        this.currentZone.timeoutId = setTimeout(() => this.goNextZone(), this.getCurrentZone().duration * 60 * 1000);
-        this.currentZone.endDate = Date.now() + this.getCurrentZone().duration * 60 * 1000;
+        if (this.currentZone.id >= this.zones.length - 1) {
+            this.currentZone.endDate = Date.now();
+        } else {
+            this.currentZone.timeoutId = setTimeout(() => this.goNextZone(), this.getCurrentZone().duration * 60 * 1000);
+            this.currentZone.endDate = Date.now() + this.getCurrentZone().duration * 60 * 1000;
+        }
         this.zoneBroadcast();
     },
 

@@ -117,7 +117,7 @@ export default {
             if (team.currentLocation == null || !zoneManager.isRunning) {
                 return;
             }
-            if (!zoneManager.isInCircle({ lat: team.currentLocation[0], lng: team.currentLocation[1] })) {
+            if (!zoneManager.isInZone({ lat: team.currentLocation[0], lng: team.currentLocation[1] })) {
                 //The team was not previously out of the zone
                 if (!this.outOfBoundsSince[team.id]) {
                     this.outOfBoundsSince[team.id] = Date.now();
