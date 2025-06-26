@@ -14,9 +14,10 @@ function MapActionControl({ onClick, children }) {
 
     useEffect(() => {
         const controlDiv = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-        controlDiv.style.background = 'rgba(0,0,0,0.5)';
+        controlDiv.style.background = 'rgba(0,0,0,0.25)';
         controlDiv.style.borderRadius = '9999px';
         controlDiv.style.padding = '8px';
+        controlDiv.style.border = 'none';
         controlDiv.title = "Plein écran";
         controlDiv.style.display = "flex";
         controlDiv.style.alignItems = "center";
