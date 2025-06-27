@@ -8,6 +8,7 @@ module.exports = {
         'custom-orange': '#fa6400',
         'custom-blue': '#1e90ff',
         'custom-grey': '#808080',
+        'custom-light-blue': '#80b3ff'
       }
     }
   },

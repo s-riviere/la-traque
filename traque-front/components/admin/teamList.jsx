@@ -1,5 +1,6 @@
 "use client";
 import useAdmin from '@/hook/useAdmin';
+import { GameState } from '@/util/gameState';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import React from 'react'
 import { useFormStatus } from 'react-dom';
@@ -20,8 +21,9 @@ const TEAM_STATUS = {
   notready:   { label: "En préparation",  color: "text-custom-grey" },
 };
 
-function TeamListItem({ team, index, onSelected, itemSelected }) {
-    const status = TEAM_STATUS.captured; //Il faudrait ici implementer la logique, ce qui est normalement pas trop difficile
+function TeamListItem({ team, index, onSelected, itemSelected, gamestate }) {
+    console.log(gamestate === GameState.PLAYING ? "En jeu" : "En préparation");
+    const status = gamestate === GameState.PLAYING ? (team.captured ? TEAM_STATUS.captured : (team.outofzone ? TEAM_STATUS.outofzone : TEAM_STATUS.playing)) : (team.ready ? TEAM_STATUS.ready : TEAM_STATUS.notready);
     return (
         <Draggable draggableId={team.id.toString()} index={index} onClick={() => onSelected(team.id)}>
             {provided => (
@@ -46,7 +48,7 @@ function TeamListItem({ team, index, onSelected, itemSelected }) {
 }
 
 export default function TeamList({selectedTeamId, onSelected}) {
-    const {teams, reorderTeams} = useAdmin();
+    const {teams, reorderTeams, gameState} = useAdmin();
     function onDragEnd(result) {
         if (!result.destination) {
             return;
@@ -71,7 +73,7 @@ export default function TeamList({selectedTeamId, onSelected}) {
                     <ul  ref={provided.innerRef} {...provided.droppableProps}>
                         {teams.map((team, i) => (
                             <li key={team.id} onClick={() => onSelected(team.id)}>
-                                <TeamListItem onSelected={onSelected} index={i} itemSelected={selectedTeamId === team.id} team={team} />
+                                <TeamListItem onSelected={onSelected} index={i} itemSelected={selectedTeamId === team.id} team={team} gamestate={gameState} />
                             </li>
                         ))}
                         {provided.placeholder}

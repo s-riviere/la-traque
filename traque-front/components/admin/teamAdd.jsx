@@ -17,7 +17,7 @@ export default function TeamAddForm({onAddTeam}) {
                 <input name="teamName" label='Team name' value={teamName} onChange={(e) => setTeamName(e.target.value)} type="text" className="block w-full h-full p-4 text-center ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400" />
             </div>
             <div className='w-1/5'>
-                <button type="submit" className="w-5 w-full h-full bg-blue-400 hover:bg-blue-500 transition text-3xl font-bold">+</button>
+                <button type="submit" className="w-5 w-full h-full bg-custom-light-blue hover:bg-blue-500 transition text-3xl font-bold">+</button>
             </div>
         </form>
     )

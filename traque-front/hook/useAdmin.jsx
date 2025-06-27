@@ -11,7 +11,6 @@ export default function useAdmin() {
     }
 
     function getTeam(teamId) {
-        console.log(teams[0]);
         return teams.find(team => team.id === teamId);
     }
 
