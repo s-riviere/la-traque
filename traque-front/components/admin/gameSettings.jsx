@@ -24,25 +24,27 @@ export default function GameSettings() {
     }
 
     return (
-        <div className='w-full h-full gap-1 bg-white p-10 flex flex-col text-center shadow-2xl overflow-y-scroll'>
-            <h2 className="text-2xl">Other settings</h2>
-            <div>
-                <p>Waiting message</p>
-                <TextArea value={waitingMessage} onChange={(e) => setWaitingMessage(e.target.value)} />
+        <div className='w-full h-full gap-5 bg-white p-10 flex flex-col text-center shadow-2xl overflow-y-scroll'>
+            <h2 className="text-2xl">Messages</h2>
+            <div className='w-full gap-1 flex flex-col text-center'>
+                <p>Game setup</p>
+                <TextArea style={{height: 60}} value={waitingMessage} onChange={(e) => setWaitingMessage(e.target.value)} />
+            </div>
+            <div className='w-full gap-1 flex flex-col text-center'>
+                <p>Team captured</p>
+                <TextArea style={{height: 60}} value={capturedMessage} onChange={(e) => setCapturedMessage(e.target.value)} />
+            </div>
+            <div className='w-full gap-1 flex flex-col text-center'>
+                <p>Game finished (winner)</p>
+                <TextArea style={{height: 60}} value={winnerEndMessage} onChange={(e) => setWinnerEndMessage(e.target.value)} />
+            </div>
+            <div className='w-full gap-1 flex flex-col text-center'>
+                <p>Game finished (loser)</p>
+                <TextArea style={{height: 60}} value={loserEndMessage} onChange={(e) => setLoserEndMessage(e.target.value)} />
             </div>
             <div>
-                <p>Captured message</p>
-                <TextArea value={capturedMessage} onChange={(e) => setCapturedMessage(e.target.value)} />
+                <GreenButton onClick={applySettings}>Apply</GreenButton>
             </div>
-            <div>
-                <p>Game finished message (winner)</p>
-                <TextArea value={winnerEndMessage} onChange={(e) => setWinnerEndMessage(e.target.value)} />
-            </div>
-            <div>
-                <p>Game finished message (loser)</p>
-                <TextArea value={loserEndMessage} onChange={(e) => setLoserEndMessage(e.target.value)} />
-            </div>
-            <GreenButton onClick={applySettings}>Apply</GreenButton>
         </div>
     )
 }

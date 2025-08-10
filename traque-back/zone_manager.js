@@ -168,7 +168,9 @@ export default {
     isRunning: false,
     zones: [], // A zone has to be connected space that doesn't contain an earth pole
     currentZone: { id: 0, timeoutId: null, endDate: null },
+    zoneType: "polygon",
     settings: defaultPolygonSettings,
+    settingsToZones: polygonSettingsToZones,
 
     start() {
         this.isRunning = true;
@@ -213,12 +215,25 @@ export default {
     },
 
     changeSettings(settings) {
-        const zones = polygonSettingsToZones(settings);
+        const zones = this.settingsToZones(settings);
         if (!zones) return false;
         this.zones = zones;
         this.settings = settings;
         this.zoneBroadcast();
         return true;
+    },
+
+    changeZoneType(type) {
+        if (this.zoneType == type) return;
+        if (type == "circle") {
+            this.zoneType = "circle";
+            this.settings = defaultCircleSettings;
+            this.settingsToZones = circleSettingsToZones;
+        } else if (type == "polygon") {
+            this.zoneType = "polygon";
+            this.settings = defaultPolygonSettings;
+            this.settingsToZones = polygonSettingsToZones;
+        }
     },
     
     zoneBroadcast() {

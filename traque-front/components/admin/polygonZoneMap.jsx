@@ -69,7 +69,7 @@ function PolygonZonePicker({ polygons, addPolygon, removePolygon, ...props }) {
     const location = useLocation(Infinity);
 
     return (
-        <div className='h-96'>
+        <div className='h-full'>
             <MapContainer {...props} className='min-h-full w-full' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -87,13 +87,18 @@ export default function PolygonZoneMap() {
     const [polygons, setPolygons] = useState([]);
     const [durations, setDurations] = useState([]);
     const {zoneSettings, changeZoneSettings} = useAdmin();
+    const {penaltySettings, changePenaltySettings} = useAdmin();
+    const [allowedTimeOutOfZone, setAllowedTimeOutOfZone] = useState("");
 
     useEffect(() => {
         if (zoneSettings) {
             setPolygons(zoneSettings.polygons);
             setDurations(zoneSettings.durations);
         }
-    }, [zoneSettings]);
+        if (penaltySettings) {
+            setAllowedTimeOutOfZone(penaltySettings.allowedTimeOutOfZone.toString());
+        }
+    }, [zoneSettings, penaltySettings]);
 
     function addPolygon(polygon) {
         // Polygons
@@ -122,21 +127,38 @@ export default function PolygonZoneMap() {
     function handleSettingsSubmit() {
         const newSettings = {polygons: polygons, durations: durations};
         changeZoneSettings(newSettings);
+        changePenaltySettings({allowedTimeOutOfZone: Number(allowedTimeOutOfZone)});
     }
-
+    
     return (
-        <div className='w-2/5 h-full gap-1 bg-white p-10 flex flex-col text-center shadow-2xl overflow-y-scroll'>
-            <h2 className="text-2xl">Edit zones</h2>
-            <PolygonZonePicker polygons={polygons} addPolygon={addPolygon} removePolygon={removePolygon} />
-            <ul>
-                {durations.map((duration, i) => (
-                    <li key={i}>
-                        <p>Zone {i+1}</p>
-                        <TextInput value={duration} onChange={(e) => updateDuration(i, e.target.value)}/>
-                    </li>
-                ))}
-            </ul>
-            <GreenButton onClick={handleSettingsSubmit}>Apply</GreenButton>
+        <div className='h-full w-full bg-white p-5 gap-5 flex flex-row shadow-2xl'>
+            <div className="h-full w-full">
+                <PolygonZonePicker polygons={polygons} addPolygon={addPolygon} removePolygon={removePolygon} />
+            </div>
+            <div className="h-full w-1/6 flex flex-col gap-5">
+                <div className="w-full text-center">
+                    <h2 className="text-xl">Reduction order</h2>
+                </div>
+                <ul className="w-full h-full bg-gray-300">
+                    {durations.map((duration, i) => (
+                        <li key={i} className="w-full bg-white flex flex-row gap-2 items-center justify-between p-1">
+                            <p>Zone {i+1}</p>
+                            <div className="w-16 h-10">
+                                <TextInput value={duration} onChange={(e) => updateDuration(i, e.target.value)}/>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+                <div className="w-full flex flex-row gap-2 items-center justify-between">
+                    <p>Timeout</p>
+                    <div className="w-16 h-10">
+                        <TextInput value={allowedTimeOutOfZone} onChange={(e) => setAllowedTimeOutOfZone(e.target.value)} />
+                    </div>
+                </div>
+                <div className="w-full h-15">
+                    <GreenButton onClick={handleSettingsSubmit}>Apply</GreenButton>
+                </div>
+            </div>
         </div>
     );
 }
