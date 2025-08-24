@@ -130,3 +130,8 @@ dist
 
 # Other
 .vscode/
+.expo/
+android/
+ios/
+yarn.lock
+keys/

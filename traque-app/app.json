@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "scheme": "la-traque",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
+      "expo-font"
+    ],
+    "newArchEnabled": true,
+    "name": "La Traque",
+    "slug": "la-traque",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/logo/logo_traque.png",
+    "splash": {
+      "image": "./assets/images/logo/logo_traque.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "android": {
+      "package": "com.anonymous.traqueapp",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "INTERNET",
+        "POST_NOTIFICATIONS"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyD0yuWIHFbsIDVfGQ9wEM3pOtVC2TgEO1U"
+        }
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.anonymous.traqueapp",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "location"
+        ],
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Your location is used to track you in the background.",
+        "NSLocationWhenInUseUsageDescription": "Location is used to track your movement."
+      }
+    }
+  }
+}

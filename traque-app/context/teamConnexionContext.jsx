@@ -1,0 +1,24 @@
+import { createContext, useContext, useMemo } from "react";
+import { useSocket } from "./socketContext";
+import { useSocketAuth } from "../hook/useSocketAuth";
+
+const teamConnexionContext = createContext();
+const TeamConnexionProvider = ({ children }) => {
+    const { teamSocket } = useSocket();
+    const { login, password: teamId, loggedIn, loading, logout  } = useSocketAuth(teamSocket, "team_password");
+
+    const value = useMemo(() => ({ teamId, login, logout, loggedIn, loading}), [teamId, login, loggedIn, loading]);
+
+    return (
+        <teamConnexionContext.Provider value={value}>
+            {children}
+        </teamConnexionContext.Provider>
+    );
+}
+
+function useTeamConnexion() {
+    return useContext(teamConnexionContext);
+}
+
+export { TeamConnexionProvider, useTeamConnexion };
+
