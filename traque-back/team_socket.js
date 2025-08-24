@@ -37,29 +37,24 @@ export function playersBroadcast(event, data) {
  */
 export function sendUpdatedTeamInformations(teamId) {
     const team = game.getTeam(teamId);
-    if (!team) {
-        return;
-    }
-    team.sockets.forEach(socketId => {
-        io.of("player").to(socketId).emit("update_team", {
-            name: team.name,
-            enemyLocation: team.enemyLocation,
-            enemyName: team.enemyName,
-            lastSentLocation: team.lastSentLocation,
-            locationSendDeadline: team.locationSendDeadline,
-            captureCode: team.captureCode,
-            startingArea: team.startingArea,
-            ready: team.ready,
-            captured: team.captured,
-            penalties: team.penalties,
-            outOfZone: team.outOfZone,
-            outOfZoneDeadline: team.outOfZoneDeadline,
-            distance: team.distance,
-            startDate: game.startDate,
-            finishDate: team.finishDate,
-            nCaptures: team.nCaptures,
-            nSentLocation: team.nSentLocation,
-        })
+    teamBroadcast(teamId, "update_team", {
+        name: team.name,
+        enemyName: game.getTeam(team.chasing).name,
+        lastSentLocation: team.lastSentLocation,
+        enemyLocation: team.enemyLocation,
+        locationSendDeadline: team.locationSendDeadline,
+        startingArea: team.startingArea,
+        ready: team.ready,
+        captureCode: team.captureCode,
+        captured: team.captured,
+        penalties: team.penalties,
+        outOfZone: team.outOfZone,
+        outOfZoneDeadline: team.outOfZoneDeadline,
+        distance: team.distance,
+        startDate: game.startDate,
+        finishDate: team.finishDate,
+        nCaptures: team.nCaptures,
+        nSentLocation: team.nSentLocation,
     })
     secureAdminBroadcast("teams", game.teams);
 }

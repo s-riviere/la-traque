@@ -96,10 +96,9 @@ export default {
                     team.penalties = 0;
                     team.captured = false;
                     team.enemyLocation = null;
-                    team.enemyName = null;
                     team.currentLocation = null;
                     team.lastSentLocation = null;
-                    team.distance = null;
+                    team.distance = 0;
                     team.finishDate = null;
                     team.nCaptures = 0;
                     team.nSentLocation = 0;
@@ -179,19 +178,18 @@ export default {
      */
     addTeam(teamName) {
         this.teams.push({
+            sockets: [],
             id: this.getNewTeamId(),
             name: teamName,
             chasing: null,
             chased: null,
-            currentLocation: null,
             lastSentLocation: null,
-            locationSendDeadline: null,
+            currentLocation: null,
             enemyLocation: null,
-            enemyName: null,
-            captureCode: this.createCaptureCode(),
-            sockets: [],
+            locationSendDeadline: null,
             startingArea: null,
             ready: false,
+            captureCode: this.createCaptureCode(),
             captured: false,
             penalties: 0,
             outOfZone: false,
@@ -228,7 +226,7 @@ export default {
     /**
      * Update the chasing chain of the teams based of the ordre of the teams array
      * If there are only 2 teams left, the game will end
-     * This function will update the enemyName, chasing and chased values of each teams
+     * This function will update the chasing and chased values of each teams
      * @returns true if successful
      */
     updateTeamChasing() {
@@ -245,7 +243,6 @@ export default {
                 if (previousTeam != null) {
                     this.teams[i].chased = previousTeam;
                     this.getTeam(previousTeam).chasing = this.teams[i].id;
-                    this.getTeam(previousTeam).enemyName = this.teams[i].name;
                 } else {
                     firstTeam = this.teams[i].id;
                 }
@@ -254,7 +251,6 @@ export default {
         }
         this.getTeam(firstTeam).chased = previousTeam;
         this.getTeam(previousTeam).chasing = firstTeam;
-        this.getTeam(previousTeam).enemyName = this.getTeam(firstTeam).name;
         secureAdminBroadcast("teams", this.teams);
         return true;
     },
