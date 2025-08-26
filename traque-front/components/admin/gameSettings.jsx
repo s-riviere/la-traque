@@ -1,7 +1,16 @@
 import useAdmin from "@/hook/useAdmin";
-import { TextArea } from "../util/textInput";
 import { GreenButton } from "../util/button";
+import { Section } from "../util/section";
 import { useEffect, useState } from "react";
+
+function MessageInput({title, ...props}) {
+    return (
+        <div className="w-full flex flex-row gap-3 items-center">
+            <p>{title}</p>
+            <input {...props} type="text" className="w-full h-8 p-2 rounded ring-1 ring-inset ring-gray-400 placeholder:text-gray-600" />
+        </div>
+    );
+}
 
 export default function GameSettings() {
     const {gameSettings, changeGameSettings} = useAdmin();
@@ -24,27 +33,16 @@ export default function GameSettings() {
     }
 
     return (
-        <div className='w-full h-full gap-5 bg-white p-10 flex flex-col text-center shadow-2xl overflow-y-scroll'>
-            <h2 className="text-2xl">Messages</h2>
-            <div className='w-full gap-1 flex flex-col text-center'>
-                <p>Game setup</p>
-                <TextArea style={{height: 60}} value={waitingMessage} onChange={(e) => setWaitingMessage(e.target.value)} />
+        <Section title="Message">
+            <div className="w-full h-full flex flex-col gap-3 items-center">
+                <MessageInput title="Attente  :" value={waitingMessage} onChange={(e) => setWaitingMessage(e.target.value)}/>
+                <MessageInput title="Capture :" value={capturedMessage} onChange={(e) => setCapturedMessage(e.target.value)} />
+                <MessageInput title="Victoire :" value={winnerEndMessage} onChange={(e) => setWinnerEndMessage(e.target.value)} />
+                <MessageInput title="Défaite  :" value={loserEndMessage} onChange={(e) => setLoserEndMessage(e.target.value)} />
+                <div className='w-40 h-15'>
+                    <GreenButton onClick={applySettings}>Apply</GreenButton>
+                </div>
             </div>
-            <div className='w-full gap-1 flex flex-col text-center'>
-                <p>Team captured</p>
-                <TextArea style={{height: 60}} value={capturedMessage} onChange={(e) => setCapturedMessage(e.target.value)} />
-            </div>
-            <div className='w-full gap-1 flex flex-col text-center'>
-                <p>Game finished (winner)</p>
-                <TextArea style={{height: 60}} value={winnerEndMessage} onChange={(e) => setWinnerEndMessage(e.target.value)} />
-            </div>
-            <div className='w-full gap-1 flex flex-col text-center'>
-                <p>Game finished (loser)</p>
-                <TextArea style={{height: 60}} value={loserEndMessage} onChange={(e) => setLoserEndMessage(e.target.value)} />
-            </div>
-            <div>
-                <GreenButton onClick={applySettings}>Apply</GreenButton>
-            </div>
-        </div>
-    )
+        </Section>
+    );
 }

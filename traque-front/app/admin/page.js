@@ -1,11 +1,10 @@
 "use client";
 import { useAdminConnexion } from "@/context/adminConnexionContext";
-import useAdmin from "@/hook/useAdmin";
 import dynamic from "next/dynamic";
-import TeamList from '@/components/admin/teamList';
+import TeamList from '@/components/admin/teamViewer';
 import React, { useState } from 'react'
-import TeamAddForm from '@/components/admin/teamAdd';
 import Link from "next/link";
+import { Section } from "@/components/util/section";
 import TeamInformation from "@/components/admin/teamInformation";
 
 // Imported at runtime and not at compile time
@@ -14,20 +13,26 @@ const LiveMap = dynamic(() => import('@/components/admin/liveMap'), { ssr: false
 export default function AdminPage() {
     const { useProtect } = useAdminConnexion();
     const [selectedTeamId, setSelectedTeamId] = useState(null);
-    const { addTeam, gameState, changeState, teams } = useAdmin();
+
     useProtect();
+
+    function onSelected(id) {
+        if (selectedTeamId === id) {
+            setSelectedTeamId(null);
+        } else {
+            setSelectedTeamId(id);
+        }
+    }
     
     return (
-        <div className='min-h-full bg-gray-200 p-5 flex flex-row content-start gap-5'>
-            <div className="h-full w-2/6">
-                <div className='w-full mb-5 h-1/2 gap-3 bg-custom-light-blue p-10 flex flex-col text-left shadow-2xl'>
-                    <h2 className="text-4xl font-bold">Page Principale</h2>
+        <div className='h-full bg-gray-200 p-3 flex flex-row content-start gap-3'>
+            <div className="h-full w-2/6 flex flex-col gap-3">
+                <div className='w-full bg-custom-light-blue gap-5 p-5 flex flex-row shadow-2xl'>
+                    <img src="/icons/home.png" className="w-8 h-8" />
+                    <h2 className="text-3xl font-bold">Page principale</h2>
                 </div>
-                <div className='w-full mb-5 h-1/2 gap-3 bg-white flex flex-col'>
-                    <div className='w-full gap-3 bg-custom-light-blue flex flex-col items-center justify-center text-middle shadow-2xl p-1'>
-                        <h2 className="text-2xl">Contrôle</h2>
-                    </div>
-                    <div className="flex flex-row justify-between items-center px-6 py-3">
+                <Section title="Contrôle">
+                    <div className='w-full h-full flex flex-row justify-between'>
                         <Link 
                             href="/admin/parameters"
                             className="w-[4.5rem] h-[4.5rem] bg-custom-light-blue rounded-lg hover:bg-blue-500 transition flex items-center justify-center" 
@@ -55,21 +60,19 @@ export default function AdminPage() {
                             <img src="/icons/begin.png" className="w-10 h-10" />
                         </button>
                     </div>
-                </div>
-                <div className='h-full w-full mb-5 h-1/2 gap-3 bg-white flex flex-col'>
-                    <div className='w-full gap-3 bg-custom-light-blue flex flex-col items-center justify-center text-middle shadow-2xl p-1'>
-                        <h2 className="text-2xl">Équipes</h2>
+                </Section>
+                <Section className="h-full" title="Équipes">
+                    <div className="w-full h-full bg-gray-300 p-1">
+                        <TeamList selectedTeamId={selectedTeamId} onSelected={onSelected}/>
                     </div>
-                    <div className="items-center px-6 py-3">
-                        <TeamList selectedTeamId={selectedTeamId} onSelected={setSelectedTeamId}/>
-                    </div>
-                </div>
+                </Section>
             </div>
-            <div className='grow flex-1 flex flex-col bg-white p-5 shadow-2xl relative'>
-                <div className="flex-1 flex items-center justify-center bg-gray-200 mb-5 relative">
-                    <LiveMap selectedTeamId={selectedTeamId} setSelectedTeamId={setSelectedTeamId} />
+            <div className='grow flex-1 flex flex-col bg-white p-3 gap-3 shadow-2xl'>
+                <div className="flex-1 flex flex-row gap-3">
+                    <LiveMap/>
+                    <TeamInformation selectedTeamId={selectedTeamId} onClose={() => setSelectedTeamId(null)}/>
                 </div>
-                <div className='w-full flex flex-row gap-10 items-center px-6 relative'>
+                <div className='w-full flex flex-row items-center justify-evenly py-2'>
                     <button 
                         className="w-16 h-16 bg-custom-light-blue rounded-full hover:bg-blue-500 transition flex items-center justify-center"
                         title ="Changer le style de la carte">

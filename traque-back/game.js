@@ -92,17 +92,26 @@ export default {
                 penaltyController.stop();
                 timeoutHandler.endAllSendPositionTimeout();
                 for (let team of this.teams) {
-                    team.outOfZone = false;
-                    team.penalties = 0;
+                    // Chasing
                     team.captured = false;
-                    team.enemyLocation = null;
-                    team.currentLocation = null;
+                    team.chasing = null;
+                    team.chased = null;
+                    // Locations
                     team.lastSentLocation = null;
+                    team.locationSendDeadline = null;
+                    team.enemyLocation = null;
+                    // Placement
+                    team.ready = false;
+                    // Zone
+                    team.penalties = 0;
+                    team.outOfZone = false;
+                    team.outOfZoneDeadline = null;
+                    // Stats
                     team.distance = 0;
-                    team.finishDate = null;
                     team.nCaptures = 0;
                     team.nSentLocation = 0;
                     team.nObserved = 0;
+                    team.finishDate = null;
                 }
                 this.startDate = null;
                 this.updateTeamChasing();
@@ -178,32 +187,38 @@ export default {
      */
     addTeam(teamName) {
         this.teams.push({
+            // Identification
             sockets: [],
-            id: this.getNewTeamId(),
             name: teamName,
+            id: this.getNewTeamId(),
+            captureCode: this.createCaptureCode(),
+            // Chasing
+            captured: false,
             chasing: null,
             chased: null,
+            // Locations
             lastSentLocation: null,
-            currentLocation: null,
-            enemyLocation: null,
             locationSendDeadline: null,
+            currentLocation: null,
+            lastCurrentLocationDate: null,
+            enemyLocation: null,
+            // Placement
             startingArea: null,
             ready: false,
-            captureCode: this.createCaptureCode(),
-            captured: false,
+            // Zone
             penalties: 0,
             outOfZone: false,
             outOfZoneDeadline: null,
+            // Stats
             distance: 0,
-            finishDate: null,
             nCaptures: 0,
             nSentLocation: 0,
             nObserved: 0,
+            finishDate: null,
+            // First socket infos
             phoneModel: null,
             phoneName: null,
             battery: null,
-            ping: null,
-            nConnected: 0,
         });
         this.updateTeamChasing();
         return true;

@@ -38,23 +38,29 @@ export function playersBroadcast(event, data) {
 export function sendUpdatedTeamInformations(teamId) {
     const team = game.getTeam(teamId);
     teamBroadcast(teamId, "update_team", {
+        // Identification
         name: team.name,
+        captureCode: team.captureCode,
+        // Chasing
+        captured: team.captured,
         enemyName: game.getTeam(team.chasing).name,
+        // Locations
         lastSentLocation: team.lastSentLocation,
         enemyLocation: team.enemyLocation,
-        locationSendDeadline: team.locationSendDeadline,
+        // Placement phase
         startingArea: team.startingArea,
         ready: team.ready,
-        captureCode: team.captureCode,
-        captured: team.captured,
+        // Constraints
         penalties: team.penalties,
         outOfZone: team.outOfZone,
         outOfZoneDeadline: team.outOfZoneDeadline,
+        locationSendDeadline: team.locationSendDeadline,
+        // Stats
         distance: team.distance,
-        startDate: game.startDate,
-        finishDate: team.finishDate,
         nCaptures: team.nCaptures,
         nSentLocation: team.nSentLocation,
+        startDate: game.startDate,
+        finishDate: team.finishDate,
     })
     secureAdminBroadcast("teams", game.teams);
 }
@@ -65,8 +71,14 @@ export function sendUpdatedTeamInformations(teamId) {
  */
 function logoutPlayer(id) {
     for (const team of game.teams) {
+        if (team.sockets.indexOf(id) == 0) {
+            team.battery = null;
+            team.phoneModel = null;
+            team.phoneName = null;
+        }
         team.sockets = team.sockets.filter((sid) => sid != id);
     }
+    secureAdminBroadcast("teams", game.teams);
 }
 
 export function initTeamSocket() {
@@ -115,7 +127,9 @@ export function initTeamSocket() {
             const team = game.getTeam(teamId);
             if (team.sockets.indexOf(socket.id) == 0) {
                 game.updateLocation(teamId, position);
+                team.lastCurrentLocationDate = Date.now();
             }
+            secureAdminBroadcast("teams", game.teams);
         });
 
         socket.on("send_position", () => {

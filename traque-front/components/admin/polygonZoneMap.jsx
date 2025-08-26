@@ -131,11 +131,11 @@ export default function PolygonZoneMap() {
     }
     
     return (
-        <div className='h-full w-full bg-white p-5 gap-5 flex flex-row shadow-2xl'>
+        <div className='h-full w-full bg-white p-3 gap-3 flex flex-row shadow-2xl'>
             <div className="h-full w-full">
                 <PolygonZonePicker polygons={polygons} addPolygon={addPolygon} removePolygon={removePolygon} />
             </div>
-            <div className="h-full w-1/6 flex flex-col gap-5">
+            <div className="h-full w-1/6 flex flex-col gap-3">
                 <div className="w-full text-center">
                     <h2 className="text-xl">Reduction order</h2>
                 </div>

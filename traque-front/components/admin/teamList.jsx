@@ -2,7 +2,6 @@ import useAdmin from '@/hook/useAdmin';
 import { GameState } from '@/util/gameState';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import React from 'react'
-import { useFormStatus } from 'react-dom';
 
 function reorder(list, startIndex, endIndex) {
     const result = Array.from(list);

@@ -1,7 +1,7 @@
 "use client";
 import TeamAddForm from '@/components/admin/teamAdd';
 import TeamEdit from '@/components/admin/teamEdit';
-import TeamList from '@/components/admin/teamList';
+import TeamList from '@/components/admin/teamManager';
 import { useAdminConnexion } from '@/context/adminConnexionContext';
 import useAdmin from '@/hook/useAdmin';
 import React, { useState } from 'react'
