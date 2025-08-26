@@ -2,11 +2,15 @@
 import GameSettings from "@/components/admin/gameSettings";
 import { useAdminConnexion } from "@/context/adminConnexionContext";
 import dynamic from "next/dynamic";
+import TeamAddForm from '@/components/admin/teamAdd';
+import useAdmin from '@/hook/useAdmin';
+import Link from "next/link";
 
 // Imported at runtime and not at compile time
 const ZoneSelector = dynamic(() => import('@/components/admin/polygonZoneMap'), { ssr: false });
 
 export default function AdminPage() {
+    const { addTeam } = useAdmin();
     const { useProtect } = useAdminConnexion();
     
     useProtect();
@@ -14,6 +18,13 @@ export default function AdminPage() {
     return (
         <div className='h-full bg-gray-200 p-10 flex flex-row gap-5'>
             <div className="h-full w-2/6">
+                <div className='w-full mb-5 h-full gap-3 bg-custom-light-blue p-7 flex flex-row text-left shadow-2xl'>
+                    <Link href="/admin" className="w-fit flex items-center text-white hover:text-blue-900 transition-colors">
+                        <img src="/icons/backarrow.png" className="w-10 h-10 mr-10" title="retour" />
+                    </Link>
+                    <h2 className="text-4xl font-bold">Paramètres</h2>
+                </div>
+                <TeamAddForm onAddTeam={addTeam}/>
                 <GameSettings />
             </div>
             <div className="h-full w-full">

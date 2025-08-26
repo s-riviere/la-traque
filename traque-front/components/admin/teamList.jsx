@@ -1,6 +1,8 @@
 import useAdmin from '@/hook/useAdmin';
+import { GameState } from '@/util/gameState';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import React from 'react'
+import { useFormStatus } from 'react-dom';
 
 function reorder(list, startIndex, endIndex) {
     const result = Array.from(list);
@@ -9,15 +11,33 @@ function reorder(list, startIndex, endIndex) {
     return result;
 };
 
-function TeamListItem({ team, index, onSelected, itemSelected }) {
-    const bgColor = team.captured ? " bg-red-400" : " bg-gray-300";
-    const border = " border border-4 " + (itemSelected ? "border-black" : team.captured ? "border-red-400" : "border-gray-300");
-    const classNames = 'w-full p-3 my-3' + (bgColor) + (border);
+const TEAM_STATUS = {
+  playing:    { label: "En jeu",           color: "text-custom-green" },
+  captured:   { label: "Capturée",        color: "text-custom-red" },
+  outofzone:  { label: "Hors zone",       color: "text-custom-orange" },
+  ready:      { label: "Prête",           color: "text-custom-blue" },
+  notready:   { label: "En préparation",  color: "text-custom-grey" },
+};
+
+function TeamListItem({ team, index, onSelected, itemSelected, gamestate }) {
+    console.log(gamestate === GameState.PLAYING ? "En jeu" : "En préparation");
+    const status = gamestate === GameState.PLAYING ? (team.captured ? TEAM_STATUS.captured : (team.outofzone ? TEAM_STATUS.outofzone : TEAM_STATUS.playing)) : (team.ready ? TEAM_STATUS.ready : TEAM_STATUS.notready);
     return (
         <Draggable draggableId={team.id.toString()} index={index} onClick={() => onSelected(team.id)}>
             {provided => (
-                <div className={classNames} {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
-                    <p className='text-center'>{team.name}</p>
+                <div className='w-full p-2 bg-white border-2 border-gray-300 flex flex-row items-center text-3xl gap-3 font-bold' {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+                    <div className="w-12 h-12 grid grid-cols-2 grid-rows-2 gap-1">
+                        <img src="/icons/greendude.png" className="w-6 h-6 object-contain" />
+                        <img src="/icons/greenlocation.png" className="w-6 h-6 object-contain" />
+                        <img src="/icons/greenconnection.png" className="w-6 h-6 object-contain" />
+                        <img src="/icons/greenbattery.png" className="w-6 h-6 object-contain" />
+                    </div>
+                    <div className='flex-1 w-full h-full flex flex-row items-center justify-between'>
+                        <p className='text-center'>{team.name}</p>
+                        <p className={`text-center ${status.color}`}>
+                            {status.label}
+                        </p>
+                    </div>
                 </div>
 
             )}
@@ -26,8 +46,7 @@ function TeamListItem({ team, index, onSelected, itemSelected }) {
 }
 
 export default function TeamList({selectedTeamId, onSelected}) {
-    const {teams, reorderTeams} = useAdmin();
-
+    const {teams, reorderTeams, gameState} = useAdmin();
     function onDragEnd(result) {
         if (!result.destination) return;
         if (result.destination.index === result.source.index) return;
@@ -42,7 +61,7 @@ export default function TeamList({selectedTeamId, onSelected}) {
                     <ul ref={provided.innerRef} {...provided.droppableProps}>
                         {teams.map((team, i) => (
                             <li key={team.id} onClick={() => onSelected(team.id)}>
-                                <TeamListItem onSelected={onSelected} index={i} itemSelected={selectedTeamId === team.id} team={team} />
+                                <TeamListItem onSelected={onSelected} index={i} itemSelected={selectedTeamId === team.id} team={team} gamestate={gameState} />
                             </li>
                         ))}
                         {provided.placeholder}
