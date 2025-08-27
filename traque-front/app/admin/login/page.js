@@ -1,7 +1,6 @@
 "use client";
-import LoginForm from '@/components/team/loginForm'
 import { useAdminConnexion } from '@/context/adminConnexionContext';
-import React from 'react'
+import LoginForm from './components/loginForm';
 
 export default function AdminLoginPage() {
     const {login, useProtect} = useAdminConnexion();

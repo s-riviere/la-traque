@@ -1,7 +1,7 @@
+import { env } from 'next-runtime-env';
+import { useEffect, useState } from "react";
 import useAdmin from "@/hook/useAdmin";
 import { GameState } from '@/util/gameState';
-import { useEffect, useState } from "react";
-import { env } from 'next-runtime-env';
 
 function DotLine({ label, value }) {
     return (
@@ -49,7 +49,7 @@ function getStatus(team, gamestate) {
     }
 }
 
-export default function TeamInformation({ selectedTeamId, onClose }) {
+export default function TeamSidePanel({ selectedTeamId, onClose }) {
     const { getTeam, getTeamName, startDate, gameState } = useAdmin();
     const [imgSrc, setImgSrc] = useState("");
     const team = getTeam(selectedTeamId);

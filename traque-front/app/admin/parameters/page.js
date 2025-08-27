@@ -1,21 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
-import GameSettings from "@/components/admin/gameSettings";
-import { useAdminConnexion } from "@/context/adminConnexionContext";
 import dynamic from "next/dynamic";
-import TeamList from '@/components/admin/teamManager';
-import useAdmin from '@/hook/useAdmin';
 import Link from "next/link";
-import { GreenButton } from "@/components/util/button";
-import { TextInput } from "@/components/util/textInput";
-import { Section } from "@/components/util/section";
+import { TextInput } from "@/components/textInput";
+import { Section } from "@/components/section";
+import { useAdminConnexion } from "@/context/adminConnexionContext";
+import useAdmin from '@/hook/useAdmin';
+import Messages from "./components/messages";
+import TeamList from './components/teamManager';
 
 // Imported at runtime and not at compile time
-const ZoneSelector = dynamic(() => import('@/components/admin/polygonZoneMap'), { ssr: false });
+const ZoneSelector = dynamic(() => import('./components/polygonZoneMap'), { ssr: false });
 
 export default function AdminPage() {
     const {penaltySettings, changePenaltySettings} = useAdmin();
-    const { addTeam } = useAdmin();
     const { useProtect } = useAdminConnexion();
     const [allowedTimeBetweenUpdates, setAllowedTimeBetweenUpdates] = useState("");
 
@@ -42,18 +40,15 @@ export default function AdminPage() {
                     </Link>
                     <h2 className="text-3xl font-bold">Paramètres</h2>
                 </div>
-                <GameSettings />
+                <Messages/>
                 <Section className="h-full" title="Équipe">
                     <div className="w-full h-full gap-3 flex flex-col items-center">
                         <TeamList/>
                         <div className="w-full flex flex-row gap-2 items-center justify-between">
                             <p>Interval between position updates</p>
                             <div className="w-16 h-10">
-                                <TextInput value={allowedTimeBetweenUpdates} onChange={(e) => setAllowedTimeBetweenUpdates(e.target.value)} />
+                                <TextInput value={allowedTimeBetweenUpdates} onChange={(e) => setAllowedTimeBetweenUpdates(e.target.value)} onBlur={applySettings} />
                             </div>
-                        </div>
-                        <div className="w-40 h-15">
-                            <GreenButton onClick={applySettings}>Apply</GreenButton>
                         </div>
                     </div>
                 </Section>

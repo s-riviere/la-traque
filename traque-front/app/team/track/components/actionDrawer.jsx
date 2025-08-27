@@ -1,8 +1,8 @@
-import useGame from "@/hook/useGame";
 import { useEffect, useState } from "react"
-import { BlueButton, GreenButton } from "../util/button";
-import { TextInput } from "../util/textInput";
+import { BlueButton, GreenButton } from "@/components/button";
+import { TextInput } from "@/components/textInput";
 import useTeamConnexion from "@/context/teamConnexionContext";
+import useGame from "@/hook/useGame";
 import EnemyTeamModal from "./enemyTeamModal";
 
 export default function ActionDrawer() {

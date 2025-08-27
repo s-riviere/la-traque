@@ -1,6 +1,6 @@
 "use client"
-import LoginForm from "@/components/team/loginForm";
 import { useTeamConnexion } from "@/context/teamConnexionContext";
+import LoginForm from "./components/loginForm";
 
 export default function Home() {
   const { login,useProtect  } = useTeamConnexion();

@@ -1,10 +1,10 @@
-import useLocation from "@/hook/useLocation";
 import { useEffect, useState } from "react";
-import "leaflet/dist/leaflet.css";
 import { MapContainer, Marker, TileLayer, Tooltip, Polyline, Polygon } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { MapPan } from "@/components/mapUtils";
+import useLocation from "@/hook/useLocation";
 import useAdmin from "@/hook/useAdmin";
 import { GameState } from "@/util/gameState";
-import { MapPan } from "./mapUtils";
 
 const DEFAULT_ZOOM = 14;
 const positionIcon = new L.Icon({

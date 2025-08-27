@@ -1,7 +1,6 @@
-import useAdmin from "@/hook/useAdmin";
-import { GreenButton } from "../util/button";
-import { Section } from "../util/section";
 import { useEffect, useState } from "react";
+import { Section } from "@/components/section";
+import useAdmin from "@/hook/useAdmin";
 
 function MessageInput({title, ...props}) {
     return (
@@ -12,7 +11,7 @@ function MessageInput({title, ...props}) {
     );
 }
 
-export default function GameSettings() {
+export default function Messages() {
     const {gameSettings, changeGameSettings} = useAdmin();
     const [capturedMessage, setCapturedMessage] = useState("");
     const [winnerEndMessage, setWinnerEndMessage] = useState("");
@@ -35,13 +34,10 @@ export default function GameSettings() {
     return (
         <Section title="Message">
             <div className="w-full h-full flex flex-col gap-3 items-center">
-                <MessageInput title="Attente  :" value={waitingMessage} onChange={(e) => setWaitingMessage(e.target.value)}/>
-                <MessageInput title="Capture :" value={capturedMessage} onChange={(e) => setCapturedMessage(e.target.value)} />
-                <MessageInput title="Victoire :" value={winnerEndMessage} onChange={(e) => setWinnerEndMessage(e.target.value)} />
-                <MessageInput title="Défaite  :" value={loserEndMessage} onChange={(e) => setLoserEndMessage(e.target.value)} />
-                <div className='w-40 h-15'>
-                    <GreenButton onClick={applySettings}>Apply</GreenButton>
-                </div>
+                <MessageInput title="Attente  :" value={waitingMessage} onChange={(e) => setWaitingMessage(e.target.value)} onBlur={applySettings}/>
+                <MessageInput title="Capture :" value={capturedMessage} onChange={(e) => setCapturedMessage(e.target.value)} onBlur={applySettings}/>
+                <MessageInput title="Victoire :" value={winnerEndMessage} onChange={(e) => setWinnerEndMessage(e.target.value)} onBlur={applySettings}/>
+                <MessageInput title="Défaite  :" value={loserEndMessage} onChange={(e) => setLoserEndMessage(e.target.value)} onBlur={applySettings}/>
             </div>
         </Section>
     );

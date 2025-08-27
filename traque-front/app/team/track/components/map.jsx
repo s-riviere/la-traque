@@ -3,8 +3,8 @@ import { Circle, MapContainer, Marker, Popup, TileLayer, useMap } from 'react-le
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import "leaflet-defaulticon-compatibility";
 import "leaflet/dist/leaflet.css";
-import useGame from '@/hook/useGame';
 import useTeamContext from '@/context/teamContext';
+import useGame from '@/hook/useGame';
 
 const DEFAULT_ZOOM = 14;
 

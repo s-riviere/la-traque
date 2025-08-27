@@ -1,6 +1,5 @@
 import useAdmin from '@/hook/useAdmin';
 import { GameState } from '@/util/gameState';
-import React from 'react';
 
 const TEAM_STATUS = {
     playing:    { label: "En jeu",          color: "text-custom-green" },

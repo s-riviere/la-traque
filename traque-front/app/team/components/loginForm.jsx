@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { BlueButton } from "../util/button";
-import { TextInput } from "../util/textInput";
+import { BlueButton } from "@/components/button";
+import { TextInput } from "@/components/textInput";
 
 export default function LoginForm({ onSubmit, title, placeholder, buttonText}) {
     const [value, setValue] = useState("");

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { BlueButton, GreenButton, RedButton } from "../util/button";
-import { TextInput } from "../util/textInput";
+import { Circle, MapContainer, TileLayer } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { BlueButton, GreenButton, RedButton } from "@/components/button";
+import { TextInput } from "@/components/textInput";
+import { MapPan, MapEventListener } from "@/components/mapUtils";
 import useAdmin from "@/hook/useAdmin";
 import useLocation from "@/hook/useLocation";
-import "leaflet/dist/leaflet.css";
-import { Circle, MapContainer, TileLayer } from "react-leaflet";
 import useMapCircleDraw from "@/hook/useMapCircleDraw";
-import { MapPan, MapEventListener } from "./mapUtils";
 
 const DEFAULT_ZOOM = 14;
 const EditMode = {
@@ -94,25 +94,27 @@ export default function CircleZoneMap() {
     useEffect(() => {
         if(editMode == EditMode.MIN) {
             setEditMode(EditMode.MAX);
-        }else {
+        } else {
             setEditMode(EditMode.MIN);
         }
 
     }, [minZone, maxZone]);
 
-    return <div className='w-2/5 h-full gap-1 bg-white p-10 flex flex-col text-center shadow-2xl overflow-y-scroll'>
-        <h2 className="text-2xl">Edit zones</h2>
-        {editMode == EditMode.MIN && <BlueButton onClick={() => setEditMode(EditMode.MAX)}>Click to edit first zone</BlueButton>}
-        {editMode == EditMode.MAX && <RedButton onClick={() => setEditMode(EditMode.MIN)}>Click to edit last zone</RedButton>}
-        <CircleZonePicker minZone={minZone} maxZone={maxZone} editMode={editMode} setMinZone={setMinZone} setMaxZone={setMaxZone} />
-        <div>
-            <p>Number of zones</p>
-            <TextInput value={reductionCount} onChange={(e) => setReductionCount(e.target.value)}></TextInput>
+    return (
+        <div className='w-2/5 h-full gap-1 bg-white p-10 flex flex-col text-center shadow-2xl overflow-y-scroll'>
+            <h2 className="text-2xl">Edit zones</h2>
+            {editMode == EditMode.MIN && <BlueButton onClick={() => setEditMode(EditMode.MAX)}>Click to edit first zone</BlueButton>}
+            {editMode == EditMode.MAX && <RedButton onClick={() => setEditMode(EditMode.MIN)}>Click to edit last zone</RedButton>}
+            <CircleZonePicker minZone={minZone} maxZone={maxZone} editMode={editMode} setMinZone={setMinZone} setMaxZone={setMaxZone} />
+            <div>
+                <p>Number of zones</p>
+                <TextInput value={reductionCount} onChange={(e) => setReductionCount(e.target.value)}></TextInput>
+            </div>
+            <div>
+                <p>Duration of a zone</p>
+                <TextInput value={duration} onChange={(e) => setDuration(e.target.value)}></TextInput>
+            </div>
+            <GreenButton onClick={handleSettingsSubmit}>Apply</GreenButton>
         </div>
-        <div>
-            <p>Duration of a zone</p>
-            <TextInput value={duration} onChange={(e) => setDuration(e.target.value)}></TextInput>
-        </div>
-        <GreenButton onClick={handleSettingsSubmit}>Apply</GreenButton>
-    </div>
+    );
 }

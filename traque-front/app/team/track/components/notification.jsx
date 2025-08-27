@@ -1,5 +1,5 @@
-import { useSocketListener } from "@/hook/useSocketListener";
 import { useEffect, useState } from "react";
+import { useSocketListener } from "@/hook/useSocketListener";
 
 export default function Notification({ socket }) {
     const [visible, setVisible] = useState(false);

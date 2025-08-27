@@ -1,8 +1,8 @@
-import useGame from "@/hook/useGame"
-import { GreenButton, LogoutButton } from "../util/button";
 import { useRef } from "react";
-import useTeamContext from "@/context/teamContext";
 import { env } from 'next-runtime-env';
+import { GreenButton, LogoutButton } from "@/components/button";
+import useTeamContext from "@/context/teamContext";
+import useGame from "@/hook/useGame"
 
 export default function WaitingScreen() {
     const { name, teamId  } = useGame();

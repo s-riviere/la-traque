@@ -1,5 +1,5 @@
 import useTeamConnexion from "@/context/teamConnexionContext";
-import useGame from "@/hook/useGame"
+import useGame from "@/hook/useGame";
 
 export default function PlacementOverlay() {
     const { name, ready } = useGame();

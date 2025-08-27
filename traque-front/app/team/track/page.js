@@ -1,22 +1,22 @@
 "use client";
-import ActionDrawer from '@/components/team/actionDrawer';
-import Notification from '@/components/team/notification';
-import PlacementOverlay from '@/components/team/placementOverlay';
-import WaitingScreen from '@/components/team/waitingScreen';
-import { LogoutButton } from '@/components/util/button';
+import React from 'react';
+import dynamic from 'next/dynamic';
+import { LogoutButton } from '@/components/button';
 import { useSocket } from '@/context/socketContext';
 import { useTeamConnexion } from '@/context/teamConnexionContext';
 import { useTeamContext } from '@/context/teamContext';
 import useGame from '@/hook/useGame';
 import { GameState } from '@/util/gameState';
-import dynamic from 'next/dynamic';
-import React from 'react'
+import ActionDrawer from './components/actionDrawer';
+import Notification from './components/notification';
+import PlacementOverlay from './components/placementOverlay';
+import WaitingScreen from './components/waitingScreen';
 
 //Load the map without SSR
-const LiveMap = dynamic(() => import('@/components/team/map').then((mod) => mod.LiveMap), {
+const LiveMap = dynamic(() => import('./components/map').then((mod) => mod.LiveMap), {
     ssr: false
 });
-const PlacementMap = dynamic(() => import('@/components/team/map').then((mod) => mod.PlacementMap), {
+const PlacementMap = dynamic(() => import('./components/map').then((mod) => mod.PlacementMap), {
     ssr: false
 });
 

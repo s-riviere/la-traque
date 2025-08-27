@@ -1,14 +1,15 @@
 "use client";
-import { useAdminConnexion } from "@/context/adminConnexionContext";
+import React, { useState } from 'react';
 import dynamic from "next/dynamic";
-import TeamList from '@/components/admin/teamViewer';
-import React, { useState } from 'react'
 import Link from "next/link";
-import { Section } from "@/components/util/section";
-import TeamInformation from "@/components/admin/teamInformation";
+import { Section } from "@/components/section";
+import { useAdminConnexion } from "@/context/adminConnexionContext";
+import TeamSidePanel from "./components/teamSidePanel";
+import TeamList from './components/teamViewer';
+import { MapButton, ControlButton } from './components/buttons';
 
 // Imported at runtime and not at compile time
-const LiveMap = dynamic(() => import('@/components/admin/liveMap'), { ssr: false });
+const LiveMap = dynamic(() => import('./components/liveMap'), { ssr: false });
 
 export default function AdminPage() {
     const { useProtect } = useAdminConnexion();
@@ -33,32 +34,13 @@ export default function AdminPage() {
                 </div>
                 <Section title="Contrôle">
                     <div className='w-full h-full flex flex-row justify-between'>
-                        <Link 
-                            href="/admin/parameters"
-                            className="w-[4.5rem] h-[4.5rem] bg-custom-light-blue rounded-lg hover:bg-blue-500 transition flex items-center justify-center" 
-                            title="Accéder aux paramètres du jeu">
-                            <img src="/icons/parameters.png" className="w-10 h-10" />
+                        <Link href="/admin/parameters">
+                            <ControlButton icon="parameters" title="Accéder aux paramètres du jeu"/>
                         </Link>
-                        <button 
-                            className="w-[4.5rem] h-[4.5rem] bg-custom-light-blue rounded-lg hover:bg-blue-500 transition flex items-center justify-center" 
-                            title="Reprendre la partie">
-                            <img src="/icons/play.png" className="w-10 h-10" />
-                        </button>
-                        <button 
-                            className="w-[4.5rem] h-[4.5rem] bg-custom-light-blue rounded-lg hover:bg-blue-500 transition flex items-center justify-center" 
-                            title="Réinitialiser la partie">
-                            <img src="/icons/reset.png" className="w-10 h-10" />
-                        </button>
-                        <button 
-                            className="w-[4.5rem] h-[4.5rem] bg-custom-light-blue rounded-lg hover:bg-blue-500 transition flex items-center justify-center" 
-                            title="Commencer les placements">
-                            <img src="/icons/placement.png" className="w-10 h-10" />
-                        </button>
-                        <button 
-                            className="w-[4.5rem] h-[4.5rem] bg-custom-light-blue rounded-lg hover:bg-blue-500 transition flex items-center justify-center" 
-                            title="Lancer la traque">
-                            <img src="/icons/begin.png" className="w-10 h-10" />
-                        </button>
+                        <ControlButton icon="play" title="Reprendre la partie"/>
+                        <ControlButton icon="reset" title="Réinitialiser la partie"/>
+                        <ControlButton icon="placement" title="Commencer les placements"/>
+                        <ControlButton icon="begin" title="Lancer la traque"/>
                     </div>
                 </Section>
                 <Section className="h-full" title="Équipes">
@@ -70,44 +52,16 @@ export default function AdminPage() {
             <div className='grow flex-1 flex flex-col bg-white p-3 gap-3 shadow-2xl'>
                 <div className="flex-1 flex flex-row gap-3">
                     <LiveMap/>
-                    <TeamInformation selectedTeamId={selectedTeamId} onClose={() => setSelectedTeamId(null)}/>
+                    <TeamSidePanel selectedTeamId={selectedTeamId} onClose={() => setSelectedTeamId(null)}/>
                 </div>
                 <div className='w-full flex flex-row items-center justify-evenly py-2'>
-                    <button 
-                        className="w-16 h-16 bg-custom-light-blue rounded-full hover:bg-blue-500 transition flex items-center justify-center"
-                        title ="Changer le style de la carte">
-                        <img src="/icons/mapstyle.png" className="w-10 h-10" />
-                    </button>
-                    <button 
-                        className="w-16 h-16 bg-custom-light-blue rounded-full hover:bg-blue-500 transition flex items-center justify-center"
-                        title ="Afficher/cacher les zones">
-                        <img src="/icons/zones.png" className="w-10 h-10" />
-                    </button>
-                    <button 
-                        className="w-16 h-16 bg-custom-light-blue rounded-full hover:bg-blue-500 transition flex items-center justify-center"
-                        title ="Afficher/cacher les noms des équipes">
-                        <img src="/icons/names.png" className="w-10 h-10" />
-                    </button>
-                    <button 
-                        className="w-16 h-16 bg-custom-light-blue rounded-full hover:bg-blue-500 transition flex items-center justify-center"
-                        title ="Afficher/cacher les relations de traque">
-                        <img src="/icons/arrows.png" className="w-10 h-10" />
-                    </button>
-                    <button 
-                        className="w-16 h-16 bg-custom-light-blue rounded-full hover:bg-blue-500 transition flex items-center justify-center"
-                        title ="Afficher/cacher les incertitudes de position">
-                        <img src="/icons/incertitude.png" className="w-10 h-10" />
-                    </button>
-                    <button 
-                        className="w-16 h-16 bg-custom-light-blue rounded-full hover:bg-blue-500 transition flex items-center justify-center"
-                        title ="Afficher/cacher les chemins des équipes">
-                        <img src="/icons/path.png" className="w-10 h-10" />
-                    </button>
-                    <button 
-                        className="w-16 h-16 bg-custom-light-blue rounded-full hover:bg-blue-500 transition flex items-center justify-center"
-                        title ="Afficher/cacher les événements">
-                        <img src="/icons/informations.png" className="w-10 h-10" />
-                    </button>
+                    <MapButton icon="mapstyle" title="Changer le style de la carte"/>
+                    <MapButton icon="zones" title="Afficher/masquer les zones"/>
+                    <MapButton icon="names" title="Afficher/masquer les noms des équipes"/>
+                    <MapButton icon="arrows" title="Afficher/masquer les relations de traque"/>
+                    <MapButton icon="incertitude" title="Afficher/masquer les incertitudes de position"/>
+                    <MapButton icon="path" title="Afficher/masquer la trace de l'équipe sélectionnée"/>
+                    <MapButton icon="informations" title="Afficher/masquer les évènements de l'équipe sélectionnée"/>
                 </div>
             </div>
         </div>
