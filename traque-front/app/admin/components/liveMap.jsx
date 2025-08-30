@@ -7,15 +7,16 @@ import useAdmin from "@/hook/useAdmin";
 import { GameState } from "@/util/gameState";
 
 const DEFAULT_ZOOM = 14;
+
 const positionIcon = new L.Icon({
-    iconUrl: '/icons/location.png',
+    iconUrl: '/icons/marker/blue.png',
     iconSize: [30, 30],
     iconAnchor: [15, 15],
     popupAnchor: [0, -15],
     shadowSize: [30, 30],
 });
 
-export default function LiveMap() {
+export default function LiveMap({mapStyle, showZones, showNames, showArrows}) {
     const location = useLocation(Infinity);
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
     const { zoneExtremities, teams, nextZoneDate, getTeam, gameState } = useAdmin();
@@ -53,20 +54,17 @@ export default function LiveMap() {
     }
 
     return (
-        <div className='h-full w-full'>
+        <div className='h-full w-full flex flex-col'>
             {gameState == GameState.PLAYING && <p>{`Next zone in : ${formatTime(timeLeftNextZone)}`}</p>}
-            <MapContainer className='h-full w-full' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
+            <MapContainer className='flex-1 w-full' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
+                <TileLayer url={mapStyle.url} attribution={mapStyle.attribution}/>
                 <MapPan center={location} zoom={DEFAULT_ZOOM} />
-                {gameState == GameState.PLAYING && zoneExtremities.begin && <Polygon positions={zoneExtremities.begin.points} pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: '0.1', weight: 3 }} />}
-                {gameState == GameState.PLAYING && zoneExtremities.end && <Polygon positions={zoneExtremities.end.points} pathOptions={{ color: 'green', fillColor: 'green', fillOpacity: '0.1', weight: 3 }} />}
+                {showZones && gameState == GameState.PLAYING && zoneExtremities.begin && <Polygon positions={zoneExtremities.begin.points} pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: '0.1', weight: 3 }} />}
+                {showZones && gameState == GameState.PLAYING && zoneExtremities.end && <Polygon positions={zoneExtremities.end.points} pathOptions={{ color: 'green', fillColor: 'green', fillOpacity: '0.1', weight: 3 }} />}
                 {teams.map((team) => team.currentLocation && !team.captured &&
                     <Marker key={team.id} position={team.currentLocation} icon={positionIcon}>
-                        <Tooltip permanent direction="top" offset={[0, -5]} className="custom-tooltip">{team.name}</Tooltip>
-                        <Arrow pos1={team.currentLocation} pos2={getTeam(team.chasing).currentLocation}/>
+                        {showNames && <Tooltip permanent direction="top" offset={[0.5, -15]} className="custom-tooltip">{team.name}</Tooltip>}
+                        {showArrows && <Arrow pos1={team.currentLocation} pos2={getTeam(team.chasing).currentLocation}/>}
                     </Marker>
                 )}
             </MapContainer>

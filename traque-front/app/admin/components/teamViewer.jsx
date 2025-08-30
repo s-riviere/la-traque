@@ -1,3 +1,4 @@
+import { List } from '@/components/list';
 import useAdmin from '@/hook/useAdmin';
 import { GameState } from '@/util/gameState';
 
@@ -23,17 +24,17 @@ function getStatus(team, gamestate) {
     }
 }
 
-function TeamListItem({ itemSelected, team }) {
+function TeamViewerItem({ team, itemSelected, onSelected }) {
     const { gameState } = useAdmin();
     const status = getStatus(team, gameState);
 
     return (
-        <div className={'w-full p-2 bg-white flex flex-row gap-3 justify-between cursor-pointer' + (itemSelected ? " outline outline-4 outline-black" : "")}>
+        <div className={'w-full flex flex-row gap-3 p-2 bg-white justify-between cursor-pointer ' + (itemSelected ? "outline outline-4 outline-black" : "")} onClick={() => onSelected(team.id)}>
             <div className='flex flex-row items-center gap-3'>
                 <div className='flex flex-row gap-1'>
-                    <img src={team.sockets.length > 0 ? "/icons/greendude.png" : "/icons/reddude.png"} className="w-4 h-4" />
-                    <img src={team.battery > 20 ? "/icons/greenbattery.png" : "/icons/redbattery.png"} className="w-4 h-4" />
-                    <img src={team.lastCurrentLocationDate != null && (Date.now() - team.lastCurrentLocationDate <= 30000) ? "/icons/greenlocation.png" : "/icons/redlocation.png"} className="w-4 h-4" />
+                    <img src={`/icons/user/${team.sockets.length > 0 ? "green" : "red"}.png`} className="w-4 h-4" />
+                    <img src={`/icons/battery/${team.battery >= 20 ? "green" : "red"}.png`} className="w-4 h-4" />
+                    <img src={`/icons/location/${team.lastCurrentLocationDate != null && (Date.now() - team.lastCurrentLocationDate <= 30000) ? "green" : "red"}.png`} className="w-4 h-4" />
                 </div>
                 <p className={`text-xl font-bold`}>{team.name}</p>
             </div>
@@ -44,16 +45,14 @@ function TeamListItem({ itemSelected, team }) {
     );
 }
 
-export default function TeamList({selectedTeamId, onSelected}) {
+export default function TeamViewer({selectedTeamId, onSelected}) {
     const { teams } = useAdmin();
 
     return (
-        <ul className='h-full gap-1 flex flex-col'>
-            {teams.map((team) => (
-                <li key={team.id} onClick={() => onSelected(team.id)}>
-                    <TeamListItem itemSelected={selectedTeamId === team.id} team={team} />
-                </li>
-            ))}
-        </ul>
+        <List array={teams}>
+            {(team) => (
+                <TeamViewerItem team={team} itemSelected={selectedTeamId === team.id} onSelected={onSelected}/>
+            )}
+        </List>
     );
 }

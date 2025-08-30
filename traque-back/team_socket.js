@@ -37,13 +37,14 @@ export function playersBroadcast(event, data) {
  */
 export function sendUpdatedTeamInformations(teamId) {
     const team = game.getTeam(teamId);
+    if (!team) return;
     teamBroadcast(teamId, "update_team", {
         // Identification
         name: team.name,
         captureCode: team.captureCode,
         // Chasing
         captured: team.captured,
-        enemyName: game.getTeam(team.chasing).name,
+        enemyName: game.getTeam(team.chasing)? game.getTeam(team.chasing).name : null,
         // Locations
         lastSentLocation: team.lastSentLocation,
         enemyLocation: team.enemyLocation,

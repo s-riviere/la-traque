@@ -21,7 +21,7 @@ function DotLine({ label, value }) {
 function IconValue({ color, icon, value }) {
     return (
         <div className="flex flex-row gap-2">
-            <img src={`/icons/${color}${icon}.png`} className="w-6 h-6" />
+            <img src={`/icons/${icon}/${color}.png`} className="w-6 h-6" />
             <p className={`text-custom-${color}`}>{value}</p>
         </div>
     );
@@ -95,7 +95,7 @@ export default function TeamSidePanel({ selectedTeamId, onClose }) {
     }
 
     return (
-        <div className="relative p-3 w-3/12 h-full flex flex-col gap-3">
+        <div className="w-full h-full relative flex flex-col p-3 gap-3">
             <button className="absolute left-2 -top-1 text-black text-5xl" onClick={onClose} title="Fermer">x</button>
             <p className={`text-2xl font-bold text-center ${getStatus(team, gameState).color} font-bold`}>{getStatus(team, gameState).label}</p>
             <p className="text-4xl font-bold text-center">{team.name ?? NO_VALUE}</p>
@@ -103,7 +103,7 @@ export default function TeamSidePanel({ selectedTeamId, onClose }) {
                 <img src={imgSrc ? imgSrc : "/images/missing_image.jpg"} alt="Photo de l'équipe"/>
             </div>
             <div className="flex flex-row justify-between items-center">
-                <IconValue color={team.sockets.length > 0 ? "green" : "red"} icon="dude" value={team.sockets.length ?? NO_VALUE} />
+                <IconValue color={team.sockets.length > 0 ? "green" : "red"} icon="user" value={team.sockets.length ?? NO_VALUE} />
                 <IconValue color={team.battery >= 20 ? "green" : "red"} icon="battery" value={(team.battery ?? NO_VALUE) + "%"} />
                 <IconValue
                     color={team.lastCurrentLocationDate != null && (Date.now() - team.lastCurrentLocationDate <= 30000) ? "green" : "red"}
