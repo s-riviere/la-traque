@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import { MapContainer, Marker, TileLayer, Tooltip, Polyline, Polygon } from "react-leaflet";
+import { Marker, Tooltip, Polyline, Polygon } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { MapPan } from "@/components/mapUtils";
-import useLocation from "@/hook/useLocation";
+import { CustomMapContainer } from "@/components/map";
 import useAdmin from "@/hook/useAdmin";
 import { GameState } from "@/util/gameState";
-
-const DEFAULT_ZOOM = 14;
 
 const positionIcon = new L.Icon({
     iconUrl: '/icons/marker/blue.png',
@@ -17,7 +14,6 @@ const positionIcon = new L.Icon({
 });
 
 export default function LiveMap({mapStyle, showZones, showNames, showArrows}) {
-    const location = useLocation(Infinity);
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
     const { zoneExtremities, teams, nextZoneDate, getTeam, gameState } = useAdmin();
 
@@ -56,9 +52,7 @@ export default function LiveMap({mapStyle, showZones, showNames, showArrows}) {
     return (
         <div className='h-full w-full flex flex-col'>
             {gameState == GameState.PLAYING && <p>{`Next zone in : ${formatTime(timeLeftNextZone)}`}</p>}
-            <MapContainer className='flex-1 w-full' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
-                <TileLayer url={mapStyle.url} attribution={mapStyle.attribution}/>
-                <MapPan center={location} zoom={DEFAULT_ZOOM} />
+            <CustomMapContainer mapStyle={mapStyle}>
                 {showZones && gameState == GameState.PLAYING && zoneExtremities.begin && <Polygon positions={zoneExtremities.begin.points} pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: '0.1', weight: 3 }} />}
                 {showZones && gameState == GameState.PLAYING && zoneExtremities.end && <Polygon positions={zoneExtremities.end.points} pathOptions={{ color: 'green', fillColor: 'green', fillOpacity: '0.1', weight: 3 }} />}
                 {teams.map((team) => team.currentLocation && !team.captured &&
@@ -67,7 +61,7 @@ export default function LiveMap({mapStyle, showZones, showNames, showArrows}) {
                         {showArrows && <Arrow pos1={team.currentLocation} pos2={getTeam(team.chasing).currentLocation}/>}
                     </Marker>
                 )}
-            </MapContainer>
+            </CustomMapContainer>
         </div>
     )
 }

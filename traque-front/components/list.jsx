@@ -1,14 +1,67 @@
+import { useEffect, useState } from 'react';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+
 export function List({array, children}) {
-    // The elements of array have to be identified by a field id
+    // TODO : change key
     return (
-        <div className='w-full h-full bg-gray-300 overflow-y-auto'>
-            <ul className="w-full p-1 divide-y-4 divide-gray-300">
+        <div className='w-full h-full bg-gray-300 overflow-y-scroll'>
+            <ul className="w-full p-1 pb-0">
                 {array.map((elem, i) => (
-                    <li className="w-full" key={elem.id}>
+                    <li className="w-full" key={elem.id ?? i}>
                         {children(elem, i)}
+                        <div className="w-full h-1"/>
                     </li>
                 ))}
             </ul>
         </div>
+    );
+}
+
+export function ReorderList({droppableId, array, setArray, children}) {
+    const [arrayLocal, setArrayLocal] = useState(array);
+
+    useEffect(() => {
+        setArrayLocal(array);
+    }, [array])
+
+    function reorder(list, startIndex, endIndex) {
+        const result = Array.from(list);
+        const [removed] = result.splice(startIndex, 1);
+        result.splice(endIndex, 0, removed);
+        return result;
+    };
+    
+    function onDragEnd(result) {
+        if (!result.destination) return;
+        if (result.destination.index === result.source.index) return;
+        const newArray = reorder(array, result.source.index, result.destination.index);
+        setArrayLocal(newArray);
+        setArray(newArray);
+    }
+
+    return (
+        <DragDropContext onDragEnd={onDragEnd} >
+            <Droppable droppableId={droppableId}>
+                {provided => (
+                    <div className='w-full h-full bg-gray-300 overflow-y-scroll' ref={provided.innerRef} {...provided.droppableProps}>
+                        <ul className="w-full p-1 pb-0">
+                            {arrayLocal.map((elem, i) => (
+                                <li className='w-full' key={elem.id}>
+                                    <Draggable draggableId={elem.id.toString()} index={i}>
+                                        {provided => (
+                                            <div className='w-full' {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+                                                {children(elem, i)}
+                                                <div className="w-full h-1"/>
+                                            </div>
+                                        )}
+                                    </Draggable>
+                                </li>
+                            ))}
+                        </ul>
+                        {provided.placeholder}
+                    </div>
+                )}
+            </Droppable>
+        </DragDropContext>
     );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { BlueButton, GreenButton } from "@/components/button";
-import { TextInput } from "@/components/textInput";
+import { TextInput } from "@/components/input";
 import useTeamConnexion from "@/context/teamConnexionContext";
 import useGame from "@/hook/useGame";
 import EnemyTeamModal from "./enemyTeamModal";

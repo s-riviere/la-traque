@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Polyline, Polygon, CircleMarker } from "react-leaflet";
+import { Polyline, Polygon, CircleMarker, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { GreenButton } from "@/components/button";
-import { TextInput } from "@/components/textInput";
-import { MapPan, MapEventListener } from "@/components/mapUtils";
+import { ReorderList } from "@/components/list";
+import { CustomMapContainer, MapEventListener } from "@/components/map";
+import { TextInput } from "@/components/input";
 import useAdmin from "@/hook/useAdmin";
-import useLocation from "@/hook/useLocation";
 import useMapPolygonDraw from "@/hook/useMapPolygonDraw";
 
-const DEFAULT_ZOOM = 14;
-
-function PolygonDrawings({ polygons, addPolygon, removePolygon }) {
+function Drawings({ polygons, addPolygon, removePolygon }) {
     const { currentPolygon, highlightNodes, handleLeftClick, handleRightClick, handleMouseMove } = useMapPolygonDraw(polygons, addPolygon, removePolygon);
     const nodeSize = 5; // px
     const lineThickness = 3; // px
@@ -45,110 +43,120 @@ function PolygonDrawings({ polygons, addPolygon, removePolygon }) {
         }
     }
 
-    function DrawPolygon({polygon}) {
+    function DrawPolygon({polygon, number}) {
         const length = polygon.length;
 
-        if (length > 2) {
-            return (
+        if (length < 3) return null;
+
+        const sum = polygon.reduce(
+            (acc, coord) => ({
+                lat: acc.lat + coord.lat,
+                lng: acc.lng + coord.lng
+            }),
+            { lat: 0, lng: 0 }
+        );
+
+        // meanPoint can be out of the polygon
+        // Idea : take the mean point of the largest connected subpolygon
+        const meanPoint = {lat: sum.lat / length, lng: sum.lng / length}
+
+        const numberIcon = L.divIcon({
+            html: `<div style="
+                font-size: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: bold;
+                font-size: 25px;
+            ">${number}</div>`,
+            className: 'custom-number-icon',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        return (
+            <div>
                 <Polygon positions={polygon} pathOptions={{ color: 'black', fillColor: 'black', fillOpacity: '0.5', weight: lineThickness }} />
-            );
-        }
+                <Marker position={meanPoint} icon={numberIcon} />
+            </div>
+        );
     }
 
     return (
         <div>
             <MapEventListener onLeftClick={handleLeftClick}  onRightClick={handleRightClick} onMouseMove={handleMouseMove} />
-            {polygons.map((polygon, i) => <DrawPolygon key={i} polygon={polygon} />)}
+            {polygons.map((polygon, i) => <DrawPolygon key={i} polygon={polygon} number={i+1} />)}
             <DrawUnfinishedPolygon polygon={currentPolygon} />
             {highlightNodes.map((node, i) => <DrawNode key={i} pos={node} color={"black"} />)}
         </div>
     );
 }
 
-function PolygonZonePicker({ polygons, addPolygon, removePolygon, ...props }) {
-    const location = useLocation(Infinity);
-
-    return (
-        <div className='h-full'>
-            <MapContainer {...props} className='min-h-full w-full' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <MapPan center={location} zoom={DEFAULT_ZOOM} />
-                <PolygonDrawings polygons={polygons} addPolygon={addPolygon} removePolygon={removePolygon} />
-            </MapContainer>
-        </div>
-    );
-}
-
-export default function PolygonZoneMap() {
+export default function PolygonZoneSelector() {
     const defaultDuration = 10;
+    const [zones, setZones] = useState([]);
     const [polygons, setPolygons] = useState([]);
-    const [durations, setDurations] = useState([]);
     const {zoneSettings, changeZoneSettings} = useAdmin();
     const {penaltySettings, changePenaltySettings} = useAdmin();
     const [allowedTimeOutOfZone, setAllowedTimeOutOfZone] = useState("");
 
     useEffect(() => {
+        setPolygons(zones.map((zone) => zone.polygon));
+    }, [zones])
+
+    useEffect(() => {
         if (zoneSettings) {
-            setPolygons(zoneSettings.polygons);
-            setDurations(zoneSettings.durations);
+            setZones(zoneSettings.map((zone) => ({id: idFromPolygon(zone.polygon), polygon: zone.polygon, duration: zone.duration})));
         }
         if (penaltySettings) {
             setAllowedTimeOutOfZone(penaltySettings.allowedTimeOutOfZone.toString());
         }
     }, [zoneSettings, penaltySettings]);
 
+    function idFromPolygon(polygon) {
+        return (polygon[0].lat + polygon[1].lat + polygon[2].lat).toString() + (polygon[0].lng + polygon[1].lng + polygon[2].lng).toString();
+    }
+
     function addPolygon(polygon) {
-        // Polygons
-        setPolygons([...polygons, polygon]);
-        // Durations
-        setDurations([...durations, defaultDuration]);
+        setZones([...zones, {id: idFromPolygon(polygon), polygon: polygon, duration: defaultDuration}]);
     }
 
     function removePolygon(i) {
-        // Polygons
-        const newPolygons = [...polygons];
-        newPolygons.splice(i, 1);
-        setPolygons(newPolygons);
-        // Durations
-        const newDurations = [...durations];
-        newDurations.splice(i, 1);
-        setDurations(newDurations);
+        setZones(zones.filter((_, index) => index !== i));
     }
 
     function updateDuration(i, duration) {
-        const newDurations = [...durations];
-        newDurations[i] = duration;
-        setDurations(newDurations);
+        setZones(zones.map((zone, index) => index === i ? {id: zone.id, polygon: zone.polygon, duration: duration} : zone));
     }
 
     function handleSettingsSubmit() {
-        const newSettings = {polygons: polygons, durations: durations};
-        changeZoneSettings(newSettings);
+        changeZoneSettings(zones);
         changePenaltySettings({allowedTimeOutOfZone: Number(allowedTimeOutOfZone)});
     }
     
     return (
         <div className='h-full w-full bg-white p-3 gap-3 flex flex-row shadow-2xl'>
-            <div className="h-full w-full">
-                <PolygonZonePicker polygons={polygons} addPolygon={addPolygon} removePolygon={removePolygon} />
+            <div className="h-full flex-1">
+                <CustomMapContainer>
+                    <Drawings polygons={polygons} addPolygon={addPolygon} removePolygon={removePolygon} />
+                </CustomMapContainer>
             </div>
             <div className="h-full w-1/6 flex flex-col gap-3">
                 <div className="w-full text-center">
                     <h2 className="text-xl">Reduction order</h2>
                 </div>
-                <ul className="w-full h-full bg-gray-300">
-                    {durations.map((duration, i) => (
-                        <li key={i} className="w-full bg-white flex flex-row gap-2 items-center justify-between p-1">
+                <ReorderList droppableId="zones-order" array={zones} setArray={setZones}>
+                    { (zone, i) =>
+                        <div className="w-full p-2 bg-white flex flex-row gap-2 items-center justify-between">
                             <p>Zone {i+1}</p>
                             <div className="w-16 h-10">
-                                <TextInput value={duration} onChange={(e) => updateDuration(i, e.target.value)}/>
+                                <TextInput value={zone.duration} onChange={(e) => updateDuration(i, e.target.value)}/>
                             </div>
-                        </li>
-                    ))}
-                </ul>
+                        </div>
+                    }
+                </ReorderList>
                 <div className="w-full flex flex-row gap-2 items-center justify-between">
                     <p>Timeout</p>
                     <div className="w-16 h-10">

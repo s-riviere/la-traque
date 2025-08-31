@@ -22,7 +22,7 @@ function latlngEqual(latlng1, latlng2, epsilon = 1e-9) {
 
 /* -------------------------------- Polygon zones -------------------------------- */
 
-const defaultPolygonSettings = { polygons: [], durations: [] };
+const defaultPolygonSettings = [];
 
 function polygonZone(points, duration) {
     return {
@@ -82,15 +82,9 @@ function mergePolygons(poly1, poly2) {
 }
 
 function polygonSettingsToZones(settings) {
-    const { polygons, durations } = settings;
-    const reversedPolygons = polygons.slice().reverse();
-    const reversedDurations = durations.slice().reverse();
-
     const zones = [];
 
-    for (let i = 0; i < reversedPolygons.length; i++) {
-        const polygon =reversedPolygons[i];
-        const duration = reversedDurations[i];
+    for (const { polygon, duration } of settings.slice().reverse()) {
         const length = zones.length;
 
         if (length == 0) {

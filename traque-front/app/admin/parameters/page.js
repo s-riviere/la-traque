@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { TextInput } from "@/components/textInput";
+import { TextInput } from "@/components/input";
 import { Section } from "@/components/section";
 import { useAdminConnexion } from "@/context/adminConnexionContext";
 import useAdmin from '@/hook/useAdmin';
@@ -10,13 +10,20 @@ import Messages from "./components/messages";
 import TeamManager from './components/teamManager';
 
 // Imported at runtime and not at compile time
-const ZoneSelector = dynamic(() => import('./components/polygonZoneMap'), { ssr: false });
+const PolygonZoneSelector = dynamic(() => import('./components/polygonZoneSelector'), { ssr: false });
+const CircleZoneSelector = dynamic(() => import('./components/circleZoneSelector'), { ssr: false });
 
-export default function AdminPage() {
+const zoneSelectors = {
+    circle: "circle",
+    polygon: "polygon"
+}
+
+export default function ConfigurationPage() {
     const {penaltySettings, changePenaltySettings, addTeam} = useAdmin();
     const { useProtect } = useAdminConnexion();
     const [allowedTimeBetweenUpdates, setAllowedTimeBetweenUpdates] = useState("");
     const [teamName, setTeamName] = useState('');
+    const [zoneSelector, setZoneSelector] = useState(zoneSelectors.polygon);
 
     useProtect();
     
@@ -71,7 +78,8 @@ export default function AdminPage() {
                 </Section>
             </div>
             <div className="h-full flex-1">
-                <ZoneSelector />
+                {zoneSelector == zoneSelectors.circle && <CircleZoneSelector/>}
+                {zoneSelector == zoneSelectors.polygon && <PolygonZoneSelector/>}
             </div>
         </div>
     );
