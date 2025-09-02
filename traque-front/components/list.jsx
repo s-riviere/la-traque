@@ -2,12 +2,11 @@ import { useEffect, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 
 export function List({array, children}) {
-    // TODO : change key
     return (
         <div className='w-full h-full bg-gray-300 overflow-y-scroll'>
             <ul className="w-full p-1 pb-0">
                 {array.map((elem, i) => (
-                    <li className="w-full" key={elem.id ?? i}>
+                    <li className="w-full" key={elem.id}>
                         {children(elem, i)}
                         <div className="w-full h-1"/>
                     </li>

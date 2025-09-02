@@ -49,55 +49,61 @@ function Drawings({ minZone, setMinZone, maxZone, setMaxZone, editMode }) {
     );
 }
 
-export default function CircleZoneSelector() {
+export default function CircleZoneSelector({zoneSettings, updateZoneSettings, applyZoneSettings}) {
+    const {penaltySettings, changePenaltySettings} = useAdmin();
+    const [allowedTimeOutOfZone, setAllowedTimeOutOfZone] = useState("");
     const [editMode, setEditMode] = useState(EditMode.MIN);
-    const [minZone, setMinZone] = useState(null);
-    const [maxZone, setMaxZone] = useState(null);
-    const [reductionCount, setReductionCount] = useState("");
-    const [duration, setDuration] = useState("");
-    const {zoneSettings, changeZoneSettings} = useAdmin();
 
     useEffect(() => {
-        if (zoneSettings) {
-            setMinZone(zoneSettings.min);
-            setMaxZone(zoneSettings.max);
-            setReductionCount(zoneSettings.reductionCount.toString());
-            setDuration(zoneSettings.duration.toString());
-        }
-    }, [zoneSettings]);
+        setEditMode(editMode == EditMode.MIN ? EditMode.MAX : EditMode.MIN);
+    }, [zoneSettings.min, zoneSettings.max])
 
-    // When the user set one zone, switch to the other
     useEffect(() => {
-        if(editMode == EditMode.MIN) {
-            setEditMode(EditMode.MAX);
-        } else {
-            setEditMode(EditMode.MIN);
+        if (penaltySettings) {
+            setAllowedTimeOutOfZone(penaltySettings.allowedTimeOutOfZone.toString());
         }
-
-    }, [minZone, maxZone]);
+    }, [penaltySettings]);
 
     function handleSettingsSubmit() {
-        const newSettings = {min:minZone, max:maxZone, reductionCount: Number(reductionCount), duration: Number(duration)};
-        changeZoneSettings(newSettings);
+        console.log(zoneSettings)
+        applyZoneSettings();
+        changePenaltySettings({allowedTimeOutOfZone: Number(allowedTimeOutOfZone)});
     }
 
     return (
-        <div className='w-2/5 h-full gap-1 bg-white p-10 flex flex-col text-center shadow-2xl overflow-y-scroll'>
-            <h2 className="text-2xl">Edit zones</h2>
-            {editMode == EditMode.MIN && <BlueButton onClick={() => setEditMode(EditMode.MAX)}>Click to edit first zone</BlueButton>}
-            {editMode == EditMode.MAX && <RedButton onClick={() => setEditMode(EditMode.MIN)}>Click to edit last zone</RedButton>}
-            <CustomMapContainer>
-                <Drawings minZone={minZone} maxZone={maxZone} editMode={editMode} setMinZone={setMinZone} setMaxZone={setMaxZone} />
-            </CustomMapContainer>
-            <div>
-                <p>Number of zones</p>
-                <TextInput value={reductionCount} onChange={(e) => setReductionCount(e.target.value)}></TextInput>
+        <div className='h-full w-full bg-white p-3 gap-3 flex flex-row shadow-2xl'>
+            <div className="h-full flex-1">
+                <CustomMapContainer>
+                    <Drawings minZone={zoneSettings.min} setMinZone={(e) => updateZoneSettings("min", e)} maxZone={zoneSettings.max} setMaxZone={(e) => updateZoneSettings("max", e)} editMode={editMode} />
+                </CustomMapContainer>
             </div>
-            <div>
-                <p>Duration of a zone</p>
-                <TextInput value={duration} onChange={(e) => setDuration(e.target.value)}></TextInput>
+            <div className="h-full w-1/6 flex flex-col gap-3">
+                <div className="w-full h-15">
+                    {editMode == EditMode.MIN && <BlueButton onClick={() => setEditMode(EditMode.MAX)}>Click to edit first zone</BlueButton>}
+                    {editMode == EditMode.MAX && <RedButton onClick={() => setEditMode(EditMode.MIN)}>Click to edit last zone</RedButton>}
+                </div>
+                <div className="w-full flex flex-row gap-2 items-center justify-between">
+                    <p>Number</p>
+                    <div className="w-16 h-10">
+                        <TextInput value={zoneSettings.reductionCount} onChange={(e) => updateZoneSettings("reductionCount", e.target.value)} />
+                    </div>
+                </div>
+                <div className="w-full flex flex-row gap-2 items-center justify-between">
+                    <p>Duration</p>
+                    <div className="w-16 h-10">
+                        <TextInput value={zoneSettings.duration} onChange={(e) => updateZoneSettings("duration", e.target.value)} />
+                    </div>
+                </div>
+                <div className="w-full flex flex-row gap-2 items-center justify-between">
+                    <p>Timeout</p>
+                    <div className="w-16 h-10">
+                        <TextInput value={allowedTimeOutOfZone} onChange={(e) => setAllowedTimeOutOfZone(e.target.value)} />
+                    </div>
+                </div>
+                <div className="w-full h-15">
+                    <GreenButton onClick={handleSettingsSubmit}>Apply</GreenButton>
+                </div>
             </div>
-            <GreenButton onClick={handleSettingsSubmit}>Apply</GreenButton>
         </div>
     );
 }

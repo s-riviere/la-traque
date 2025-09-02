@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Marker, Tooltip, Polyline, Polygon } from "react-leaflet";
+import { Marker, Tooltip, Polyline, Polygon, Circle } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { CustomMapContainer } from "@/components/map";
 import useAdmin from "@/hook/useAdmin";
@@ -13,9 +13,14 @@ const positionIcon = new L.Icon({
     shadowSize: [30, 30],
 });
 
+const zoneTypes = {
+    circle: "circle",
+    polygon: "polygon"
+}
+
 export default function LiveMap({mapStyle, showZones, showNames, showArrows}) {
+    const { zoneSettings, zoneExtremities, teams, nextZoneDate, getTeam, gameState } = useAdmin();
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
-    const { zoneExtremities, teams, nextZoneDate, getTeam, gameState } = useAdmin();
 
     // Remaining time before sending position
     useEffect(() => {
@@ -49,12 +54,34 @@ export default function LiveMap({mapStyle, showZones, showNames, showArrows}) {
         }
     }
 
+    function Zones() {
+        if (!(showZones && gameState == GameState.PLAYING && zoneSettings)) return null;
+
+        switch (zoneSettings.type) {
+            case zoneTypes.circle:
+                return (
+                    <div>
+                        { zoneExtremities.begin && <Circle center={zoneExtremities.begin.center} radius={zoneExtremities.begin.radius} color="red" fillColor="red" />}
+                        { zoneExtremities.end && <Circle center={zoneExtremities.end.center} radius={zoneExtremities.end.radius} color="green" fillColor="green" />}
+                    </div>
+                );
+            case zoneTypes.polygon:
+                return (
+                    <div>
+                        { zoneExtremities.begin && <Polygon positions={zoneExtremities.begin.points} pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: '0.1', weight: 3 }} />}
+                        { zoneExtremities.end && <Polygon positions={zoneExtremities.end.points} pathOptions={{ color: 'green', fillColor: 'green', fillOpacity: '0.1', weight: 3 }} />}
+                    </div>
+                );
+            default:
+                return null;
+        }
+    }
+
     return (
         <div className='h-full w-full flex flex-col'>
             {gameState == GameState.PLAYING && <p>{`Next zone in : ${formatTime(timeLeftNextZone)}`}</p>}
             <CustomMapContainer mapStyle={mapStyle}>
-                {showZones && gameState == GameState.PLAYING && zoneExtremities.begin && <Polygon positions={zoneExtremities.begin.points} pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: '0.1', weight: 3 }} />}
-                {showZones && gameState == GameState.PLAYING && zoneExtremities.end && <Polygon positions={zoneExtremities.end.points} pathOptions={{ color: 'green', fillColor: 'green', fillOpacity: '0.1', weight: 3 }} />}
+                <Zones/>
                 {teams.map((team) => team.currentLocation && !team.captured &&
                     <Marker key={team.id} position={team.currentLocation} icon={positionIcon}>
                         {showNames && <Tooltip permanent direction="top" offset={[0.5, -15]} className="custom-tooltip">{team.name}</Tooltip>}

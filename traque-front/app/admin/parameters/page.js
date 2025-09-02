@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { TextInput } from "@/components/input";
 import { Section } from "@/components/section";
+import { BlueButton } from "@/components/button";
 import { useAdminConnexion } from "@/context/adminConnexionContext";
 import useAdmin from '@/hook/useAdmin';
 import Messages from "./components/messages";
@@ -13,17 +14,20 @@ import TeamManager from './components/teamManager';
 const PolygonZoneSelector = dynamic(() => import('./components/polygonZoneSelector'), { ssr: false });
 const CircleZoneSelector = dynamic(() => import('./components/circleZoneSelector'), { ssr: false });
 
-const zoneSelectors = {
+const zoneTypes = {
     circle: "circle",
     polygon: "polygon"
 }
 
+const defaultCircleSettings = {type: zoneTypes.circle, min: null, max: null, reductionCount: 4, duration: 10}
+const defaultPolygonSettings = {type: zoneTypes.polygon, polygons: []}
+
 export default function ConfigurationPage() {
-    const {penaltySettings, changePenaltySettings, addTeam} = useAdmin();
+    const {zoneSettings, changeZoneSettings, penaltySettings, changePenaltySettings, addTeam} = useAdmin();
     const { useProtect } = useAdminConnexion();
     const [allowedTimeBetweenUpdates, setAllowedTimeBetweenUpdates] = useState("");
     const [teamName, setTeamName] = useState('');
-    const [zoneSelector, setZoneSelector] = useState(zoneSelectors.polygon);
+    const [localZoneSettings, setLocalZoneSettings] = useState(zoneSettings);
 
     useProtect();
     
@@ -32,11 +36,25 @@ export default function ConfigurationPage() {
             setAllowedTimeBetweenUpdates(penaltySettings.allowedTimeBetweenPositionUpdate.toString());
         }
     }, [penaltySettings]);
+    
+    useEffect(() => {
+        if (zoneSettings) {
+            setLocalZoneSettings(zoneSettings);
+        }
+    }, [zoneSettings]);
+
+    function updateLocalZoneSettings(key, value) {
+        setLocalZoneSettings(prev => ({...prev, [key]: value}));
+    };
 
     function applySettings() {
         if (Number(allowedTimeBetweenUpdates) != penaltySettings.allowedTimeBetweenPositionUpdate) {
             changePenaltySettings({allowedTimeBetweenPositionUpdate: Number(allowedTimeBetweenUpdates)});
         }
+    }
+
+    function handleChangeZoneType() {
+        setLocalZoneSettings(localZoneSettings.type == zoneTypes.circle ? defaultPolygonSettings : defaultCircleSettings)
     }
     
     function handleSubmit(e) {
@@ -77,9 +95,18 @@ export default function ConfigurationPage() {
                     </div>
                 </Section>
             </div>
-            <div className="h-full flex-1">
-                {zoneSelector == zoneSelectors.circle && <CircleZoneSelector/>}
-                {zoneSelector == zoneSelectors.polygon && <PolygonZoneSelector/>}
+            <div className="h-full flex-1 flex flex-col">
+                <div className="w-full h-20">
+                    {localZoneSettings && <BlueButton onClick={handleChangeZoneType}>Change zone type</BlueButton>}
+                </div>
+                <div className="w-full flex-1">
+                    {localZoneSettings && localZoneSettings.type == zoneTypes.circle &&
+                        <CircleZoneSelector zoneSettings={localZoneSettings} updateZoneSettings={updateLocalZoneSettings} applyZoneSettings={() => changeZoneSettings(localZoneSettings)}/>
+                    }
+                    {localZoneSettings && localZoneSettings.type == zoneTypes.polygon &&
+                        <PolygonZoneSelector zoneSettings={localZoneSettings} updateZoneSettings={updateLocalZoneSettings} applyZoneSettings={() => changeZoneSettings(localZoneSettings)}/>
+                    }
+                </div>
             </div>
         </div>
     );

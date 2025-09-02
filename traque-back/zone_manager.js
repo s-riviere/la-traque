@@ -4,6 +4,11 @@ import { secureAdminBroadcast } from './admin_socket.js';
 
 /* -------------------------------- Useful functions and constants -------------------------------- */
 
+const zoneTypes = {
+    circle: "circle",
+    polygon: "polygon"
+}
+
 const EARTH_RADIUS = 6_371_000; // Radius of the earth in m
 
 function haversine_distance({ lat: lat1, lng: lon1 }, { lat: lat2, lng: lon2 }) {
@@ -20,9 +25,64 @@ function latlngEqual(latlng1, latlng2, epsilon = 1e-9) {
 }
 
 
+/* -------------------------------- Circle zones -------------------------------- */
+
+const defaultCircleSettings = {type: zoneTypes.circle, min: null, max: null, reductionCount: 4, duration: 10}
+
+function circleZone(center, radius, duration) {
+    return {
+        center: center,
+        radius: radius,
+        duration: duration,
+
+        isInZone(location) {
+            return haversine_distance(center, location) < this.radius;
+        }
+    }
+}
+
+function circleSettingsToZones(settings) {
+    const {min, max, reductionCount, duration} = settings;
+
+    if (!min || !max) return [];
+    if (haversine_distance(max.center, min.center) > max.radius - min.radius) return [];
+
+    const zones = [circleZone(max.center, max.radius, duration)];
+    const radiusReductionLength = (max.radius - min.radius) / reductionCount;
+    let center = max.center;
+    let radius = max.radius;
+
+    for (let i = 1; i < reductionCount; i++) {
+        radius -= radiusReductionLength;
+        let new_center = null;
+        while (!new_center || haversine_distance(new_center, min.center) > radius - min.radius) {
+            const angle = Math.random() * 2 * Math.PI;
+            const angularDistance = Math.sqrt(Math.random()) * radiusReductionLength / EARTH_RADIUS;
+            const lat0Rad = center.lat * Math.PI / 180;
+            const lon0Rad = center.lng * Math.PI / 180;
+            const latRad = Math.asin(
+                Math.sin(lat0Rad) * Math.cos(angularDistance) +
+                Math.cos(lat0Rad) * Math.sin(angularDistance) * Math.cos(angle)
+            );
+
+            const lonRad = lon0Rad + Math.atan2(
+                Math.sin(angle) * Math.sin(angularDistance) * Math.cos(lat0Rad),
+                Math.cos(angularDistance) - Math.sin(lat0Rad) * Math.sin(latRad)
+            );
+            new_center = {lat: latRad * 180 / Math.PI, lng: lonRad * 180 / Math.PI};
+        }
+        center = new_center;
+        zones.push(circleZone(center, radius, duration))
+    }
+    zones.push(circleZone(min.center, min.radius, 0));
+
+    return zones;
+}
+
+
 /* -------------------------------- Polygon zones -------------------------------- */
 
-const defaultPolygonSettings = [];
+const defaultPolygonSettings = {type: zoneTypes.polygon, polygons: []}
 
 function polygonZone(points, duration) {
     return {
@@ -82,9 +142,11 @@ function mergePolygons(poly1, poly2) {
 }
 
 function polygonSettingsToZones(settings) {
+    const {polygons} = settings;
+
     const zones = [];
 
-    for (const { polygon, duration } of settings.slice().reverse()) {
+    for (const { polygon, duration } of polygons.slice().reverse()) {
         const length = zones.length;
 
         if (length == 0) {
@@ -104,67 +166,13 @@ function polygonSettingsToZones(settings) {
 }
 
 
-/* -------------------------------- Circle zones -------------------------------- */
-
-const defaultCircleSettings = { min: null, max: null, reductionCount: 4, duration: 1 };
-
-function circleZone(center, radius, duration) {
-    return {
-        center: center,
-        radius: radius,
-        duration: duration,
-
-        isInZone(location) {
-            return haversine_distance(center, location) < this.radius;
-        }
-    }
-}
-
-function circleSettingsToZones(settings) {
-    const {min, max, reductionCount, duration} = settings;
-    if (haversine_distance(max.center, min.center) > max.radius - min.radius) {
-        return null;
-    }
-    const zones = [circleZone(max.center, max.radius, duration)];
-    const radiusReductionLength = (max.radius - min.radius) / reductionCount;
-    let center = max.center;
-    let radius = max.radius;
-    for (let i = 1; i < reductionCount; i++) {
-        radius -= radiusReductionLength;
-        let new_center = null;
-        while (!new_center || haversine_distance(new_center, min.center) > radius - min.radius) {
-            const angle = Math.random() * 2 * Math.PI;
-            const angularDistance = Math.sqrt(Math.random()) * radiusReductionLength / EARTH_RADIUS;
-            const lat0Rad = center.lat * Math.PI / 180;
-            const lon0Rad = center.lng * Math.PI / 180;
-            const latRad = Math.asin(
-                Math.sin(lat0Rad) * Math.cos(angularDistance) +
-                Math.cos(lat0Rad) * Math.sin(angularDistance) * Math.cos(angle)
-            );
-
-            const lonRad = lon0Rad + Math.atan2(
-                Math.sin(angle) * Math.sin(angularDistance) * Math.cos(lat0Rad),
-                Math.cos(angularDistance) - Math.sin(lat0Rad) * Math.sin(latRad)
-            );
-            new_center = {lat: latRad * 180 / Math.PI, lng: lonRad * 180 / Math.PI};
-        }
-        center = new_center;
-        zones.push(circleZone(center, radius, duration))
-    }
-    zones.push(circleZone(min.center, min.radius, 0));
-    return zones;
-}
-
-
 /* -------------------------------- Zone manager -------------------------------- */
 
 export default {
     isRunning: false,
     zones: [], // A zone has to be connected space that doesn't contain an earth pole
     currentZone: { id: 0, timeoutId: null, endDate: null },
-    zoneType: "polygon",
     settings: defaultPolygonSettings,
-    settingsToZones: polygonSettingsToZones,
 
     start() {
         this.isRunning = true;
@@ -209,25 +217,18 @@ export default {
     },
 
     changeSettings(settings) {
-        const zones = this.settingsToZones(settings);
-        if (!zones) return false;
-        this.zones = zones;
+        switch (settings.type) {
+            case zoneTypes.circle:
+                this.zones = circleSettingsToZones(settings);
+                break;
+            case zoneTypes.polygon:
+                this.zones = polygonSettingsToZones(settings);
+                break;
+            default:
+                return;
+        }
         this.settings = settings;
         this.zoneBroadcast();
-        return true;
-    },
-
-    changeZoneType(type) {
-        if (this.zoneType == type) return;
-        if (type == "circle") {
-            this.zoneType = "circle";
-            this.settings = defaultCircleSettings;
-            this.settingsToZones = circleSettingsToZones;
-        } else if (type == "polygon") {
-            this.zoneType = "polygon";
-            this.settings = defaultPolygonSettings;
-            this.settingsToZones = polygonSettingsToZones;
-        }
     },
     
     zoneBroadcast() {

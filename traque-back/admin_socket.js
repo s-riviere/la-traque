@@ -90,9 +90,9 @@ export function initAdminSocketHandler() {
             }
             if (!zoneManager.changeSettings(settings)) {
                 socket.emit("error", "Error changing zone");
-                socket.emit("zone_settings", zoneManager.settings)
+                socket.emit("zone_settings", settings)
             } else {
-                secureAdminBroadcast("zone_settings", zoneManager.settings)
+                secureAdminBroadcast("zone_settings", settings)
             }
 
         })

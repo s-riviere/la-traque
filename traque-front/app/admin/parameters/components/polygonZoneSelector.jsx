@@ -94,45 +94,46 @@ function Drawings({ polygons, addPolygon, removePolygon }) {
     );
 }
 
-export default function PolygonZoneSelector() {
+export default function PolygonZoneSelector({zoneSettings, updateZoneSettings, applyZoneSettings}) {
     const defaultDuration = 10;
-    const [zones, setZones] = useState([]);
     const [polygons, setPolygons] = useState([]);
-    const {zoneSettings, changeZoneSettings} = useAdmin();
     const {penaltySettings, changePenaltySettings} = useAdmin();
     const [allowedTimeOutOfZone, setAllowedTimeOutOfZone] = useState("");
 
     useEffect(() => {
-        setPolygons(zones.map((zone) => zone.polygon));
-    }, [zones])
+        if (zoneSettings) {
+            const newPolygons = zoneSettings.polygons.map((zone) => ({id: idFromPolygon(zone.polygon), polygon: zone.polygon, duration: zone.duration}));
+            setPolygons(newPolygons.map((zone) => zone.polygon));
+        }
+    }, [zoneSettings]);
 
     useEffect(() => {
-        if (zoneSettings) {
-            setZones(zoneSettings.map((zone) => ({id: idFromPolygon(zone.polygon), polygon: zone.polygon, duration: zone.duration})));
-        }
         if (penaltySettings) {
             setAllowedTimeOutOfZone(penaltySettings.allowedTimeOutOfZone.toString());
         }
-    }, [zoneSettings, penaltySettings]);
+    }, [penaltySettings]);
 
     function idFromPolygon(polygon) {
         return (polygon[0].lat + polygon[1].lat + polygon[2].lat).toString() + (polygon[0].lng + polygon[1].lng + polygon[2].lng).toString();
     }
 
     function addPolygon(polygon) {
-        setZones([...zones, {id: idFromPolygon(polygon), polygon: polygon, duration: defaultDuration}]);
+        const newPolygons = [...zoneSettings.polygons, {id: idFromPolygon(polygon), polygon: polygon, duration: defaultDuration}];
+        updateZoneSettings("polygons", newPolygons);
     }
 
     function removePolygon(i) {
-        setZones(zones.filter((_, index) => index !== i));
+        const newPolygons = zoneSettings.polygons.filter((_, index) => index !== i);
+        updateZoneSettings("polygons", newPolygons);
     }
 
     function updateDuration(i, duration) {
-        setZones(zones.map((zone, index) => index === i ? {id: zone.id, polygon: zone.polygon, duration: duration} : zone));
+        const newPolygons = zoneSettings.polygons.map((zone, index) => index === i ? {id: zone.id, polygon: zone.polygon, duration: duration} : zone);
+        updateZoneSettings("polygons", newPolygons);
     }
 
     function handleSettingsSubmit() {
-        changeZoneSettings(zones);
+        applyZoneSettings();
         changePenaltySettings({allowedTimeOutOfZone: Number(allowedTimeOutOfZone)});
     }
     
@@ -147,7 +148,7 @@ export default function PolygonZoneSelector() {
                 <div className="w-full text-center">
                     <h2 className="text-xl">Reduction order</h2>
                 </div>
-                <ReorderList droppableId="zones-order" array={zones} setArray={setZones}>
+                <ReorderList droppableId="zones-order" array={zoneSettings.polygons} setArray={(polygons) => updateZoneSettings("polygons", polygons)}>
                     { (zone, i) =>
                         <div className="w-full p-2 bg-white flex flex-row gap-2 items-center justify-between">
                             <p>Zone {i+1}</p>
