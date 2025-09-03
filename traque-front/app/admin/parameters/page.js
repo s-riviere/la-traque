@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { TextInput } from "@/components/input";
@@ -9,6 +9,7 @@ import { useAdminConnexion } from "@/context/adminConnexionContext";
 import useAdmin from '@/hook/useAdmin';
 import Messages from "./components/messages";
 import TeamManager from './components/teamManager';
+import useLocalVariable from "@/hook/useLocalVariable";
 
 // Imported at runtime and not at compile time
 const PolygonZoneSelector = dynamic(() => import('./components/polygonZoneSelector'), { ssr: false });
@@ -23,41 +24,23 @@ const defaultCircleSettings = {type: zoneTypes.circle, min: null, max: null, red
 const defaultPolygonSettings = {type: zoneTypes.polygon, polygons: []}
 
 export default function ConfigurationPage() {
-    const {zoneSettings, changeZoneSettings, penaltySettings, changePenaltySettings, addTeam} = useAdmin();
     const { useProtect } = useAdminConnexion();
-    const [allowedTimeBetweenUpdates, setAllowedTimeBetweenUpdates] = useState("");
+    const {zoneSettings, sendPositionDelay, updateSettings, addTeam} = useAdmin();
     const [teamName, setTeamName] = useState('');
-    const [localZoneSettings, setLocalZoneSettings] = useState(zoneSettings);
+    const [localZoneSettings, setLocalZoneSettings, applyLocalZoneSettings] = useLocalVariable(zoneSettings, (e) => updateSettings({zone: e}));
+    const [localSendPositionDelay, setLocalSendPositionDelay, applyLocalSendPositionDelay] = useLocalVariable(sendPositionDelay, (e) => updateSettings({sendPositionDelay: e}));
 
     useProtect();
-    
-    useEffect(() => {
-        if (penaltySettings) {
-            setAllowedTimeBetweenUpdates(penaltySettings.allowedTimeBetweenPositionUpdate.toString());
-        }
-    }, [penaltySettings]);
-    
-    useEffect(() => {
-        if (zoneSettings) {
-            setLocalZoneSettings(zoneSettings);
-        }
-    }, [zoneSettings]);
 
-    function updateLocalZoneSettings(key, value) {
+    function modifyLocalZoneSettings(key, value) {
         setLocalZoneSettings(prev => ({...prev, [key]: value}));
     };
-
-    function applySettings() {
-        if (Number(allowedTimeBetweenUpdates) != penaltySettings.allowedTimeBetweenPositionUpdate) {
-            changePenaltySettings({allowedTimeBetweenPositionUpdate: Number(allowedTimeBetweenUpdates)});
-        }
-    }
 
     function handleChangeZoneType() {
         setLocalZoneSettings(localZoneSettings.type == zoneTypes.circle ? defaultPolygonSettings : defaultCircleSettings)
     }
     
-    function handleSubmit(e) {
+    function handleTeamSubmit(e) {
         e.preventDefault();
         if (teamName !== "") {
             addTeam(teamName);
@@ -76,7 +59,7 @@ export default function ConfigurationPage() {
                 </div>
                 <Messages/>
                 <Section title="Équipe" outerClassName="flex-1 min-h-0" innerClassName="flex flex-col items-center gap-3">
-                    <form className='w-full flex flex-row gap-3' onSubmit={handleSubmit}>
+                    <form className='w-full flex flex-row gap-3' onSubmit={handleTeamSubmit}>
                         <div className='w-full'>
                             <input name="teamName" label='Team name' value={teamName} onChange={(e) => setTeamName(e.target.value)} type="text" className="w-full h-full p-4 ring-1 ring-inset ring-gray-300" />
                         </div>
@@ -90,21 +73,21 @@ export default function ConfigurationPage() {
                     <div className="w-full flex flex-row gap-2 items-center justify-between">
                         <p>Interval between position updates</p>
                         <div className="w-16 h-10">
-                            <TextInput value={allowedTimeBetweenUpdates} onChange={(e) => setAllowedTimeBetweenUpdates(e.target.value)} onBlur={applySettings} />
+                            <TextInput id="position-update" value={localSendPositionDelay ?? ""} onChange={(e) => setLocalSendPositionDelay(parseInt(e.target.value, 10))} onBlur={applyLocalSendPositionDelay} />
                         </div>
                     </div>
                 </Section>
             </div>
-            <div className="h-full flex-1 flex flex-col">
-                <div className="w-full h-20">
+            <div className="h-full flex-1 flex flex-col p-3 gap-3 bg-white shadow-2xl">
+                <div className="w-full h-15">
                     {localZoneSettings && <BlueButton onClick={handleChangeZoneType}>Change zone type</BlueButton>}
                 </div>
                 <div className="w-full flex-1">
                     {localZoneSettings && localZoneSettings.type == zoneTypes.circle &&
-                        <CircleZoneSelector zoneSettings={localZoneSettings} updateZoneSettings={updateLocalZoneSettings} applyZoneSettings={() => changeZoneSettings(localZoneSettings)}/>
+                        <CircleZoneSelector zoneSettings={localZoneSettings} modifyZoneSettings={modifyLocalZoneSettings} applyZoneSettings={applyLocalZoneSettings}/>
                     }
                     {localZoneSettings && localZoneSettings.type == zoneTypes.polygon &&
-                        <PolygonZoneSelector zoneSettings={localZoneSettings} updateZoneSettings={updateLocalZoneSettings} applyZoneSettings={() => changeZoneSettings(localZoneSettings)}/>
+                        <PolygonZoneSelector zoneSettings={localZoneSettings} modifyZoneSettings={modifyLocalZoneSettings} applyZoneSettings={applyLocalZoneSettings}/>
                     }
                 </div>
             </div>

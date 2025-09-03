@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import { Section } from "@/components/section";
 import useAdmin from "@/hook/useAdmin";
+import useLocalVariable from "@/hook/useLocalVariable";
 
 function MessageInput({title, ...props}) {
     return (
@@ -12,33 +12,19 @@ function MessageInput({title, ...props}) {
 }
 
 export default function Messages() {
-    const {gameSettings, changeGameSettings} = useAdmin();
-    const [capturedMessage, setCapturedMessage] = useState("");
-    const [winnerEndMessage, setWinnerEndMessage] = useState("");
-    const [loserEndMessage, setLoserEndMessage] = useState("");
-    const [waitingMessage, setWaitingMessage] = useState("");
+    const {messages, updateSettings} = useAdmin();
+    const [localGameSettings, setLocalGameSettings, applyLocalGameSettings] = useLocalVariable(messages, (e) => updateSettings({messages: e}));
 
-    useEffect(() => {
-        if (gameSettings) {
-            setCapturedMessage(gameSettings.capturedMessage);
-            setWinnerEndMessage(gameSettings.winnerEndGameMessage);
-            setLoserEndMessage(gameSettings.loserEndGameMessage);
-            setWaitingMessage(gameSettings.waitingMessage);
-        }
-    }, [gameSettings]);
-
-    function applySettings() {
-        changeGameSettings({capturedMessage: capturedMessage, winnerEndGameMessage: winnerEndMessage, loserEndGameMessage: loserEndMessage, waitingMessage: waitingMessage});
-    }
+    function modifyLocalZoneSettings(key, value) {
+        setLocalGameSettings(prev => ({...prev, [key]: value}));
+    };
 
     return (
-        <Section title="Message">
-            <div className="w-full h-full flex flex-col gap-3 items-center">
-                <MessageInput title="Attente  :" value={waitingMessage} onChange={(e) => setWaitingMessage(e.target.value)} onBlur={applySettings}/>
-                <MessageInput title="Capture :" value={capturedMessage} onChange={(e) => setCapturedMessage(e.target.value)} onBlur={applySettings}/>
-                <MessageInput title="Victoire :" value={winnerEndMessage} onChange={(e) => setWinnerEndMessage(e.target.value)} onBlur={applySettings}/>
-                <MessageInput title="Défaite  :" value={loserEndMessage} onChange={(e) => setLoserEndMessage(e.target.value)} onBlur={applySettings}/>
-            </div>
+        <Section title="Message" innerClassName="w-full h-full flex flex-col gap-3 items-center">
+            <MessageInput id="waiting" title="Attente  :" value={localGameSettings?.waiting ?? ""} onChange={(e) => modifyLocalZoneSettings("waiting", e.target.value)} onBlur={applyLocalGameSettings}/>
+            <MessageInput id="captured" title="Capture :" value={localGameSettings?.captured ?? ""} onChange={(e) => modifyLocalZoneSettings("captured", e.target.value)} onBlur={applyLocalGameSettings}/>
+            <MessageInput id="winner" title="Victoire :" value={localGameSettings?.winner ?? ""} onChange={(e) => modifyLocalZoneSettings("winner", e.target.value)} onBlur={applyLocalGameSettings}/>
+            <MessageInput id="loser" title="Défaite  :" value={localGameSettings?.loser ?? ""} onChange={(e) => modifyLocalZoneSettings("loser", e.target.value)} onBlur={applyLocalGameSettings}/>
         </Section>
     );
 }

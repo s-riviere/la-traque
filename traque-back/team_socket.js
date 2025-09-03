@@ -15,9 +15,7 @@ import zoneManager from "./zone_manager.js";
  * @param {*} data The payload
  */
 export function teamBroadcast(teamId, event, data) {
-    for (const socketId of game.getTeam(teamId).sockets) {
-        io.of("player").to(socketId).emit(event, data);
-    }
+    game.getTeam(teamId).sockets.forEach(socketId => io.of("player").to(socketId).emit(event, data));
 }
 
 /**
@@ -52,7 +50,6 @@ export function sendUpdatedTeamInformations(teamId) {
         startingArea: team.startingArea,
         ready: team.ready,
         // Constraints
-        penalties: team.penalties,
         outOfZone: team.outOfZone,
         outOfZoneDeadline: team.outOfZoneDeadline,
         locationSendDeadline: team.locationSendDeadline,
@@ -66,66 +63,60 @@ export function sendUpdatedTeamInformations(teamId) {
     secureAdminBroadcast("teams", game.teams);
 }
 
-/**
- * Remove a player from the list of logged in players
- * @param {Number} id The id of the player to log out
- */
-function logoutPlayer(id) {
-    for (const team of game.teams) {
-        if (team.sockets.indexOf(id) == 0) {
-            team.battery = null;
-            team.phoneModel = null;
-            team.phoneName = null;
-        }
-        team.sockets = team.sockets.filter((sid) => sid != id);
-    }
-    secureAdminBroadcast("teams", game.teams);
-}
-
 export function initTeamSocket() {
     io.of("player").on("connection", (socket) => {
         console.log("Connection of a player");
         let teamId = null;
 
+        const logoutPlayer = () => {
+            if (!teamId) return;
+            const team = game.getTeam(teamId);
+            if (team.sockets.indexOf(socket.id) == 0) {
+                team.battery = null;
+                team.phoneModel = null;
+                team.phoneName = null;
+            }
+            // Delete the player from the team
+            team.sockets = team.sockets.filter((sid) => sid != socket.id);
+            secureAdminBroadcast("teams", game.teams);
+            socket.emit("logout");
+            teamId = null;
+        }
+
         socket.on("disconnect", () => {
             console.log("Disconnection of a player");
-            logoutPlayer(socket.id);
+            logoutPlayer();
+        });
+
+        socket.on("logout", () => {
+            logoutPlayer();
         });
 
         socket.on("login", (loginTeamId, callback) => {
+            logoutPlayer();
             const team = game.getTeam(loginTeamId);
             if (!team) {
                 callback({ isLoggedIn: false, message: "Login denied" });
                 return;
             }
-            logoutPlayer(socket.id);
-            team.sockets.push(socket.id);
             teamId = loginTeamId;
+            team.sockets.push(socket.id);
             sendUpdatedTeamInformations(loginTeamId);
-            socket.emit("login_response", true);
             socket.emit("game_state", game.state);
             socket.emit("game_settings", game.settings);
             socket.emit("zone", {
+                type: zoneManager.settings.type,
                 begin: zoneManager.getCurrentZone(),
                 end: zoneManager.getNextZone(),
                 endDate: zoneManager.currentZoneEndDate,
-            })
+            });
             callback({ isLoggedIn : true, message: "Logged in"});
         });
 
-        socket.on("logout", () => {
-            logoutPlayer(socket.id);
-            teamId = null;
-        })
-
         socket.on("update_position", (position) => {
-            // Only the first player to connect to the team socket can update the current position
-            // This is done to prevent multiple clients from sending slightly different prosition back and forth
-            // Making the point jitter on the map
-            if (!teamId) {
-                return;
-            }
+            if (!teamId) return;
             const team = game.getTeam(teamId);
+            // Only the first socket can update the current position since he is the one whose location is tracked
             if (team.sockets.indexOf(socket.id) == 0) {
                 game.updateLocation(teamId, position);
                 team.lastCurrentLocationDate = Date.now();
@@ -134,27 +125,18 @@ export function initTeamSocket() {
         });
 
         socket.on("send_position", () => {
-            if (!teamId) {
-                return;
-            }
+            if (!teamId) return;
             game.sendLocation(teamId);
         });
 
         socket.on("capture", (captureCode, callback) => {
-            if (!teamId) {
-                return;
-            }
-            if (!game.requestCapture(teamId, captureCode)) {
-                callback({ hasCaptured : false, message: "Capture failed" });
-                return;
-            }
+            if (!teamId) return;
+            game.requestCapture(teamId, captureCode);
             callback({ hasCaptured : true, message: "Capture successful" });
         });
 
-        socket.on("deviceInfo", (infos) => {
-            if (!teamId) {
-                return;
-            }
+        socket.on("device_info", (infos) => {
+            if (!teamId) return;
             const team = game.getTeam(teamId);
             // Only the first socket shares its infos since he is the one whose location is tracked
             if (team.sockets.indexOf(socket.id) == 0) {
@@ -163,10 +145,8 @@ export function initTeamSocket() {
             }
         });
 
-        socket.on("batteryUpdate", (batteryLevel) => {
-            if (!teamId) {
-                return;
-            }
+        socket.on("battery_update", (batteryLevel) => {
+            if (!teamId) return;
             const team = game.getTeam(teamId);
             // Only the first socket shares its infos since he is the one whose location is tracked
             if (team.sockets.indexOf(socket.id) == 0) {

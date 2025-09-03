@@ -14,12 +14,17 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useSocket } from '../context/socketContext';
 import { useTeamContext } from '../context/teamContext';
 import { useTeamConnexion } from '../context/teamConnexionContext';
-import { useDeadline, useTimeDifference } from '../hook/useTimeDifference';
+import { useTimeDifference } from '../hook/useTimeDifference';
 import { GameState } from '../util/gameState';
 import useGame from '../hook/useGame';
 
 const backgroundColor = '#f5f5f5';
 const initialRegion = {latitude: 48.864, longitude: 2.342, latitudeDelta: 0, longitudeDelta: 50} // France centrée sur Paris
+
+const zoneTypes = {
+    circle: "circle",
+    polygon: "polygon"
+}
 
 export default function Display() {
     const arrowUp = require('../assets/images/arrow.png');
@@ -27,9 +32,9 @@ export default function Display() {
     const [bottomContainerHeight, setBottomContainerHeight] = useState(0);
     const router = useRouter();
     const {SERVER_URL} = useSocket();
-    const {gameSettings, zoneExtremities, nextZoneDate, isShrinking, location, startLocationTracking, stopLocationTracking, gameState, zone} = useTeamContext();
+    const {gameSettings, zoneType, zoneExtremities, nextZoneDate, isShrinking, location, startLocationTracking, stopLocationTracking, gameState} = useTeamContext();
     const {loggedIn, logout, loading} = useTeamConnexion();
-    const {sendCurrentPosition, capture, enemyLocation, enemyName, startingArea, captureCode, name, ready, captured, lastSentLocation, locationSendDeadline, penalties, teamId, outOfZone, outOfZoneDeadline, distance, startDate, finishDate, nCaptures, nSentLocation} = useGame();
+    const {sendCurrentPosition, capture, enemyLocation, enemyName, startingArea, captureCode, name, ready, captured, lastSentLocation, locationSendDeadline, teamId, outOfZone, outOfZoneDeadline, distance, startDate, finishDate, nCaptures, nSentLocation} = useGame();
     const [enemyCaptureCode, setEnemyCaptureCode] = useState("");
     const [timeLeftSendLocation] = useTimeDifference(locationSendDeadline, 1000);
     const [timeLeftNextZone] = useTimeDifference(nextZoneDate, 1000);
@@ -234,12 +239,32 @@ export default function Display() {
         );
     }
 
+    const Zones = () => {
+        switch (zoneType) {
+            case zoneTypes.circle:
+                return (
+                    <View>
+                        { zoneExtremities.begin && <Circle center={zoneExtremities.begin.center} radius={zoneExtremities.begin.radius} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} />}
+                        { zoneExtremities.end && <Circle center={zoneExtremities.end.center} radius={zoneExtremities.end.radius} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} />}
+                    </View>
+                );
+            case zoneTypes.polygon:
+                return (
+                    <View>
+                        { zoneExtremities.begin && <Polygon coordinates={zoneExtremities.begin.points} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} /> }
+                        { zoneExtremities.end && <Polygon coordinates={zoneExtremities.end.points} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} /> }
+                    </View>
+                );
+            default:
+                return null;
+        }
+    }
+
     const Map = () => {
         return (
             <MapView ref={mapRef} style={{flex: 1}} initialRegion={initialRegion} mapType="standard" onTouchMove={() => setCenterMap(false)}>
                 { gameState == GameState.PLACEMENT && startingArea && circle("0, 0, 255", startingArea)}
-                { gameState == GameState.PLAYING && zoneExtremities && <Polygon coordinates={zoneExtremities.begin.points} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} /> }
-                { gameState == GameState.PLAYING && zoneExtremities && <Polygon coordinates={zoneExtremities.end.points} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} /> }
+                { gameState == GameState.PLAYING && zoneExtremities && <Zones/>}
                 { location &&
                     <Marker coordinate={{ latitude: location[0], longitude: location[1] }} anchor={{ x: 0.33, y: 0.33 }}>
                         <Image source={require("../assets/images/marker/blue.png")} style={{width: 24, height: 24}} resizeMode="contain"/>
@@ -345,9 +370,6 @@ export default function Display() {
             <View style={styles.topContainer}>
                 <View style={styles.topheadContainer}>
                     { Logout() }
-                    { penalties > 0 && gameState == GameState.PLAYING &&
-                        <Text style={{marginTop: 15, fontSize: 15}}>Pénalités : {penalties}</Text>
-                    }
                     { false && Settings() }
                 </View>          
                 <View style={styles.teamNameContainer}>

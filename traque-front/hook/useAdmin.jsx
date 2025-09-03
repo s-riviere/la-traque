@@ -7,17 +7,8 @@ export default function useAdmin() {
     const { teams } = adminContext;
     const { adminSocket } = useSocket();
 
-    function pollTeams() {
-        adminSocket.emit("get_teams");
-    }
-
     function getTeam(teamId) {
         return teams.find(team => team.id === teamId);
-    }
-
-    function getTeamName(teamId) {
-        let team = getTeam(teamId);
-        return team ? team.name : "";
     }
 
     function reorderTeams(newOrder) {
@@ -40,17 +31,9 @@ export default function useAdmin() {
         adminSocket.emit("change_state", state);
     }
 
-    function changeZoneSettings(zone) {
-        adminSocket.emit("set_zone_settings", zone);
+    function updateSettings(settings) {
+        adminSocket.emit("update_settings", settings);
     }
 
-    function changePenaltySettings(penalties) {
-        adminSocket.emit("set_penalty_settings", penalties);
-    }
-
-    function changeGameSettings(settings) {
-        adminSocket.emit("set_game_settings", settings);
-    }
-    return { ...adminContext, changeGameSettings, changeZoneSettings, changePenaltySettings, pollTeams, getTeam, getTeamName, reorderTeams, addTeam, removeTeam, changeState, updateTeam };
-
+    return { ...adminContext, getTeam, reorderTeams, addTeam, removeTeam, updateTeam, changeState, updateSettings };
 }

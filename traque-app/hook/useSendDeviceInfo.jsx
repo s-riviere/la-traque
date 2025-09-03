@@ -15,12 +15,12 @@ export default function useSendDeviceInfo() {
             const brand = DeviceInfo.getBrand();
             const model = DeviceInfo.getModel();
             const name = await DeviceInfo.getDeviceName();
-            teamSocket.emit('deviceInfo', {model: brand + " " + model, name: name});
+            teamSocket.emit('device_info', {model: brand + " " + model, name: name});
         };
 
         const sendBattery = async () => {
             const level = await DeviceInfo.getBatteryLevel();
-            teamSocket.emit('batteryUpdate', Math.round(level * 100));
+            teamSocket.emit('battery_update', Math.round(level * 100));
         };
 
         sendInfo();

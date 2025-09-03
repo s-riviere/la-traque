@@ -7,6 +7,7 @@ import { CustomMapContainer, MapEventListener } from "@/components/map";
 import { TextInput } from "@/components/input";
 import useAdmin from "@/hook/useAdmin";
 import useMapPolygonDraw from "@/hook/useMapPolygonDraw";
+import useLocalVariable from "@/hook/useLocalVariable";
 
 function Drawings({ polygons, addPolygon, removePolygon }) {
     const { currentPolygon, highlightNodes, handleLeftClick, handleRightClick, handleMouseMove } = useMapPolygonDraw(polygons, addPolygon, removePolygon);
@@ -94,24 +95,17 @@ function Drawings({ polygons, addPolygon, removePolygon }) {
     );
 }
 
-export default function PolygonZoneSelector({zoneSettings, updateZoneSettings, applyZoneSettings}) {
+export default function PolygonZoneSelector({zoneSettings, modifyZoneSettings, applyZoneSettings}) {
     const defaultDuration = 10;
     const [polygons, setPolygons] = useState([]);
-    const {penaltySettings, changePenaltySettings} = useAdmin();
-    const [allowedTimeOutOfZone, setAllowedTimeOutOfZone] = useState("");
+    const {outOfZoneDelay, updateSettings} = useAdmin();
+    const [localOutOfZoneDelay, setLocalOutOfZoneDelay, applyLocalOutOfZoneDelay] = useLocalVariable(outOfZoneDelay, (e) => updateSettings({outOfZoneDelay: e}));
 
     useEffect(() => {
         if (zoneSettings) {
-            const newPolygons = zoneSettings.polygons.map((zone) => ({id: idFromPolygon(zone.polygon), polygon: zone.polygon, duration: zone.duration}));
-            setPolygons(newPolygons.map((zone) => zone.polygon));
+            setPolygons(zoneSettings.polygons.map((zone) => zone.polygon));
         }
     }, [zoneSettings]);
-
-    useEffect(() => {
-        if (penaltySettings) {
-            setAllowedTimeOutOfZone(penaltySettings.allowedTimeOutOfZone.toString());
-        }
-    }, [penaltySettings]);
 
     function idFromPolygon(polygon) {
         return (polygon[0].lat + polygon[1].lat + polygon[2].lat).toString() + (polygon[0].lng + polygon[1].lng + polygon[2].lng).toString();
@@ -119,26 +113,26 @@ export default function PolygonZoneSelector({zoneSettings, updateZoneSettings, a
 
     function addPolygon(polygon) {
         const newPolygons = [...zoneSettings.polygons, {id: idFromPolygon(polygon), polygon: polygon, duration: defaultDuration}];
-        updateZoneSettings("polygons", newPolygons);
+        modifyZoneSettings("polygons", newPolygons);
     }
 
     function removePolygon(i) {
         const newPolygons = zoneSettings.polygons.filter((_, index) => index !== i);
-        updateZoneSettings("polygons", newPolygons);
+        modifyZoneSettings("polygons", newPolygons);
     }
 
     function updateDuration(i, duration) {
         const newPolygons = zoneSettings.polygons.map((zone, index) => index === i ? {id: zone.id, polygon: zone.polygon, duration: duration} : zone);
-        updateZoneSettings("polygons", newPolygons);
+        modifyZoneSettings("polygons", newPolygons);
     }
 
     function handleSettingsSubmit() {
         applyZoneSettings();
-        changePenaltySettings({allowedTimeOutOfZone: Number(allowedTimeOutOfZone)});
+        applyLocalOutOfZoneDelay();
     }
     
     return (
-        <div className='h-full w-full bg-white p-3 gap-3 flex flex-row shadow-2xl'>
+        <div className='h-full w-full gap-3 flex flex-row'>
             <div className="h-full flex-1">
                 <CustomMapContainer>
                     <Drawings polygons={polygons} addPolygon={addPolygon} removePolygon={removePolygon} />
@@ -148,12 +142,12 @@ export default function PolygonZoneSelector({zoneSettings, updateZoneSettings, a
                 <div className="w-full text-center">
                     <h2 className="text-xl">Reduction order</h2>
                 </div>
-                <ReorderList droppableId="zones-order" array={zoneSettings.polygons} setArray={(polygons) => updateZoneSettings("polygons", polygons)}>
+                <ReorderList droppableId="zones-order" array={zoneSettings.polygons} setArray={(polygons) => modifyZoneSettings("polygons", polygons)}>
                     { (zone, i) =>
                         <div className="w-full p-2 bg-white flex flex-row gap-2 items-center justify-between">
                             <p>Zone {i+1}</p>
                             <div className="w-16 h-10">
-                                <TextInput value={zone.duration} onChange={(e) => updateDuration(i, e.target.value)}/>
+                                <TextInput value={zone?.duration || ""} onChange={(e) => updateDuration(i, parseInt(e.target.value, 10))}/>
                             </div>
                         </div>
                     }
@@ -161,7 +155,7 @@ export default function PolygonZoneSelector({zoneSettings, updateZoneSettings, a
                 <div className="w-full flex flex-row gap-2 items-center justify-between">
                     <p>Timeout</p>
                     <div className="w-16 h-10">
-                        <TextInput value={allowedTimeOutOfZone} onChange={(e) => setAllowedTimeOutOfZone(e.target.value)} />
+                        <TextInput id="timeout" value={localOutOfZoneDelay ?? ""} onChange={(e) => setLocalOutOfZoneDelay(parseInt(e.target.value, 10))} />
                     </div>
                 </div>
                 <div className="w-full h-15">

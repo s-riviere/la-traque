@@ -1,44 +1,52 @@
 "use client";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { useSocket } from "./socketContext";
 import useSocketListener from "@/hook/useSocketListener";
-import { useAdminConnexion } from "./adminConnexionContext";
 import { GameState } from "@/util/gameState";
 
 const adminContext = createContext();
 
 export function AdminProvider({ children }) {
-    const [teams, setTeams] = useState([]);
-    const [zoneSettings, setZoneSettings] = useState(null)
-    const [penaltySettings, setPenaltySettings] = useState(null);
-    const [gameSettings, setGameSettings] = useState(null);
-    const [zoneExtremities, setZoneExtremities] = useState(null);
-    const [nextZoneDate, setNextZoneDate] = useState(null);
     const { adminSocket } = useSocket();
-    const { loggedIn } = useAdminConnexion();
+    // teams
+    const [teams, setTeams] = useState([]);
+    // game_state
     const [gameState, setGameState] = useState(GameState.SETUP);
     const [startDate, setStartDate] = useState(null);
+    // current_zone
+    const [zoneType, setZoneType] = useState(null);
+    const [zoneExtremities, setZoneExtremities] = useState(null);
+    const [nextZoneDate, setNextZoneDate] = useState(null);
+    // settings
+    const [messages, setMessages] = useState(null);
+    const [zoneSettings, setZoneSettings] = useState(null)
+    const [sendPositionDelay, setSendPositionDelay] = useState(null);
+    const [outOfZoneDelay, setOutOfZoneDelay] = useState(null);
 
-    // Send a request to get the teams when the user logs in
-    useEffect(() => {
-        adminSocket.emit("get_teams");
-    }, [loggedIn]);
+    useSocketListener(adminSocket, "teams", setTeams);
 
-    function setCurrentZone(data) {
+    useSocketListener(adminSocket, "game_state", (data) => {
+        setGameState(data.state);
+        setStartDate(data.date)
+    });
+
+    useSocketListener(adminSocket, "current_zone", (data) => {
+        setZoneType(data.type);
         setZoneExtremities({begin: data.begin, end: data.end});
         setNextZoneDate(data.endDate);
-    }
+    });
 
-    useSocketListener(adminSocket, "game_state", (data) => {setGameState(data.state); setStartDate(data.startDate)});
-    useSocketListener(adminSocket, "teams", setTeams);
-    useSocketListener(adminSocket, "zone_settings", setZoneSettings);
-    useSocketListener(adminSocket, "game_settings", setGameSettings);
-    useSocketListener(adminSocket, "penalty_settings", setPenaltySettings);
-    useSocketListener(adminSocket, "current_zone", setCurrentZone);
+    useSocketListener(adminSocket, "settings", (data) => {
+        setMessages(data.messages);
+        setZoneSettings(data.zone);
+        setSendPositionDelay(data.sendPositionDelay);
+        setOutOfZoneDelay(data.outOfZoneDelay);
+    });
 
     const value = useMemo(() => (
-        { zoneExtremities, teams, zoneSettings, penaltySettings, gameSettings, gameState, nextZoneDate, startDate }
-    ), [zoneSettings, teams, gameState, zoneExtremities, penaltySettings, gameSettings, nextZoneDate, startDate]);
+        { zoneSettings, teams, gameState, zoneType, zoneExtremities, sendPositionDelay, outOfZoneDelay, messages, nextZoneDate, startDate }
+    ), [zoneSettings, teams, gameState, zoneType, zoneExtremities, sendPositionDelay, outOfZoneDelay, messages, nextZoneDate, startDate]);
+
     return (
         <adminContext.Provider value={value}>
             {children}

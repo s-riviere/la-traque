@@ -19,7 +19,7 @@ const zoneTypes = {
 }
 
 export default function LiveMap({mapStyle, showZones, showNames, showArrows}) {
-    const { zoneSettings, zoneExtremities, teams, nextZoneDate, getTeam, gameState } = useAdmin();
+    const { zoneType, zoneExtremities, teams, nextZoneDate, getTeam, gameState } = useAdmin();
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
 
     // Remaining time before sending position
@@ -48,16 +48,16 @@ export default function LiveMap({mapStyle, showZones, showNames, showArrows}) {
         if (pos1 && pos2) {
             return (
                 <Polyline positions={[pos1, pos2]} pathOptions={{ color: 'black', weight: 3 }}/>
-            )
+            );
         } else {
             return null;
         }
     }
 
     function Zones() {
-        if (!(showZones && gameState == GameState.PLAYING && zoneSettings)) return null;
+        if (!(showZones && gameState == GameState.PLAYING && zoneType)) return null;
 
-        switch (zoneSettings.type) {
+        switch (zoneType) {
             case zoneTypes.circle:
                 return (
                     <div>
@@ -83,10 +83,12 @@ export default function LiveMap({mapStyle, showZones, showNames, showArrows}) {
             <CustomMapContainer mapStyle={mapStyle}>
                 <Zones/>
                 {teams.map((team) => team.currentLocation && !team.captured &&
-                    <Marker key={team.id} position={team.currentLocation} icon={positionIcon}>
-                        {showNames && <Tooltip permanent direction="top" offset={[0.5, -15]} className="custom-tooltip">{team.name}</Tooltip>}
-                        {showArrows && <Arrow pos1={team.currentLocation} pos2={getTeam(team.chasing).currentLocation}/>}
-                    </Marker>
+                    <div>
+                        <Marker key={team.id} position={team.currentLocation} icon={positionIcon}>
+                            {showNames && <Tooltip permanent direction="top" offset={[0.5, -15]} className="custom-tooltip">{team.name}</Tooltip>}
+                        </Marker>
+                        {showArrows && <Arrow key={team.id} pos1={team.currentLocation} pos2={getTeam(team.chased).currentLocation}/>}
+                    </div>
                 )}
             </CustomMapContainer>
         </div>

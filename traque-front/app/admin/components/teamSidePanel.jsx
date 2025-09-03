@@ -50,7 +50,7 @@ function getStatus(team, gamestate) {
 }
 
 export default function TeamSidePanel({ selectedTeamId, onClose }) {
-    const { getTeam, getTeamName, startDate, gameState } = useAdmin();
+    const { getTeam, startDate, gameState } = useAdmin();
     const [imgSrc, setImgSrc] = useState("");
     const team = getTeam(selectedTeamId);
     const NO_VALUE = "XX";
@@ -115,8 +115,8 @@ export default function TeamSidePanel({ selectedTeamId, onClose }) {
                 <DotLine label="ID de capture" value={String(team.captureCode).padStart(4, '0')} />
             </div>
             <div>
-                <DotLine label="Chasse" value={getTeamName(team.chasing) ?? NO_VALUE} />
-                <DotLine label="Chassé par" value={getTeamName(team.chased) ?? NO_VALUE} />
+                <DotLine label="Chasse" value={getTeam(team.chasing).name ?? NO_VALUE} />
+                <DotLine label="Chassé par" value={getTeam(team.chased).name ?? NO_VALUE} />
             </div>
             <div>
                 <DotLine label="Distance" value={formatDistance(team.distance)} />

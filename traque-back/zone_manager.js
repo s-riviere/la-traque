@@ -233,11 +233,12 @@ export default {
     
     zoneBroadcast() {
         const zone = {
+            type: this.settings.type,
             begin: this.getCurrentZone(),
             end: this.getNextZone(),
             endDate:this.currentZone.endDate,
         };
-        playersBroadcast("current_zone", zone);
+        playersBroadcast("zone", zone);
         secureAdminBroadcast("current_zone", zone);
     },
 }

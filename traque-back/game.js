@@ -2,9 +2,8 @@
 This module manages the main game state, the teams, the settings and the game logic
 */
 import { secureAdminBroadcast } from "./admin_socket.js";
-import { playersBroadcast, sendUpdatedTeamInformations } from "./team_socket.js";
-import timeoutHandler from "./timeoutHandler.js";
-import penaltyController from "./penalty_controller.js";
+import { teamBroadcast, playersBroadcast, sendUpdatedTeamInformations,  } from "./team_socket.js";
+import { sendPositionTimeouts, outOfZoneTimeouts } from "./timeout_handler.js";
 import zoneManager from "./zone_manager.js";
 import trajectory from "./trajectory.js";
 
@@ -52,34 +51,43 @@ export const GameState = {
 }
 
 export default {
-    //List of teams, as objects. To see the fields see the addTeam methods
+    // List of teams, as objects. To see the fields see the addTeam methods
     teams: [],
-    //Current state of the game
+    // Current state of the game
     state: GameState.SETUP,
-    // Date since gameState switched to PLAYING
-    startDate: null,
-    //Settings of the game
-    settings: {
-        loserEndGameMessage: "",
-        winnerEndGameMessage: "",
-        capturedMessage: "",
-        waitingMessage: ""
+    // Date since the state changed
+    stateDate: Date.now(),
+    // Messages
+    messages: {
+        waiting: "",
+        captured: "",
+        winner: "",
+        loser: "",
+    },
+
+    getSettings() {
+        return {
+            messages: this.messages,
+            zone: zoneManager.settings,
+            sendPositionDelay: sendPositionTimeouts.delay,
+            outOfZoneDelay: outOfZoneTimeouts.delay
+        };
     },
 
     /**
      * Update the game settings
      * @param {Object} newSettings settings to be updated, can be partial
-     * @returns true if the settings are applied
      */
     changeSettings(newSettings) {
-        this.settings = { ...this.settings, ...newSettings };
-        return true;
+        if ("messages" in newSettings) this.messages = {...this.messages, ...newSettings.messages};
+        if ("zone" in newSettings) zoneManager.changeSettings(newSettings.zone);
+        if ("sendPositionDelay" in newSettings) sendPositionTimeouts.setDelay(newSettings.sendPositionDelay);
+        if ("outOfZoneDelay" in newSettings) outOfZoneTimeouts.setDelay(newSettings.outOfZoneDelay);
     },
 
     /**
      * Change the state of the game to newState and start the necessary processes
      * @param {String} newState 
-     * @returns true if the state has been changed
      */
     setState(newState) {
         // Checks is the newState is a Gamestate
@@ -89,8 +97,8 @@ export default {
             case GameState.SETUP:
                 trajectory.stop();
                 zoneManager.stop();
-                penaltyController.stop();
-                timeoutHandler.endAllSendPositionTimeout();
+                sendPositionTimeouts.clearAll();
+                outOfZoneTimeouts.clearAll();
                 for (let team of this.teams) {
                     // Chasing
                     team.captured = false;
@@ -103,7 +111,6 @@ export default {
                     // Placement
                     team.ready = false;
                     // Zone
-                    team.penalties = 0;
                     team.outOfZone = false;
                     team.outOfZoneDeadline = null;
                     // Stats
@@ -113,34 +120,33 @@ export default {
                     team.nObserved = 0;
                     team.finishDate = null;
                 }
-                this.startDate = null;
+                this.stateDate = Date.now();
                 this.updateTeamChasing();
                 break;
             case GameState.PLACEMENT:
                 if (this.teams.length < 3) {
-                    secureAdminBroadcast("game_state", {state: this.state, startDate: this.startDate});
+                    secureAdminBroadcast("game_state", {state: this.state, stateDate: this.stateDate});
                     return false;
                 }
                 trajectory.stop();
                 zoneManager.stop();
-                penaltyController.stop();
-                timeoutHandler.endAllSendPositionTimeout();
-                this.startDate = null;
+                sendPositionTimeouts.clearAll();
+                outOfZoneTimeouts.clearAll();
+                this.stateDate = Date.now();
                 break;
             case GameState.PLAYING:
                 if (this.teams.length < 3) {
-                    secureAdminBroadcast("game_state", {state: this.state, startDate: this.startDate});
+                    secureAdminBroadcast("game_state", {state: this.state, stateDate: this.stateDate});
                     return false;
                 }
                 trajectory.start();
                 zoneManager.start();
-                penaltyController.start();
                 this.initLastSentLocations();
-                this.startDate = Date.now();
+                this.stateDate = Date.now();
                 break;
             case GameState.FINISHED:
                 if (this.state != GameState.PLAYING) {
-                    secureAdminBroadcast("game_state", {state: this.state, startDate: this.startDate});
+                    secureAdminBroadcast("game_state", {state: this.state, stateDate: this.stateDate});
                     return false;
                 }
                 for (const team of this.teams) {
@@ -148,16 +154,15 @@ export default {
                 }
                 trajectory.stop();
                 zoneManager.stop();
-                penaltyController.stop();
-                timeoutHandler.endAllSendPositionTimeout();
+                sendPositionTimeouts.clearAll();
+                outOfZoneTimeouts.clearAll();
                 break;
         }
         // Update the state
         this.state = newState;
-        secureAdminBroadcast("game_state", {state: newState, startDate: this.startDate});
+        secureAdminBroadcast("game_state", {state: newState, stateDate: this.stateDate});
         playersBroadcast("game_state", newState);
         secureAdminBroadcast("teams", this.teams);
-        return true;
     },
 
     /**
@@ -183,7 +188,6 @@ export default {
     /**
      * Add a new team to the game
      * @param {String} teamName the name of the team
-     * @returns true if the team has been added
      */
     addTeam(teamName) {
         this.teams.push({
@@ -206,7 +210,6 @@ export default {
             startingArea: null,
             ready: false,
             // Zone
-            penalties: 0,
             outOfZone: false,
             outOfZoneDeadline: null,
             // Stats
@@ -221,35 +224,18 @@ export default {
             battery: null,
         });
         this.updateTeamChasing();
-        return true;
-    },
-
-    /**
-     * Count the number of teams that are not captured
-     * @returns the number of teams that are not captured
-     */
-    playingTeamCount() {
-        let res = 0;
-        this.teams.forEach((t) => {
-            if (!t.captured) {
-                res++;
-            }
-        })
-        return res;
     },
 
     /**
      * Update the chasing chain of the teams based of the ordre of the teams array
      * If there are only 2 teams left, the game will end
      * This function will update the chasing and chased values of each teams
-     * @returns true if successful
      */
     updateTeamChasing() {
-        if (this.playingTeamCount() <= 2) {
-            if (this.state == GameState.PLAYING) {
-                this.setState(GameState.FINISHED);
-            }
-            return false;
+        const playingTeams = this.teams.reduce((count, team) => count + (!team.captured ? 1 : 0), 0);
+        if (playingTeams <= 2) {
+            if (this.state == GameState.PLAYING) this.setState(GameState.FINISHED);
+            return;
         }
         let firstTeam = null;
         let previousTeam = null
@@ -267,17 +253,15 @@ export default {
         this.getTeam(firstTeam).chased = previousTeam;
         this.getTeam(previousTeam).chasing = firstTeam;
         secureAdminBroadcast("teams", this.teams);
-        return true;
     },
 
     /**
      * Rearrange the order of the teams and update the chasing chain
      * @param {Array} newOrder An array of teams in the new order
-     * @returns 
      */
     reorderTeams(newOrder) {
         this.teams = newOrder;
-        return this.updateTeamChasing();
+        this.updateTeamChasing();
     },
 
     /**
@@ -293,7 +277,6 @@ export default {
      * Update a team's values
      * @param {Number} teamId The id of the team to update
      * @param {Object} newTeam An object containing the new values of the team, can be partial
-     * @returns true if the team has been updated
      */
     updateTeam(teamId, newTeam) {
         this.teams = this.teams.map((t) => {
@@ -304,20 +287,17 @@ export default {
             }
         })
         this.updateTeamChasing();
-        penaltyController.checkPenalties();
-        return true;
     },
 
     /**
      * 
      * @param {Number} teamId The ID of the team which location will be updated
      * @param {Array} location An array containing in order the latitude and longitude of the new location
-     * @returns true if the location has been updated 
      */
     updateLocation(teamId, location) {
         const team = this.getTeam(teamId);
         if (!team || !location) {
-            return false;
+            return;
         }
         if (team.currentLocation) team.distance += Math.floor(getDistanceFromLatLon({lat: location[0], lng: location[1]}, {lat: team.currentLocation[0], lng: team.currentLocation[1]}));
         // Update of events of the game
@@ -328,9 +308,19 @@ export default {
         if (this.state == GameState.PLACEMENT && team.startingArea && team.startingArea && location) {
             team.ready = isInCircle({ lat: location[0], lng: location[1] }, team.startingArea.center, team.startingArea.radius);
         }
+        // Verify zone
+        const teamCurrentlyOutOfZone = !zoneManager.isInZone({ lat: location[0], lng: location[1] })
+        if (teamCurrentlyOutOfZone && !team.outOfZone) {
+            team.outOfZone = true;
+            team.outOfZoneDeadline = Date.now() + outOfZoneTimeouts.duration * 60 * 1000;
+            outOfZoneTimeouts.set(teamId);
+        } else if (!teamCurrentlyOutOfZone && team.outOfZone) {
+            team.outOfZone = false;
+            team.outOfZoneDeadline = null;
+            outOfZoneTimeouts.clear(teamId);
+        }
         // Sending new infos to the team
         sendUpdatedTeamInformations(team.id);
-        return true;
     },
 
     /**
@@ -340,8 +330,8 @@ export default {
         // Update of lastSentLocation
         for (const team of this.teams) {
             team.lastSentLocation = team.currentLocation;
-            team.locationSendDeadline = Date.now() + penaltyController.settings.allowedTimeBetweenPositionUpdate * 60 * 1000;
-            timeoutHandler.setSendPositionTimeout(team.id, team.locationSendDeadline);
+            team.locationSendDeadline = Date.now() + sendPositionTimeouts.duration * 60 * 1000;
+            sendPositionTimeouts.set(team.id);
             sendUpdatedTeamInformations(team.id);
         }
         // Update of enemyLocation now we have the lastSentLocation of the enemy
@@ -354,22 +344,21 @@ export default {
     /**
      * Get the most recent enemy team's location as well as setting the latest accessible location to the current one
      * @param {Number} teamId The ID of the team that will send its location
-     * @returns true if the location has been sent
      */
     sendLocation(teamId) {
         const team = this.getTeam(teamId);
-        const enemyTeam = this.getTeam(team.chasing);
         if (!team || !team.currentLocation) {
-            return false;
+            return;
         }
+        const enemyTeam = this.getTeam(team.chasing);
         team.nSentLocation++;
         enemyTeam.nObserved++;
         const dateNow = Date.now();
         // Update of events of the game
         trajectory.writeSeePosition(dateNow, teamId, team.chasing);
         // Update of locationSendDeadline
-        team.locationSendDeadline = dateNow + penaltyController.settings.allowedTimeBetweenPositionUpdate * 60 * 1000;
-        timeoutHandler.setSendPositionTimeout(team.id, team.locationSendDeadline);
+        team.locationSendDeadline = dateNow + sendPositionTimeouts.duration * 60 * 1000;
+        sendPositionTimeouts.set(team.id);
         // Update of lastSentLocation
         team.lastSentLocation = team.currentLocation;
         // Update of enemyLocation
@@ -378,22 +367,21 @@ export default {
         // Sending new infos to the team
         sendUpdatedTeamInformations(team.id);
         sendUpdatedTeamInformations(enemyTeam.id);
-        return true;
     },
 
     /**
      * Remove a team by its ID
      * @param {Number} teamId The id of the team to remove
-     * @returns true if the team has been deleted
      */
     removeTeam(teamId) {
         if (!this.getTeam(teamId)) {
-            return false;
+            return;
         }
+        teamBroadcast("logout");
         this.teams = this.teams.filter(t => t.id !== teamId);
         this.updateTeamChasing();
-        timeoutHandler.endSendPositionTimeout(teamId);
-        return true;
+        sendPositionTimeouts.clear(teamId);
+        outOfZoneTimeouts.clear(teamId);
     },
 
     /**
@@ -402,13 +390,12 @@ export default {
      * And the chase chain will be updated
      * @param {Number} teamId The id of the capturing team
      * @param {Number} captureCode The code sent by the capturing that only the captured team know, used to verify the authenticity of the capture
-     * @returns {Boolean} if the capture has been successfull or not
      */
     requestCapture(teamId, captureCode) {
         const team = this.getTeam(teamId);
         const enemyTeam = this.getTeam(team.chasing);
         if (!enemyTeam || enemyTeam.captureCode != captureCode) {
-            return false;
+            return;
         }
         team.nCaptures++;
         // Update of events of the game
@@ -418,7 +405,6 @@ export default {
         // Sending new infos to the teams
         sendUpdatedTeamInformations(team.id);
         sendUpdatedTeamInformations(enemyTeam.id);
-        return true;
     },
 
     /**
@@ -429,7 +415,12 @@ export default {
         const team = this.getTeam(teamId);
         team.captured = true;
         team.finishDate = Date.now();
-        timeoutHandler.endSendPositionTimeout(teamId);
+        sendPositionTimeouts.clear(teamId);
+        outOfZoneTimeouts.clear(teamId);
         this.updateTeamChasing();
     },
+
+    handicapTeam(teamId) {
+        // TODO
+    }
 }

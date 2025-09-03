@@ -23,6 +23,8 @@
 - [ ] Permettre le changement du style de la carte (schéma, satellite, relief etc)
 - [ ] Ajouter imprécision de la position au besoin (comme sur google maps)
 - [ ] Synchroniser les horloges sur l'interface
+- [ ] Avoir un récap des évènement de la partie
+- [ ] Publier sur le playstore
 
 ### Admin (Pageweb)
 
@@ -30,12 +32,27 @@
 - [x] Clarifier qui chasse qui sur l'interface.
 - [x] Ajouter timer du rétrécissement des zones.
 - [x] Pouvoir changer les paramètres du jeu pendant une partie.
-- [ ] Implémenter les wireframes
+- [x] Implémenter les wireframes
+- [ ] Ajouter une région par défaut si pas de position
+- [ ] Pouvoir faire pause dans la partie
+- [ ] Voir les traces et évènements des teams
+- [ ] Voir l'incertitude de position des teams
+- [ ] Focus une team cliquée
+- [ ] Refaire les flèches de chasse sur la map
+- [ ] Mettre en évidence le menu paramètre (configuration)
+- [ ] Afficher un feedback quand un paramètre est sauvegardé
+- [ ] Pouvoir définir la zone de départ de chaque équipe
+- [ ] Nommer les polygons par des lettres de l'alphabet
+- [ ] Faire un menu quand on arrive sur la traque
+- [ ] Pouvoir load des paramètres enregistrés
+- [ ] Améliorer le système de création zone (cercle et polygone)
+- [ ] Améliorer la sélection du système de zone
+- [ ] Penser l'affichage en fin de traque
 
 ### Améliorations du jeu de la traque
 
 - [x] Supprimer la pénalité de non envoi de position : envoyer la position automatiquement à la fin du timer.
-- [ ] Supprimer la pénalité d'hors zone : révéler la position de la team hors zone au bout d'un certain temps.
+- [x] Supprimer la pénalité d'hors zone : révéler la position de la team hors zone au bout d'un certain temps.
 - [x] Changer le système de zone de jeu pour qu'il soit fait d'un pavage de zones qui se ferment successivement.
 
 ### Autres idées
