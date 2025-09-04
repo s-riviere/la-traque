@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
 
     output: 'standalone',
@@ -7,14 +8,12 @@ const nextConfig = {
         return [
             {
                 source: '/',
-                destination: '/team',
-                permanent: true,
+                destination: '/admin',
+                permanent: true, // The browser will save the redirect in its cache, empty the cache to change the redirect
             },
         ]
     },
 
 };
-
-
 
 export default nextConfig;

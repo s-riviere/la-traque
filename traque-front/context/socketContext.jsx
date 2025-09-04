@@ -5,12 +5,7 @@ import { io } from 'socket.io-client';
 
 const NEXT_PUBLIC_SOCKET_HOST = env("NEXT_PUBLIC_SOCKET_HOST");
 const SOCKET_URL = (NEXT_PUBLIC_SOCKET_HOST == "localhost" ? "ws://" : "wss://") + NEXT_PUBLIC_SOCKET_HOST;
-const USER_SOCKET_URL = SOCKET_URL + "/player";
 const ADMIN_SOCKET_URL = SOCKET_URL + "/admin";
-
-export const teamSocket = io(USER_SOCKET_URL, {
-    path: "/back/socket.io",
-});
 
 export const adminSocket = io(ADMIN_SOCKET_URL, {
     path: "/back/socket.io",
@@ -19,7 +14,8 @@ export const adminSocket = io(ADMIN_SOCKET_URL, {
 export const SocketContext = createContext();
 
 export default function SocketProvider({ children }) {
-    const value = useMemo(() => ({ teamSocket, adminSocket }), [teamSocket, adminSocket]);
+    const value = useMemo(() => ({ adminSocket }), [adminSocket]);
+    
     return (
         <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
     );
