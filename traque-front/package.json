@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@hello-pangea/dnd": "^16.6.0",
+    "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
+    "leaflet-polylinedecorator": "^1.6.0",
     "next": "^14.2.9",
     "next-runtime-env": "^3.2.2",
     "react": "^18",

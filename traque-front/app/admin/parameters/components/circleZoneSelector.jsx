@@ -16,38 +16,16 @@ const EditMode = {
 function Drawings({ minZone, setMinZone, maxZone, setMaxZone, editMode }) {
     const { center: maxCenter, radius: maxRadius, handleLeftClick: maxLeftClick, handleRightClick: maxRightClick, handleMouseMove: maxHover } = useMapCircleDraw(maxZone, setMaxZone);
     const { center: minCenter, radius: minRadius, handleLeftClick: minLeftClick, handleRightClick: minRightClick, handleMouseMove: minHover } = useMapCircleDraw(minZone, setMinZone);
-    
-    function handleLeftClick(e) {
-        if (editMode == EditMode.MAX) {
-            maxLeftClick(e);
-        } else {
-            minLeftClick(e);
-        }
-    }
-    
-    function handleRightClick(e) {
-        if (editMode == EditMode.MAX) {
-            maxRightClick(e);
-        } else {
-            minRightClick(e);
-        }
-    }
-    
-    function handleMouseMove(e) {
-        if (editMode == EditMode.MAX) {
-            maxHover(e);
-        } else {
-            minHover(e);
-        }
-    }
 
-    return (
-        <div>
-            <MapEventListener onLeftClick={handleLeftClick}  onRightClick={handleRightClick} onMouseMove={handleMouseMove}/>
-            {minCenter && minRadius && <Circle center={minCenter} radius={minRadius} color="red" fillColor="red" />}
-            {maxCenter && maxRadius && <Circle center={maxCenter} radius={maxRadius} color="blue" fillColor="blue" />}
-        </div>
-    );
+    return (<>
+        <MapEventListener
+            onLeftClick={editMode == EditMode.MAX ? maxLeftClick : minLeftClick} 
+            onRightClick={editMode == EditMode.MAX ? maxRightClick : minRightClick}
+            onMouseMove={editMode == EditMode.MAX ? maxHover : minHover}
+        />
+        {minCenter && minRadius && <Circle center={minCenter} radius={minRadius} color="red" fillColor="red" />}
+        {maxCenter && maxRadius && <Circle center={maxCenter} radius={maxRadius} color="blue" fillColor="blue" />}
+    </>);
 }
 
 export default function CircleZoneSelector({zoneSettings, modifyZoneSettings, applyZoneSettings}) {

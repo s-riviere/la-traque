@@ -38,7 +38,7 @@
 - [ ] Voir les traces et évènements des teams
 - [ ] Voir l'incertitude de position des teams
 - [x] Focus une team cliquée
-- [ ] Refaire les flèches de chasse sur la map
+- [x] Refaire les flèches de chasse sur la map
 - [ ] Mettre en évidence le menu paramètre (configuration)
 - [ ] Afficher un feedback quand un paramètre est sauvegardé
 - [ ] Pouvoir définir la zone de départ de chaque équipe

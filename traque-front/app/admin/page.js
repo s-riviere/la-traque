@@ -77,6 +77,7 @@ export default function AdminPage() {
                     <div className="flex-1 h-full">
                         <LiveMap
                             selectedTeamId={selectedTeamId}
+                            onSelected={onSelected}
                             isFocusing={isFocusing}
                             setIsFocusing={setIsFocusing}
                             mapStyle={mapStyle}
