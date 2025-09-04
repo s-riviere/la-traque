@@ -10,18 +10,12 @@ import useAdmin from '@/hook/useAdmin';
 import Messages from "./components/messages";
 import TeamManager from './components/teamManager';
 import useLocalVariable from "@/hook/useLocalVariable";
+import { ZoneTypes } from "@/util/types";
+import { defaultZoneSettings } from "@/util/configurations";
 
 // Imported at runtime and not at compile time
-const PolygonZoneSelector = dynamic(() => import('./components/polygonZoneSelector'), { ssr: false });
 const CircleZoneSelector = dynamic(() => import('./components/circleZoneSelector'), { ssr: false });
-
-const zoneTypes = {
-    circle: "circle",
-    polygon: "polygon"
-}
-
-const defaultCircleSettings = {type: zoneTypes.circle, min: null, max: null, reductionCount: 4, duration: 10}
-const defaultPolygonSettings = {type: zoneTypes.polygon, polygons: []}
+const PolygonZoneSelector = dynamic(() => import('./components/polygonZoneSelector'), { ssr: false });
 
 export default function ConfigurationPage() {
     const { useProtect } = useAdminConnexion();
@@ -34,10 +28,10 @@ export default function ConfigurationPage() {
 
     function modifyLocalZoneSettings(key, value) {
         setLocalZoneSettings(prev => ({...prev, [key]: value}));
-    };
+    }
 
     function handleChangeZoneType() {
-        setLocalZoneSettings(localZoneSettings.type == zoneTypes.circle ? defaultPolygonSettings : defaultCircleSettings)
+        setLocalZoneSettings(localZoneSettings.type == ZoneTypes.CIRCLE ? defaultZoneSettings.polygon : defaultZoneSettings.circle)
     }
     
     function handleTeamSubmit(e) {
@@ -83,10 +77,10 @@ export default function ConfigurationPage() {
                     {localZoneSettings && <BlueButton onClick={handleChangeZoneType}>Change zone type</BlueButton>}
                 </div>
                 <div className="w-full flex-1">
-                    {localZoneSettings && localZoneSettings.type == zoneTypes.circle &&
+                    {localZoneSettings && localZoneSettings.type == ZoneTypes.CIRCLE &&
                         <CircleZoneSelector zoneSettings={localZoneSettings} modifyZoneSettings={modifyLocalZoneSettings} applyZoneSettings={applyLocalZoneSettings}/>
                     }
-                    {localZoneSettings && localZoneSettings.type == zoneTypes.polygon &&
+                    {localZoneSettings && localZoneSettings.type == ZoneTypes.POLYGON &&
                         <PolygonZoneSelector zoneSettings={localZoneSettings} modifyZoneSettings={modifyLocalZoneSettings} applyZoneSettings={applyLocalZoneSettings}/>
                     }
                 </div>

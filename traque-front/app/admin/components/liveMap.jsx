@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Marker, Tooltip, Polyline, Polygon, Circle } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { CustomMapContainer } from "@/components/map";
+import { CustomMapContainer, MapEventListener, MapPan } from "@/components/map";
 import useAdmin from "@/hook/useAdmin";
-import { GameState } from "@/util/gameState";
+import { GameState, ZoneTypes } from "@/util/types";
+import { mapZooms } from "@/util/configurations";
 
 const positionIcon = new L.Icon({
     iconUrl: '/icons/marker/blue.png',
@@ -13,12 +14,7 @@ const positionIcon = new L.Icon({
     shadowSize: [30, 30],
 });
 
-const zoneTypes = {
-    circle: "circle",
-    polygon: "polygon"
-}
-
-export default function LiveMap({mapStyle, showZones, showNames, showArrows}) {
+export default function LiveMap({ selectedTeamId, isFocusing, setIsFocusing, mapStyle, showZones, showNames, showArrows}) {
     const { zoneType, zoneExtremities, teams, nextZoneDate, getTeam, gameState } = useAdmin();
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
 
@@ -58,14 +54,14 @@ export default function LiveMap({mapStyle, showZones, showNames, showArrows}) {
         if (!(showZones && gameState == GameState.PLAYING && zoneType)) return null;
 
         switch (zoneType) {
-            case zoneTypes.circle:
+            case ZoneTypes.CIRCLE:
                 return (
                     <div>
                         { zoneExtremities.begin && <Circle center={zoneExtremities.begin.center} radius={zoneExtremities.begin.radius} color="red" fillColor="red" />}
                         { zoneExtremities.end && <Circle center={zoneExtremities.end.center} radius={zoneExtremities.end.radius} color="green" fillColor="green" />}
                     </div>
                 );
-            case zoneTypes.polygon:
+            case ZoneTypes.POLYGON:
                 return (
                     <div>
                         { zoneExtremities.begin && <Polygon positions={zoneExtremities.begin.points} pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: '0.1', weight: 3 }} />}
@@ -81,14 +77,16 @@ export default function LiveMap({mapStyle, showZones, showNames, showArrows}) {
         <div className='h-full w-full flex flex-col'>
             {gameState == GameState.PLAYING && <p>{`Next zone in : ${formatTime(timeLeftNextZone)}`}</p>}
             <CustomMapContainer mapStyle={mapStyle}>
+                {isFocusing && <MapPan center={getTeam(selectedTeamId)?.currentLocation} zoom={mapZooms.high} animate />}
+                <MapEventListener onDragStart={() => setIsFocusing(false)}/>
                 <Zones/>
                 {teams.map((team) => team.currentLocation && !team.captured &&
-                    <div>
+                    <>
                         <Marker key={team.id} position={team.currentLocation} icon={positionIcon}>
                             {showNames && <Tooltip permanent direction="top" offset={[0.5, -15]} className="custom-tooltip">{team.name}</Tooltip>}
                         </Marker>
                         {showArrows && <Arrow key={team.id} pos1={team.currentLocation} pos2={getTeam(team.chased).currentLocation}/>}
-                    </div>
+                    </>
                 )}
             </CustomMapContainer>
         </div>

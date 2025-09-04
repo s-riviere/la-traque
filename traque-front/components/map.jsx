@@ -1,33 +1,21 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { mapLocations, mapZooms, mapStyles } from "@/util/configurations";
 
-const DEFAULT_ZOOM = 14;
-
-const mapStyles = {
-    default: {
-        url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    },
-    satellite: {
-        url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        attribution: 'Tiles &copy; Esri'
-    },
-}
-
-export function MapPan({center, zoom}) {
+export function MapPan({center, zoom, animate=false}) {
     const map = useMap();
 
     useEffect(() => {
-        if (center, zoom) {
-            map.flyTo(center, zoom, { animate: false });
+        if (center && zoom) {
+            map.flyTo(center, zoom, { animate: animate });
         }
     }, [center, zoom]);
 
     return null;
 }
 
-export function MapEventListener({ onLeftClick, onRightClick, onMouseMove }) {
+export function MapEventListener({ onLeftClick, onRightClick, onMouseMove, onDragStart }) {
     const map = useMap();
 
     // Handle the mouse click left
@@ -93,6 +81,17 @@ export function MapEventListener({ onLeftClick, onRightClick, onMouseMove }) {
             map.off('mousemove', onMouseMove);
         }
     }, [onMouseMove]);
+
+    // Handle the drag start
+    useEffect(() => {
+        if (!onDragStart) return;
+
+        map.on('dragstart', onDragStart);
+
+        return () => {
+            map.off('dragstart', onDragStart);
+        }
+    }, [onDragStart]);
     
     // Prevent right click context menu
     useEffect(() => {
@@ -105,9 +104,23 @@ export function MapEventListener({ onLeftClick, onRightClick, onMouseMove }) {
     return null;
 }
 
+function MapResizeWatcher() {
+    const map = useMap();
+
+    useEffect(() => {
+        const observer = new ResizeObserver(() => {
+            map.invalidateSize();
+        });
+        observer.observe(map.getContainer());
+
+        return () => observer.disconnect();
+    }, [map]);
+
+    return null;
+}
+
 export function CustomMapContainer({mapStyle, children}) {
     const [location, setLocation] = useState(null);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (!navigator.geolocation) {
@@ -118,7 +131,6 @@ export function CustomMapContainer({mapStyle, children}) {
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 setLocation([pos.coords.latitude, pos.coords.longitude]);
-                setLoading(false);
             },
             (err) => console.log("Error :", err),
             {
@@ -129,13 +141,11 @@ export function CustomMapContainer({mapStyle, children}) {
         );
     }, []);
 
-    if (loading) {
-        return <div className="w-full h-full"/>
-    }
-
     return (
-        <MapContainer className='w-full h-full' center={location} zoom={DEFAULT_ZOOM} scrollWheelZoom={true}>
+        <MapContainer className='w-full h-full' center={mapLocations.paris} zoom={mapZooms.low} scrollWheelZoom={true}>
             <TileLayer url={(mapStyle || mapStyles.default).url} attribution={(mapStyle || mapStyles.default).attribution}/>
+            <MapPan center={location} zoom={mapZooms.high}/>
+            <MapResizeWatcher/>
             {children}
         </MapContainer>
     )

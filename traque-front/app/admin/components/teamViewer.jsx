@@ -1,28 +1,6 @@
 import { List } from '@/components/list';
 import useAdmin from '@/hook/useAdmin';
-import { GameState } from '@/util/gameState';
-
-const TEAM_STATUS = {
-    playing:    { label: "En jeu",          color: "text-custom-green" },
-    captured:   { label: "Capturée",        color: "text-custom-red" },
-    outofzone:  { label: "Hors zone",       color: "text-custom-orange" },
-    ready:      { label: "Placée",          color: "text-custom-green" },
-    notready:   { label: "Non placée",      color: "text-custom-red" },
-    waiting:    { label: "En attente",      color: "text-custom-grey" },
-};
-
-function getStatus(team, gamestate) {
-    switch (gamestate) {
-        case GameState.SETUP:
-            return TEAM_STATUS.waiting;
-        case GameState.PLACEMENT:
-            return team.ready ? TEAM_STATUS.ready : TEAM_STATUS.notready;
-        case GameState.PLAYING:
-            return team.captured ? TEAM_STATUS.captured : team.outofzone ? TEAM_STATUS.outofzone : TEAM_STATUS.playing;
-        case GameState.FINISHED:
-            return team.captured ? TEAM_STATUS.captured : TEAM_STATUS.playing;
-    }
-}
+import { getStatus } from '@/util/functions';
 
 function TeamViewerItem({ team, itemSelected, onSelected }) {
     const { gameState } = useAdmin();

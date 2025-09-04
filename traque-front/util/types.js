@@ -4,3 +4,8 @@ export const GameState = {
     PLAYING: "playing",
     FINISHED: "finished"
 }
+
+export const ZoneTypes = {
+    CIRCLE: "circle",
+    POLYGON: "polygon"
+}

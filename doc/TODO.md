@@ -33,11 +33,11 @@
 - [x] Ajouter timer du rétrécissement des zones.
 - [x] Pouvoir changer les paramètres du jeu pendant une partie.
 - [x] Implémenter les wireframes
-- [ ] Ajouter une région par défaut si pas de position
+- [x] Ajouter une région par défaut si pas de position
 - [ ] Pouvoir faire pause dans la partie
 - [ ] Voir les traces et évènements des teams
 - [ ] Voir l'incertitude de position des teams
-- [ ] Focus une team cliquée
+- [x] Focus une team cliquée
 - [ ] Refaire les flèches de chasse sur la map
 - [ ] Mettre en évidence le menu paramètre (configuration)
 - [ ] Afficher un feedback quand un paramètre est sauvegardé

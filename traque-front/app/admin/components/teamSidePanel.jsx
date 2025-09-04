@@ -1,7 +1,7 @@
 import { env } from 'next-runtime-env';
 import { useEffect, useState } from "react";
 import useAdmin from "@/hook/useAdmin";
-import { GameState } from '@/util/gameState';
+import { getStatus } from '@/util/functions';
 
 function DotLine({ label, value }) {
     return (
@@ -25,28 +25,6 @@ function IconValue({ color, icon, value }) {
             <p className={`text-custom-${color}`}>{value}</p>
         </div>
     );
-}
-
-const TEAM_STATUS = {
-    playing:    { label: "En jeu",          color: "text-custom-green" },
-    captured:   { label: "Capturée",        color: "text-custom-red" },
-    outofzone:  { label: "Hors zone",       color: "text-custom-orange" },
-    ready:      { label: "Placée",          color: "text-custom-green" },
-    notready:   { label: "Non placée",      color: "text-custom-red" },
-    waiting:    { label: "En attente",      color: "text-custom-grey" },
-};
-
-function getStatus(team, gamestate) {
-    switch (gamestate) {
-        case GameState.SETUP:
-            return TEAM_STATUS.waiting;
-        case GameState.PLACEMENT:
-            return team.ready ? TEAM_STATUS.ready : TEAM_STATUS.notready;
-        case GameState.PLAYING:
-            return team.captured ? TEAM_STATUS.captured : team.outofzone ? TEAM_STATUS.outofzone : TEAM_STATUS.playing;
-        case GameState.FINISHED:
-            return team.captured ? TEAM_STATUS.captured : TEAM_STATUS.playing;
-    }
 }
 
 export default function TeamSidePanel({ selectedTeamId, onClose }) {

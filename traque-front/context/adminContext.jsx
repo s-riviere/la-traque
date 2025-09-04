@@ -2,7 +2,7 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import { useSocket } from "./socketContext";
 import useSocketListener from "@/hook/useSocketListener";
-import { GameState } from "@/util/gameState";
+import { GameState } from "@/util/types";
 
 const adminContext = createContext();
 

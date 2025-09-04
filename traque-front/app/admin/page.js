@@ -1,11 +1,12 @@
 "use client";
-import React, { useState } from 'react';
+import { useState } from 'react';
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Section } from "@/components/section";
 import { useAdminConnexion } from "@/context/adminConnexionContext";
 import useAdmin from "@/hook/useAdmin";
-import { GameState } from "@/util/gameState";
+import { GameState } from "@/util/types";
+import { mapStyles } from '@/util/configurations';
 import TeamSidePanel from "./components/teamSidePanel";
 import TeamViewer from './components/teamViewer';
 import { MapButton, ControlButton } from './components/buttons';
@@ -13,33 +14,25 @@ import { MapButton, ControlButton } from './components/buttons';
 // Imported at runtime and not at compile time
 const LiveMap = dynamic(() => import('./components/liveMap'), { ssr: false });
 
-const mapStyles = {
-    default: {
-        url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    },
-    satellite: {
-        url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        attribution: 'Tiles &copy; Esri'
-    },
-}
-
 export default function AdminPage() {
     const { useProtect } = useAdminConnexion();
     const [selectedTeamId, setSelectedTeamId] = useState(null);
-    const { changeState } = useAdmin();
+    const { changeState, getTeam } = useAdmin();
     const [mapStyle, setMapStyle] = useState(mapStyles.default);
     const [showZones, setShowZones] = useState(true);
     const [showNames, setShowNames] = useState(true);
     const [showArrows, setShowArrows] = useState(false);
+    const [isFocusing, setIsFocusing] = useState(true);
 
     useProtect();
 
     function onSelected(id) {
-        if (selectedTeamId === id) {
+        if (selectedTeamId == id && (!getTeam(id)?.currentLocation || isFocusing)) {
             setSelectedTeamId(null);
+            setIsFocusing(false);
         } else {
             setSelectedTeamId(id);
+            setIsFocusing(true);
         }
     }
 
@@ -82,7 +75,15 @@ export default function AdminPage() {
             <div className='grow flex-1 flex flex-col bg-white p-3 gap-3 shadow-2xl'>
                 <div className="flex-1 flex flex-row gap-3">
                     <div className="flex-1 h-full">
-                        <LiveMap mapStyle={mapStyle} showZones={showZones} showNames={showNames} showArrows={showArrows}/>
+                        <LiveMap
+                            selectedTeamId={selectedTeamId}
+                            isFocusing={isFocusing}
+                            setIsFocusing={setIsFocusing}
+                            mapStyle={mapStyle}
+                            showZones={showZones}
+                            showNames={showNames}
+                            showArrows={showArrows}
+                        />
                     </div>
                     {selectedTeamId &&
                         <div className="w-3/12 h-full">
