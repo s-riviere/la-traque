@@ -89,7 +89,7 @@ export default function TeamSidePanel({ selectedTeamId, onClose }) {
                 />
             </div>
             <div>
-                <DotLine label="ID d'équipe" value={String(team.id).padStart(6, '0').replace(/(\d{3})(\d{3})/, "$1 $2")} />
+                <DotLine label="ID d'équipe" value={String(selectedTeamId).padStart(6, '0').replace(/(\d{3})(\d{3})/, "$1 $2")} />
                 <DotLine label="ID de capture" value={String(team.captureCode).padStart(4, '0')} />
             </div>
             <div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Circle } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { BlueButton, GreenButton, RedButton } from "@/components/button";
+import { CustomButton } from "@/components/button";
 import { CustomMapContainer, MapEventListener } from "@/components/map";
 import { TextInput } from "@/components/input";
 import useAdmin from "@/hook/useAdmin";
@@ -43,8 +43,7 @@ export default function CircleZoneSelector({zoneSettings, modifyZoneSettings, ap
     }
 
     function customStringToInt(e) {
-        const res = parseInt(e, 10);
-        return isNaN(res) ? null : res;
+        return parseInt(e, 10) || null;
     }
 
     return (
@@ -56,8 +55,8 @@ export default function CircleZoneSelector({zoneSettings, modifyZoneSettings, ap
             </div>
             <div className="h-full w-1/6 flex flex-col gap-3">
                 <div className="w-full h-15">
-                    {editMode == EditMode.MIN && <BlueButton onClick={() => setEditMode(EditMode.MAX)}>Click to edit first zone</BlueButton>}
-                    {editMode == EditMode.MAX && <RedButton onClick={() => setEditMode(EditMode.MIN)}>Click to edit last zone</RedButton>}
+                    {editMode == EditMode.MIN && <CustomButton color="blue" onClick={() => setEditMode(EditMode.MAX)}>Click to edit first zone</CustomButton>}
+                    {editMode == EditMode.MAX && <CustomButton color="red" onClick={() => setEditMode(EditMode.MIN)}>Click to edit last zone</CustomButton>}
                 </div>
                 <div className="w-full flex flex-row gap-2 items-center justify-between">
                     <p>Reduction number</p>
@@ -78,7 +77,7 @@ export default function CircleZoneSelector({zoneSettings, modifyZoneSettings, ap
                     </div>
                 </div>
                 <div className="w-full h-15">
-                    <GreenButton onClick={handleSettingsSubmit}>Apply</GreenButton>
+                    <CustomButton color="green" onClick={handleSettingsSubmit}>Apply</CustomButton>
                 </div>
             </div>
         </div>

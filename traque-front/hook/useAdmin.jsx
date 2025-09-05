@@ -23,8 +23,8 @@ export default function useAdmin() {
         adminSocket.emit("remove_team", teamId);
     }
 
-    function updateTeam(teamId, team) {
-        adminSocket.emit("update_team", teamId, team);
+    function captureTeam(teamId) {
+        adminSocket.emit("capture_team", teamId);
     }
 
     function changeState(state) {
@@ -35,5 +35,5 @@ export default function useAdmin() {
         adminSocket.emit("update_settings", settings);
     }
 
-    return { ...adminContext, getTeam, reorderTeams, addTeam, removeTeam, updateTeam, changeState, updateSettings };
+    return { ...adminContext, getTeam, reorderTeams, addTeam, removeTeam, captureTeam, changeState, updateSettings };
 }

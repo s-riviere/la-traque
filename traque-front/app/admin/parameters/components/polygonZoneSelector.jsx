@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Polyline, Polygon, Marker } from "react-leaflet";
+import { Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { GreenButton } from "@/components/button";
+import { CustomButton } from "@/components/button";
 import { ReorderList } from "@/components/list";
 import { CustomMapContainer, MapEventListener } from "@/components/map";
 import { TextInput } from "@/components/input";
@@ -88,7 +88,7 @@ export default function PolygonZoneSelector({zoneSettings, modifyZoneSettings, a
                     </div>
                 </div>
                 <div className="w-full h-15">
-                    <GreenButton onClick={handleSettingsSubmit}>Apply</GreenButton>
+                    <CustomButton color="green" onClick={handleSettingsSubmit}>Apply</CustomButton>
                 </div>
             </div>
         </div>

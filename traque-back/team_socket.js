@@ -3,7 +3,6 @@ This file manages team access to the server via websocket.
 It receives messages, checks permissions, manages authentication and performs actions by calling functions from other modules.
 This module also exposes functions to send messages via socket to all teams
 */
-import { secureAdminBroadcast } from "./admin_socket.js";
 import { io } from "./index.js";
 import game from "./game.js";
 import zoneManager from "./zone_manager.js";
@@ -24,9 +23,7 @@ export function teamBroadcast(teamId, event, data) {
  * @param {String} data payload
  */
 export function playersBroadcast(event, data) {
-    for (const team of game.teams) {
-        teamBroadcast(team.id, event, data);
-    }
+    game.teams.forEach(team => teamBroadcast(team.id, event, data));
 }
 
 /**
@@ -42,7 +39,7 @@ export function sendUpdatedTeamInformations(teamId) {
         captureCode: team.captureCode,
         // Chasing
         captured: team.captured,
-        enemyName: game.getTeam(team.chasing)? game.getTeam(team.chasing).name : null,
+        enemyName: game.getTeam(team.chasing)?.name ?? null,
         // Locations
         lastSentLocation: team.lastSentLocation,
         enemyLocation: team.enemyLocation,
@@ -57,10 +54,9 @@ export function sendUpdatedTeamInformations(teamId) {
         distance: team.distance,
         nCaptures: team.nCaptures,
         nSentLocation: team.nSentLocation,
-        startDate: game.startDate,
+        stateDate: game.stateDate,
         finishDate: team.finishDate,
-    })
-    secureAdminBroadcast("teams", game.teams);
+    });
 }
 
 export function initTeamSocket() {
@@ -68,42 +64,36 @@ export function initTeamSocket() {
         console.log("Connection of a player");
         let teamId = null;
 
-        const logoutPlayer = () => {
+        const login = (loginTeamId) => {
+            logout();
+            if (!game.addPlayer(loginTeamId, socket.id)) return false;
+            teamId = loginTeamId;
+            return true;
+        }
+
+        const logout = () => {
             if (!teamId) return;
-            const team = game.getTeam(teamId);
-            if (team.sockets.indexOf(socket.id) == 0) {
-                team.battery = null;
-                team.phoneModel = null;
-                team.phoneName = null;
-            }
-            // Delete the player from the team
-            team.sockets = team.sockets.filter((sid) => sid != socket.id);
-            secureAdminBroadcast("teams", game.teams);
-            socket.emit("logout");
+            game.removePlayer(teamId, socket.id);
             teamId = null;
         }
 
         socket.on("disconnect", () => {
             console.log("Disconnection of a player");
-            logoutPlayer();
+            logout();
         });
 
         socket.on("logout", () => {
-            logoutPlayer();
+            logout();
         });
 
         socket.on("login", (loginTeamId, callback) => {
-            logoutPlayer();
-            const team = game.getTeam(loginTeamId);
-            if (!team) {
+            if (!login(loginTeamId)) {
                 callback({ isLoggedIn: false, message: "Login denied" });
                 return;
             }
-            teamId = loginTeamId;
-            team.sockets.push(socket.id);
             sendUpdatedTeamInformations(loginTeamId);
             socket.emit("game_state", game.state);
-            socket.emit("game_settings", game.settings);
+            socket.emit("game_settings", game.messages);
             socket.emit("zone", {
                 type: zoneManager.settings.type,
                 begin: zoneManager.getCurrentZone(),
@@ -115,13 +105,9 @@ export function initTeamSocket() {
 
         socket.on("update_position", (position) => {
             if (!teamId) return;
-            const team = game.getTeam(teamId);
-            // Only the first socket can update the current position since he is the one whose location is tracked
-            if (team.sockets.indexOf(socket.id) == 0) {
+            if (game.isPlayerCapitain(teamId, socket.id)) {
                 game.updateLocation(teamId, position);
-                team.lastCurrentLocationDate = Date.now();
             }
-            secureAdminBroadcast("teams", game.teams);
         });
 
         socket.on("send_position", () => {
@@ -131,26 +117,24 @@ export function initTeamSocket() {
 
         socket.on("capture", (captureCode, callback) => {
             if (!teamId) return;
-            game.requestCapture(teamId, captureCode);
-            callback({ hasCaptured : true, message: "Capture successful" });
+            if (game.tryCapture(teamId, captureCode)) {
+                callback({ hasCaptured : true, message: "Capture successful" });
+            } else {
+                callback({ hasCaptured : false, message: "Capture denied" });
+            }
         });
 
         socket.on("device_info", (infos) => {
             if (!teamId) return;
-            const team = game.getTeam(teamId);
-            // Only the first socket shares its infos since he is the one whose location is tracked
-            if (team.sockets.indexOf(socket.id) == 0) {
-                team.phoneModel = infos.model;
-                team.phoneName = infos.name;
+            if (game.isPlayerCapitain(teamId, socket.id)) {
+                game.updateTeam(teamId, {phoneModel: infos.model, phoneName: infos.name});
             }
         });
 
         socket.on("battery_update", (batteryLevel) => {
             if (!teamId) return;
-            const team = game.getTeam(teamId);
-            // Only the first socket shares its infos since he is the one whose location is tracked
-            if (team.sockets.indexOf(socket.id) == 0) {
-                team.battery = batteryLevel;
+            if (game.isPlayerCapitain(teamId, socket.id)) {
+                game.updateTeam(teamId, {battery: batteryLevel});
             }
         });
     });

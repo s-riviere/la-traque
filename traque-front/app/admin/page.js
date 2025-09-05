@@ -16,8 +16,8 @@ const LiveMap = dynamic(() => import('./components/liveMap'), { ssr: false });
 
 export default function AdminPage() {
     const { useProtect } = useAdminConnexion();
-    const [selectedTeamId, setSelectedTeamId] = useState(null);
     const { changeState, getTeam } = useAdmin();
+    const [selectedTeamId, setSelectedTeamId] = useState(null);
     const [mapStyle, setMapStyle] = useState(mapStyles.default);
     const [showZones, setShowZones] = useState(true);
     const [showNames, setShowNames] = useState(true);

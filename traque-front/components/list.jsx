@@ -17,10 +17,10 @@ export function List({array, children}) {
 }
 
 export function ReorderList({droppableId, array, setArray, children}) {
-    const [arrayLocal, setArrayLocal] = useState(array);
+    const [localArray, setLocalArray] = useState(array);
 
     useEffect(() => {
-        setArrayLocal(array);
+        setLocalArray(array);
     }, [array])
 
     function reorder(list, startIndex, endIndex) {
@@ -34,7 +34,7 @@ export function ReorderList({droppableId, array, setArray, children}) {
         if (!result.destination) return;
         if (result.destination.index === result.source.index) return;
         const newArray = reorder(array, result.source.index, result.destination.index);
-        setArrayLocal(newArray);
+        setLocalArray(newArray);
         setArray(newArray);
     }
 
@@ -44,7 +44,7 @@ export function ReorderList({droppableId, array, setArray, children}) {
                 {provided => (
                     <div className='w-full h-full bg-gray-300 overflow-y-scroll' ref={provided.innerRef} {...provided.droppableProps}>
                         <ul className="w-full p-1 pb-0">
-                            {arrayLocal.map((elem, i) => (
+                            {localArray.map((elem, i) => (
                                 <li className='w-full' key={elem.id}>
                                     <Draggable draggableId={elem.id.toString()} index={i}>
                                         {provided => (

@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { TextInput } from "@/components/input";
 import { Section } from "@/components/section";
-import { BlueButton } from "@/components/button";
+import { CustomButton } from "@/components/button";
 import { useAdminConnexion } from "@/context/adminConnexionContext";
 import useAdmin from '@/hook/useAdmin';
 import Messages from "./components/messages";
@@ -74,7 +74,7 @@ export default function ConfigurationPage() {
             </div>
             <div className="h-full flex-1 flex flex-col p-3 gap-3 bg-white shadow-2xl">
                 <div className="w-full h-15">
-                    {localZoneSettings && <BlueButton onClick={handleChangeZoneType}>Change zone type</BlueButton>}
+                    {localZoneSettings && <CustomButton color="blue" onClick={handleChangeZoneType}>Change zone type</CustomButton>}
                 </div>
                 <div className="w-full flex-1">
                     {localZoneSettings && localZoneSettings.type == ZoneTypes.CIRCLE &&
