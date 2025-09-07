@@ -68,6 +68,11 @@ export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsF
                 {isFocusing && <MapPan center={getTeam(selectedTeamId)?.currentLocation} zoom={mapZooms.high} animate />}
                 <MapEventListener onDragStart={() => setIsFocusing(false)}/>
                 <Zones/>
+                {teams.map((team) => gameState == GameState.PLACEMENT && team.startingArea &&
+                    <Circle key={team.id} center={team.startingArea.center} radius={team.startingArea.radius} color="blue" fillColor="blue">
+                        <Tooltip permanent direction="top" offset={[0.5, -15]} className="custom-tooltip">{team.name}</Tooltip>
+                    </Circle>
+                )}
                 {teams.map((team) => team.currentLocation && !team.captured && <>
                     <Marker key={team.id} position={team.currentLocation} icon={positionIcon} eventHandlers={{click: () => onSelected(team.id)}}>
                         {showNames && <Tooltip permanent direction="top" offset={[0.5, -15]} className="custom-tooltip">{team.name}</Tooltip>}

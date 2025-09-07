@@ -114,6 +114,7 @@ export default {
             team.finishDate = null;
             sendUpdatedTeamInformations(team.id);
         }
+        this.updateChasingChain();
         secureAdminBroadcast("teams", this.teams);
     },
 
@@ -311,6 +312,19 @@ export default {
         outOfZoneTimeouts.clear(team.id);
         this.updateChasingChain();
         this.checkEndGame();
+        // Broadcast new infos
+        secureAdminBroadcast("teams", this.teams);
+        sendUpdatedTeamInformations(team.id);
+        return true;
+    },
+
+    placementTeam(teamId, placementZone) {
+        // Test of parameters
+        if (!this.hasTeam(teamId)) return false;
+        // Variables
+        const team = this.getTeam(teamId);
+        // Make the capture
+        team.startingArea = placementZone;
         // Broadcast new infos
         secureAdminBroadcast("teams", this.teams);
         sendUpdatedTeamInformations(team.id);

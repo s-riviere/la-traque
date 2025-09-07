@@ -9,7 +9,7 @@ export function Node({pos, nodeSize = 5, color = 'black'}) {
     );
 }
 
-export function LabeledPolygon({polygon, number, color = 'black', opacity = '0.5', border = 3, iconSize = 24, iconColor = 'white'}) {
+export function LabeledPolygon({polygon, label, color = 'black', opacity = '0.5', border = 3, iconSize = 24, iconColor = 'white'}) {
     const length = polygon.length;
 
     if (length < 3) return null;
@@ -26,7 +26,7 @@ export function LabeledPolygon({polygon, number, color = 'black', opacity = '0.5
     // Idea : take the mean point of the largest connected subpolygon
     const meanPoint = {lat: sum.lat / length, lng: sum.lng / length}
 
-    const numberIcon = L.divIcon({
+    const labelIcon = L.divIcon({
         html: `<div style="
             display: flex;
             align-items: center;
@@ -34,15 +34,15 @@ export function LabeledPolygon({polygon, number, color = 'black', opacity = '0.5
             color: ${iconColor};
             font-weight: bold;
             font-size: ${iconSize}px;
-        ">${number}</div>`,
-        className: 'custom-number-icon',
+        ">${label}</div>`,
+        className: 'custom-label-icon',
         iconSize: [iconSize, iconSize],
         iconAnchor: [iconSize / 2, iconSize / 2]
     });
 
     return (<>
         <Polygon positions={polygon} pathOptions={{ color: color, fillColor: color, fillOpacity: opacity, weight: border }} />
-        <Marker position={meanPoint} icon={numberIcon} />
+        <Marker position={meanPoint} icon={labelIcon} />
     </>);
 }
 

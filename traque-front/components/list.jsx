@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 
-export function List({array, children}) {
+export function List({array, selectedId, onSelected, children}) {
+    const canSelect = selectedId !== undefined
+    const cursor = () => canSelect ? " cursor-pointer" : "";
+    const outline = (id) => canSelect && id === selectedId ? " outline outline-4 outline-black" : "";
+
     return (
         <div className='w-full h-full bg-gray-300 overflow-y-scroll'>
             <ul className="w-full p-1 pb-0">
                 {array.map((elem, i) => (
                     <li className="w-full" key={elem.id}>
-                        {children(elem, i)}
+                        <div className={"w-full" + cursor() + outline(elem.id)} onClick={() => canSelect && onSelected(elem.id)}>
+                            {children(elem, i)}
+                        </div>
                         <div className="w-full h-1"/>
                     </li>
                 ))}
@@ -48,7 +54,7 @@ export function ReorderList({droppableId, array, setArray, children}) {
                                 <li className='w-full' key={elem.id}>
                                     <Draggable draggableId={elem.id.toString()} index={i}>
                                         {provided => (
-                                            <div className='w-full' {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+                                            <div className='w-full cursor-grab' {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
                                                 {children(elem, i)}
                                                 <div className="w-full h-1"/>
                                             </div>

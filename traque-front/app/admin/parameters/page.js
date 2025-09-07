@@ -2,87 +2,66 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { TextInput } from "@/components/input";
-import { Section } from "@/components/section";
-import { CustomButton } from "@/components/button";
 import { useAdminConnexion } from "@/context/adminConnexionContext";
-import useAdmin from '@/hook/useAdmin';
 import Messages from "./components/messages";
 import TeamManager from './components/teamManager';
-import useLocalVariable from "@/hook/useLocalVariable";
-import { ZoneTypes } from "@/util/types";
-import { defaultZoneSettings } from "@/util/configurations";
+import PlayingZoneSelector from "./components/playingZoneSelector";
 
 // Imported at runtime and not at compile time
-const CircleZoneSelector = dynamic(() => import('./components/circleZoneSelector'), { ssr: false });
-const PolygonZoneSelector = dynamic(() => import('./components/polygonZoneSelector'), { ssr: false });
+const PlacementZoneSelector = dynamic(() => import('./components/placementZoneSelector'), { ssr: false });
+
+const Tabs = {
+    PLACEMENT_ZONES: "placement_zones",
+    PLAYING_ZONES: "playing_zones",
+}
+
+function ParametersTitle() {
+    return (
+        <div className='w-full bg-custom-light-blue gap-5 p-5 flex flex-row shadow-2xl'>
+            <Link href="/admin">
+                <img src="/icons/backarrow.png" className="w-8 h-8" title="Main page" />
+            </Link>
+            <h2 className="text-3xl font-bold">Paramètres</h2>
+        </div>
+    );
+}
+
+function TabButton({title, onClick, isSelected}) {
+    const grayStyle = "bg-gray-300 hover:bg-gray-400";
+    const blueStyle = "bg-custom-light-blue";
+
+    return (
+        <div className={`flex-1 h-full flex justify-center items-center  cursor-pointer ${isSelected ? blueStyle : grayStyle}`} onClick={onClick}>
+            <p className="text-2xl font-bold">{title}</p>
+        </div>
+    );
+}
 
 export default function ConfigurationPage() {
     const { useProtect } = useAdminConnexion();
-    const {zoneSettings, sendPositionDelay, updateSettings, addTeam} = useAdmin();
-    const [teamName, setTeamName] = useState('');
-    const [localZoneSettings, setLocalZoneSettings, applyLocalZoneSettings] = useLocalVariable(zoneSettings, (e) => updateSettings({zone: e}));
-    const [localSendPositionDelay, setLocalSendPositionDelay, applyLocalSendPositionDelay] = useLocalVariable(sendPositionDelay, (e) => updateSettings({sendPositionDelay: e}));
+    const [currentTab, setCurrentTab] = useState(Tabs.PLACEMENT_ZONES);
 
     useProtect();
-
-    function modifyLocalZoneSettings(key, value) {
-        setLocalZoneSettings(prev => ({...prev, [key]: value}));
-    }
-
-    function handleChangeZoneType() {
-        setLocalZoneSettings(localZoneSettings.type == ZoneTypes.CIRCLE ? defaultZoneSettings.polygon : defaultZoneSettings.circle)
-    }
-    
-    function handleTeamSubmit(e) {
-        e.preventDefault();
-        if (teamName !== "") {
-            addTeam(teamName);
-            setTeamName("")
-        }
-    }
 
     return (
         <div className='h-full bg-gray-200 p-3 flex flex-row gap-3'>
             <div className="h-full w-2/6 gap-3 flex flex-col">
-                <div className='w-full bg-custom-light-blue gap-5 p-5 flex flex-row shadow-2xl'>
-                    <Link href="/admin">
-                        <img src="/icons/backarrow.png" className="w-8 h-8" title="Main page" />
-                    </Link>
-                    <h2 className="text-3xl font-bold">Paramètres</h2>
-                </div>
+                <ParametersTitle/>
                 <Messages/>
-                <Section title="Équipe" outerClassName="flex-1 min-h-0" innerClassName="flex flex-col items-center gap-3">
-                    <form className='w-full flex flex-row gap-3' onSubmit={handleTeamSubmit}>
-                        <div className='w-full'>
-                            <input name="teamName" label='Team name' value={teamName} onChange={(e) => setTeamName(e.target.value)} type="text" className="w-full h-full p-4 ring-1 ring-inset ring-gray-300" />
-                        </div>
-                        <div className='w-1/5'>
-                            <button type="submit" className="w-full h-full bg-custom-light-blue hover:bg-blue-500 transition text-3xl font-bold">+</button>
-                        </div>
-                    </form>
-                    <div className="w-full flex-1 min-h-0 ">
-                        <TeamManager/>
-                    </div>
-                    <div className="w-full flex flex-row gap-2 items-center justify-between">
-                        <p>Interval between position updates</p>
-                        <div className="w-16 h-10">
-                            <TextInput id="position-update" value={localSendPositionDelay ?? ""} onChange={(e) => setLocalSendPositionDelay(parseInt(e.target.value, 10))} onBlur={applyLocalSendPositionDelay} />
-                        </div>
-                    </div>
-                </Section>
+                <TeamManager/>
             </div>
-            <div className="h-full flex-1 flex flex-col p-3 gap-3 bg-white shadow-2xl">
-                <div className="w-full h-15">
-                    {localZoneSettings && <CustomButton color="blue" onClick={handleChangeZoneType}>Change zone type</CustomButton>}
+            <div className="h-full flex-1 flex flex-col bg-white shadow-2xl">
+                <div className="w-full h-20 flex flex-row bg-gray-300">
+                    <TabButton title="Zones de placement" onClick={() => setCurrentTab(Tabs.PLACEMENT_ZONES)} isSelected={currentTab == Tabs.PLACEMENT_ZONES}/>
+                    <TabButton title="Zones de jeu" onClick={() => setCurrentTab(Tabs.PLAYING_ZONES)} isSelected={currentTab == Tabs.PLAYING_ZONES}/>
                 </div>
-                <div className="w-full flex-1">
-                    {localZoneSettings && localZoneSettings.type == ZoneTypes.CIRCLE &&
-                        <CircleZoneSelector zoneSettings={localZoneSettings} modifyZoneSettings={modifyLocalZoneSettings} applyZoneSettings={applyLocalZoneSettings}/>
-                    }
-                    {localZoneSettings && localZoneSettings.type == ZoneTypes.POLYGON &&
-                        <PolygonZoneSelector zoneSettings={localZoneSettings} modifyZoneSettings={modifyLocalZoneSettings} applyZoneSettings={applyLocalZoneSettings}/>
-                    }
+                <div className="w-full flex-1 p-3 bg-white">
+                    { currentTab == Tabs.PLAYING_ZONES &&
+                        <PlayingZoneSelector />
+                    }  
+                    { currentTab == Tabs.PLACEMENT_ZONES &&
+                        <PlacementZoneSelector />
+                    }  
                 </div>
             </div>
         </div>

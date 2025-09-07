@@ -41,12 +41,11 @@
 - [x] Refaire les flèches de chasse sur la map
 - [ ] Mettre en évidence le menu paramètre (configuration)
 - [ ] Afficher un feedback quand un paramètre est sauvegardé
-- [ ] (IMPORTANT) Pouvoir définir la zone de départ de chaque équipe
-- [ ] (IMPORTANT) Nommer les polygons par des lettres de l'alphabet
+- [x] Pouvoir définir la zone de départ de chaque équipe
+- [x] Nommer les polygons par des lettres de l'alphabet
 - [ ] Faire un menu quand on arrive sur la traque
 - [ ] Pouvoir load des paramètres enregistrés
-- [ ] (IMPORTANT) Améliorer le système de création zone (cercle et polygone)
-- [ ] (IMPORTANT) Améliorer la sélection du système de zone
+- [ ] Améliorer le système de création zone (cercle et polygone)
 - [ ] Penser l'affichage en fin de traque
 
 ### Améliorations du jeu de la traque

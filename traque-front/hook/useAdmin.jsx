@@ -27,6 +27,10 @@ export default function useAdmin() {
         adminSocket.emit("capture_team", teamId);
     }
 
+    function placementTeam(teamId, placementZone) {
+        adminSocket.emit("placement_team", teamId, placementZone);
+    }
+
     function changeState(state) {
         adminSocket.emit("change_state", state);
     }
@@ -35,5 +39,5 @@ export default function useAdmin() {
         adminSocket.emit("update_settings", settings);
     }
 
-    return { ...adminContext, getTeam, reorderTeams, addTeam, removeTeam, captureTeam, changeState, updateSettings };
+    return { ...adminContext, getTeam, reorderTeams, addTeam, removeTeam, captureTeam, placementTeam, changeState, updateSettings };
 }

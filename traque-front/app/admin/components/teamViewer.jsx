@@ -2,12 +2,12 @@ import { List } from '@/components/list';
 import useAdmin from '@/hook/useAdmin';
 import { getStatus } from '@/util/functions';
 
-function TeamViewerItem({ team, itemSelected, onSelected }) {
+function TeamViewerItem({ team }) {
     const { gameState } = useAdmin();
     const status = getStatus(team, gameState);
 
     return (
-        <div className={'w-full flex flex-row gap-3 p-2 bg-white justify-between cursor-pointer ' + (itemSelected ? "outline outline-4 outline-black" : "")} onClick={() => onSelected(team.id)}>
+        <div className={'w-full flex flex-row gap-3 p-2 bg-white justify-between'}>
             <div className='flex flex-row items-center gap-3'>
                 <div className='flex flex-row gap-1'>
                     <img src={`/icons/user/${team.sockets.length > 0 ? "green" : "red"}.png`} className="w-4 h-4" />
@@ -27,9 +27,9 @@ export default function TeamViewer({selectedTeamId, onSelected}) {
     const { teams } = useAdmin();
 
     return (
-        <List array={teams}>
+        <List array={teams} selectedId={selectedTeamId} onSelected={onSelected} >
             {(team) => (
-                <TeamViewerItem team={team} itemSelected={selectedTeamId === team.id} onSelected={onSelected}/>
+                <TeamViewerItem team={team}/>
             )}
         </List>
     );

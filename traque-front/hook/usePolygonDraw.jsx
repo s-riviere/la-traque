@@ -94,15 +94,10 @@ export default function useMapPolygonDraw(polygons, addPolygon, removePolygon) {
         }
         return sum > 0;
     };
-
-    function getZoneIndex(latlng) {
+    
+    function getPolygonIndex(latlng) {
         // Return the index of the polygon where latlng is according to isInPolygon
-        for (let iPolygon = 0; iPolygon < polygons.length; iPolygon++) {
-            if (isInPolygon(latlng, polygons[iPolygon])) {
-                return iPolygon;
-            }
-        }
-        return -1;
+        return polygons.findIndex(polygon => isInPolygon(latlng, polygon));
     }
 
     function getEventLatLng(e) {
@@ -142,7 +137,7 @@ export default function useMapPolygonDraw(polygons, addPolygon, removePolygon) {
         // If it is the first node
         if (!isDrawing()) {
             // If the point is not in an existing polygon
-            if (getZoneIndex(latlng) == -1) {
+            if (getPolygonIndex(latlng) == -1) {
                 setCurrentPolygon([latlng]);
             }
 
@@ -172,7 +167,7 @@ export default function useMapPolygonDraw(polygons, addPolygon, removePolygon) {
             // Is the new point making the current polygon intersect with itself ?
             if (isIntersecting([latlng, currentPolygon[length-1]], currentPolygon, false)) return;
             // Is the new point inside a polygon ?
-            if (getZoneIndex(latlng) != -1) return;
+            if (getPolygonIndex(latlng) != -1) return;
             // Is the new point making the current polygon intersect with another polygon ?
             for (const polygon of polygons) {
                 // Strict intersection
@@ -200,7 +195,7 @@ export default function useMapPolygonDraw(polygons, addPolygon, removePolygon) {
             setCurrentPolygon([]);
         // If not isDrawing, remove the clicked polygon
         } else {
-            const i = getZoneIndex(e.latlng);
+            const i = getPolygonIndex(e.latlng);
             if (i != -1) removePolygon(i);
         }
     }

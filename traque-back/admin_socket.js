@@ -75,9 +75,14 @@ export function initAdminSocketHandler() {
             game.reorderTeams(newOrder);
         });
 
-        socket.on("capture_team", (teamId, newTeam) => {
+        socket.on("capture_team", (teamId) => {
             if (!loggedIn) return;
-            game.captureTeam(teamId, newTeam);
+            game.captureTeam(teamId);
+        });
+
+        socket.on("placement_team", (teamId, placementZone) => {
+            if (!loggedIn) return;
+            game.placementTeam(teamId, placementZone);
         });
 
         socket.on("change_state", (state) => {
