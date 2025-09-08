@@ -6,7 +6,7 @@ function MessageInput({title, ...props}) {
     return (
         <div className="w-full flex flex-row gap-3 items-center">
             <p>{title}</p>
-            <input {...props} type="text" className="w-full h-8 p-2 rounded ring-1 ring-inset ring-gray-400 placeholder:text-gray-600" />
+            <input className="w-full p-1 rounded ring-1 ring-inset ring-gray-400 placeholder:text-gray-600" {...props} />
         </div>
     );
 }

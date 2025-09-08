@@ -1,52 +1,77 @@
 import { useEffect, useState } from "react";
-import { Marker, CircleMarker, Polygon, useMap } from "react-leaflet";
+import { Marker, Tooltip, CircleMarker, Circle, Polygon, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import 'leaflet-polylinedecorator';
 
-export function Node({pos, nodeSize = 5, color = 'black'}) {
+export function Node({position, nodeSize = 5, color = 'black', display = true}) {
     return (
-        <CircleMarker center={pos} radius={nodeSize} pathOptions={{ color: color, fillColor: color, fillOpacity: 1 }} />
+        display && position && <CircleMarker center={position} radius={nodeSize} pathOptions={{ color: color, fillColor: color, fillOpacity: 1 }} />
     );
 }
 
-export function LabeledPolygon({polygon, label, color = 'black', opacity = '0.5', border = 3, iconSize = 24, iconColor = 'white'}) {
-    const length = polygon.length;
-
-    if (length < 3) return null;
-
-    const sum = polygon.reduce(
-        (acc, coord) => ({
-            lat: acc.lat + coord.lat,
-            lng: acc.lng + coord.lng
-        }),
-        { lat: 0, lng: 0 }
-    );
-
-    // meanPoint can be out of the polygon
-    // Idea : take the mean point of the largest connected subpolygon
-    const meanPoint = {lat: sum.lat / length, lng: sum.lng / length}
-
+export function Label({position, label, color, size = 24, display = true}) {
     const labelIcon = L.divIcon({
         html: `<div style="
             display: flex;
             align-items: center;
             justify-content: center;
-            color: ${iconColor};
+            color: ${color};
             font-weight: bold;
-            font-size: ${iconSize}px;
-        ">${label}</div>`,
+            font-size: ${size}px;
+        ">${label || ""}</div>`,
         className: 'custom-label-icon',
-        iconSize: [iconSize, iconSize],
-        iconAnchor: [iconSize / 2, iconSize / 2]
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2]
     });
 
-    return (<>
-        <Polygon positions={polygon} pathOptions={{ color: color, fillColor: color, fillOpacity: opacity, weight: border }} />
-        <Marker position={meanPoint} icon={labelIcon} />
-    </>);
+    return (
+        display && position && <Marker position={position} icon={labelIcon} />
+    );
 }
 
-export function Arrow({ pos1, pos2, color = 'black', weight = 5, arrowSize = 20, insetPixels = 25 }) {
+export function Tag({text, display = true}) {
+    return (
+        display && <Tooltip permanent direction="top" offset={[0.5, -15]} className="custom-tooltip">{text || ""}</Tooltip>
+    );
+}
+
+export function CircleZone({circle, color, opacity = '0.1', border = 3, display = true, children}) {
+    return (
+        display && circle && 
+        <Circle center={circle.center} radius={circle.radius}  pathOptions={{ color: color, fillColor: color, fillOpacity: opacity, weight: border }}>
+            {children}
+        </Circle>
+    );
+}
+
+export function PolygonZone({polygon, color, opacity = '0.1', border = 3, display = true, children}) {
+    return (
+        display && polygon && polygon.length >= 3 &&
+        <Polygon positions={polygon} pathOptions={{ color: color, fillColor: color, fillOpacity: opacity, weight: border }}>
+            {children}
+        </Polygon>
+    );
+}
+
+export function Position({position, color, onClick, display = true, children}) {
+
+    const positionIcon = new L.Icon({
+        iconUrl: `/icons/marker/${color}.png`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        popupAnchor: [0, -15],
+        shadowSize: [30, 30],
+    });
+
+    return (
+        display && position &&
+        <Marker position={position} icon={positionIcon} eventHandlers={{click: onClick}}>
+            {children}
+        </Marker>
+    );
+}
+
+export function Arrow({ pos1, pos2, color = 'black', weight = 5, arrowSize = 20, insetPixels = 25, display = true }) {
     const map = useMap();
     const [insetPositions, setInsetPositions] = useState(null);
     
@@ -103,7 +128,7 @@ export function Arrow({ pos1, pos2, color = 'black', weight = 5, arrowSize = 20,
     }, [pos1, pos2]);
 
     useEffect(() => {
-        if (!insetPositions) return;
+        if (!display || !insetPositions) return;
 
         // Create the base polyline
         const polyline = L.polyline(insetPositions, {

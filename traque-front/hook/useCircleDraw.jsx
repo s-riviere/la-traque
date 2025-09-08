@@ -2,42 +2,34 @@
 import { useEffect, useState } from "react";
 
 export default function useMapCircleDraw(circle, setCircle) {
-    const [drawing, setDrawing] = useState(false);
-    const [center, setCenter] = useState(circle?.center || null);
-    const [radius, setRadius] = useState(circle?.radius || null);
+    const [drawingCircle, setDrawingCircle] = useState(null);
 
     useEffect(() => {
-        setDrawing(false);
-        setCenter(circle?.center || null);
-        setRadius(circle?.radius || null);
-    }, [circle])
+        setDrawingCircle(null);
+    }, [circle]);
 
     function handleLeftClick(e) {
-        if (!drawing) {
-            setCenter(e.latlng);
-            setRadius(null);
-            setDrawing(true);
+        if (drawingCircle) {
+            setCircle(drawingCircle);
+            setDrawingCircle(null);
         } else {
-            setDrawing(false);
-            setCircle({center, radius});
+            setDrawingCircle({center: e.latlng, radius: 0});
         }
     }
 
     function handleRightClick(e) {
-        if (drawing) {
-            setDrawing(false);
-            setCenter(circle?.center || null);
-            setRadius(circle?.radius || null);
-        } else {
+        if (drawingCircle) {
+            setDrawingCircle(null);
+        } else if (e.latlng.distanceTo(circle.center) < circle.radius) {
             setCircle(null);
         }
     }
 
     function handleMouseMove(e) {
-        if (drawing) {
-            setRadius(e.latlng.distanceTo(center));
+        if (drawingCircle) {
+            setDrawingCircle({center: drawingCircle.center, radius: e.latlng.distanceTo(drawingCircle.center)});
         }
     }
 
-    return { center, radius, handleLeftClick, handleRightClick, handleMouseMove };
+    return { drawingCircle, handleLeftClick, handleRightClick, handleMouseMove };
 }

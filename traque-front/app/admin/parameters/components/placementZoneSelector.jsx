@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Circle, Tooltip } from "react-leaflet";
 import { List } from "@/components/list";
 import { CustomMapContainer, MapEventListener } from "@/components/map";
 import useAdmin from '@/hook/useAdmin';
 import useMultipleCircleDraw from "@/hook/useMultipleCircleDraw";
+import { CircleZone, Tag } from "@/components/layer";
 
 function Drawings({ placementZones, addZone, removeZone, handleRightClick }) {
     const { handleLeftClick, handleRightClick: handleRightClickDrawing } = useMultipleCircleDraw(placementZones, addZone, removeZone, 30);
@@ -16,14 +16,14 @@ function Drawings({ placementZones, addZone, removeZone, handleRightClick }) {
     return (<>
         <MapEventListener onLeftClick={handleLeftClick} onRightClick={modifiedHandleRightClick} />
         { placementZones.map(placementZone =>
-            <Circle key={placementZone.id} center={placementZone.center} radius={placementZone.radius} color="blue" fillColor="blue">
-                <Tooltip permanent direction="top" offset={[0.5, -15]} className="custom-tooltip">{placementZone.name}</Tooltip>
-            </Circle>
+            <CircleZone key={placementZone.id} circle={placementZone} color="blue">
+                <Tag text={placementZone.name} />
+            </CircleZone>
         )}
     </>);
 }
 
-export default function PlacementZoneSelector() {
+export default function PlacementZoneSelector({ display }) {
     const { teams, getTeam, placementTeam } = useAdmin();
     const [selectedTeamId, setSelectedTeamId] = useState(null);
     const [placementZones, setPlacementZones] = useState([]);
@@ -46,7 +46,7 @@ export default function PlacementZoneSelector() {
     }
 
     return (
-        <div className='w-full h-full gap-3 flex flex-row'>
+        <div className={display ? 'w-full h-full gap-3 flex flex-row' : "hidden"}>
             <div className="h-full flex-1">
                 <CustomMapContainer>
                     <Drawings placementZones={placementZones} addZone={addPlacementZone} removeZone={removePlacementZone} handleRightClick={() => setSelectedTeamId(null)} />
@@ -58,7 +58,7 @@ export default function PlacementZoneSelector() {
                 </div>
                 <List array={teams} selectedId={selectedTeamId} onSelected={(id) => setSelectedTeamId(selectedTeamId != id ? id : null)}>
                     { (team) =>
-                        <div className="w-full flex flex-row items-center justify-between gap-2 p-2 bg-white">
+                        <div key={team.id} className="w-full flex flex-row items-center justify-between gap-2 p-2 bg-white">
                             <p className='text-xl font-bold'>{team.name}</p>
                         </div>
                     }

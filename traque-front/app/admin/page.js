@@ -9,10 +9,34 @@ import { GameState } from "@/util/types";
 import { mapStyles } from '@/util/configurations';
 import TeamSidePanel from "./components/teamSidePanel";
 import TeamViewer from './components/teamViewer';
-import { MapButton, ControlButton } from './components/buttons';
 
 // Imported at runtime and not at compile time
 const LiveMap = dynamic(() => import('./components/liveMap'), { ssr: false });
+
+function MainTitle() {
+    return (
+        <div className='w-full bg-custom-light-blue gap-5 p-5 flex flex-row shadow-2xl'>
+            <img src="/icons/home.png" className="w-8 h-8" />
+            <h2 className="text-3xl font-bold">Page principale</h2>
+        </div>
+    );
+}
+
+function MapButton({ icon, ...props }) {
+    return (
+        <button className="w-16 h-16 bg-custom-light-blue rounded-full hover:bg-blue-500 transition flex items-center justify-center" {...props}>
+            <img src={`/icons/${icon}.png`} className="w-10 h-10" />
+        </button>
+    );
+}
+
+function ControlButton({ icon, ...props }) {
+    return (
+        <button className="w-[4.5rem] h-[4.5rem] bg-custom-light-blue rounded-lg hover:bg-blue-500 transition flex items-center justify-center" {...props}>
+            <img src={`/icons/${icon}.png`} className="w-10 h-10" />
+        </button>
+    );
+}
 
 export default function AdminPage() {
     const { useProtect } = useAdminConnexion();
@@ -53,12 +77,9 @@ export default function AdminPage() {
     }
     
     return (
-        <div className='h-full bg-gray-200 p-3 flex flex-row content-start gap-3'>
+        <div className='w-full h-full p-3 flex flex-row gap-3'>
             <div className="h-full w-2/6 flex flex-col gap-3">
-                <div className='w-full bg-custom-light-blue gap-5 p-5 flex flex-row shadow-2xl'>
-                    <img src="/icons/home.png" className="w-8 h-8" />
-                    <h2 className="text-3xl font-bold">Page principale</h2>
-                </div>
+                <MainTitle/>
                 <Section title="Contrôle" innerClassName='flex flex-row justify-between'>
                     <Link href="/admin/parameters">
                         <ControlButton icon="parameters" title="Accéder aux paramètres du jeu"/>
@@ -72,7 +93,7 @@ export default function AdminPage() {
                     <TeamViewer selectedTeamId={selectedTeamId} onSelected={onSelected}/>
                 </Section>
             </div>
-            <div className='grow flex-1 flex flex-col bg-white p-3 gap-3 shadow-2xl'>
+            <Section outerClassName='h-full flex-1' innerClassName='flex flex-col gap-3'>
                 <div className="flex-1 flex flex-row gap-3">
                     <div className="flex-1 h-full">
                         <LiveMap
@@ -101,7 +122,7 @@ export default function AdminPage() {
                     {false && <MapButton icon="path" title="Afficher/masquer la trace de l'équipe sélectionnée"/>}
                     {false && <MapButton icon="informations" title="Afficher/masquer les évènements de l'équipe sélectionnée"/>}
                 </div>
-            </div>
+            </Section>
         </div>
     )
 }

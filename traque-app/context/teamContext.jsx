@@ -1,6 +1,6 @@
 import { useLocation } from "../hook/useLocation";
 import { useSocketListener } from "../hook/useSocketListener";
-import { createContext, useContext, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { useSocket } from "./socketContext";
 import { GameState } from "../util/gameState";
 import useSendDeviceInfo from "../hook/useSendDeviceInfo";
@@ -14,52 +14,52 @@ const zoneTypes = {
 }
 
 function TeamProvider({children}) {
-    const { logout } = useTeamConnexion();
+    const {teamSocket} = useSocket();
+    const [location, getLocationAuthorization, startLocationTracking, stopLocationTracking] = useLocation(5000, 10);
+    // update_team
     const [teamInfos, setTeamInfos] = useState({});
+    // game_state
     const [gameState, setGameState] = useState(GameState.SETUP);
-    const [gameSettings, setGameSettings] = useState(null);
-    const [zoneType, setZoneType] = useState(null);
+    const [startDate, setStartDate] = useState(null);
+    // current_zone
     const [zoneExtremities, setZoneExtremities] = useState(null);
     const [nextZoneDate, setNextZoneDate] = useState(null);
-    const [location, getLocationAuthorization, startLocationTracking, stopLocationTracking] = useLocation(5000, 10);
-    const {teamSocket} = useSocket();
-    const teamInfosRef = useRef();
+    // settings
+    const [messages, setMessages] = useState(null);
+    const [zoneType, setZoneType] = useState(null);
+    // logout
+    const { logout } = useTeamConnexion();
     
     useSendDeviceInfo();
 
-    teamInfosRef.current = teamInfos;
+    useSocketListener(teamSocket, "update_team", (data) => {
+        setTeamInfos(teamInfos => ({...teamInfos, ...data}))
+    });
 
-    function setZone(data) {
-        setZoneType(data.type);
-        switch (data.type) {
-            case zoneTypes.circle:
-                setZoneExtremities({
-                    begin: {...data.begin, ...{center : {latitude: data.begin.center.lat, longitude: data.begin.center.lng} }},
-                    end: {...data.end, ...{center : {latitude: data.end.center.lat, longitude: data.end.center.lng} }}
-                });
-                break;
-            case zoneTypes.polygon:
-                setZoneExtremities({
-                    begin: {...data.begin, ...{points : data.begin.points.map( p => ({latitude: p.lat,longitude: p.lng}) )}},
-                    end: {...data.end, ...{points : data.end.points.map( p => ({latitude: p.lat,longitude: p.lng}) )}}
-                });
-                break;
-            default:
-                setZoneExtremities({begin: data.begin, end: data.end});
-                break;
-        }
+    useSocketListener(teamSocket, "game_state", (data) => {
+        setGameState(data.state);
+        setStartDate(data.date);
+    });
+
+    useSocketListener(teamSocket, "settings", (data) => {
+        setMessages(data.messages);
+        setZoneType(data.zone.type);
+        //TODO
+        //setSendPositionDelay(data.sendPositionDelay);
+        //setOutOfZoneDelay(data.outOfZoneDelay);
+    });
+
+    useSocketListener(teamSocket, "current_zone", (data) => {
+        setZoneExtremities({begin: data.begin, end: data.end});
         setNextZoneDate(data.endDate);
-    }
+    });
 
-    useSocketListener(teamSocket, "update_team", (newTeamInfos) => {setTeamInfos({...teamInfosRef.current, ...newTeamInfos})});
-    useSocketListener(teamSocket, "game_state", setGameState);
-    useSocketListener(teamSocket, "zone", setZone);
-    useSocketListener(teamSocket, "game_settings", setGameSettings);
     useSocketListener(teamSocket, "logout", logout);
+
     
     const value = useMemo(() => (
-        {teamInfos, gameState, zoneType, zoneExtremities, nextZoneDate, gameSettings, location, getLocationAuthorization, startLocationTracking, stopLocationTracking}
-    ), [teamInfos, gameState, zoneType, zoneExtremities, nextZoneDate, gameSettings, location]);
+        {teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages, location, getLocationAuthorization, startLocationTracking, stopLocationTracking}
+    ), [teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages, location]);
 
     return (
         <teamContext.Provider value={value}>

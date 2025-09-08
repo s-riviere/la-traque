@@ -1,26 +1,14 @@
-import { useEffect, useState } from "react";
-import { Marker, Tooltip, Polygon, Circle } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import 'leaflet-polylinedecorator';
-import { Arrow } from "@/components/layer";
+import { Fragment, useEffect, useState } from "react";
+import { Arrow, CircleZone, PolygonZone, Position, Tag } from "@/components/layer";
 import { CustomMapContainer, MapEventListener, MapPan } from "@/components/map";
 import useAdmin from "@/hook/useAdmin";
 import { GameState, ZoneTypes } from "@/util/types";
 import { mapZooms } from "@/util/configurations";
 
-const positionIcon = new L.Icon({
-    iconUrl: '/icons/marker/blue.png',
-    iconSize: [30, 30],
-    iconAnchor: [15, 15],
-    popupAnchor: [0, -15],
-    shadowSize: [30, 30],
-});
-
-export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsFocusing, mapStyle, showZones, showNames, showArrows}) {
+export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsFocusing, mapStyle, showZones, showNames, showArrows }) {
     const { zoneType, zoneExtremities, teams, nextZoneDate, getTeam, gameState } = useAdmin();
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
 
-    // Remaining time before sending position
     useEffect(() => {
         if (nextZoneDate) {
             const updateTime = () => {
@@ -36,25 +24,25 @@ export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsF
 
     function formatTime(time) {
         // time is in seconds
-        if (time < 0) return "00:00";
+        if (!time || time < 0) return "00:00";
         const minutes = Math.floor(time / 60);
         const seconds = Math.floor(time % 60);
         return String(minutes).padStart(2,"0") + ":" + String(seconds).padStart(2,"0");
     }
 
     function Zones() {
-        if (!(showZones && gameState == GameState.PLAYING && zoneType)) return null;
+        if (!(showZones && gameState == GameState.PLAYING)) return null;
 
         switch (zoneType) {
             case ZoneTypes.CIRCLE:
                 return (<>
-                    { zoneExtremities.begin && <Circle center={zoneExtremities.begin.center} radius={zoneExtremities.begin.radius} color="red" fillColor="red" />}
-                    { zoneExtremities.end && <Circle center={zoneExtremities.end.center} radius={zoneExtremities.end.radius} color="green" fillColor="green" />}
+                    <CircleZone circle={zoneExtremities.begin} color="red" />
+                    <CircleZone circle={zoneExtremities.end} color="green" />
                 </>);
             case ZoneTypes.POLYGON:
                 return (<>
-                    { zoneExtremities.begin && <Polygon positions={zoneExtremities.begin.points} pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: '0.1', weight: 3 }} />}
-                    { zoneExtremities.end && <Polygon positions={zoneExtremities.end.points} pathOptions={{ color: 'green', fillColor: 'green', fillOpacity: '0.1', weight: 3 }} />}
+                    <PolygonZone polygon={zoneExtremities.begin?.polygon} color="red" />
+                    <PolygonZone polygon={zoneExtremities.end?.polygon} color="green" />
                 </>);
             default:
                 return null;
@@ -68,17 +56,15 @@ export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsF
                 {isFocusing && <MapPan center={getTeam(selectedTeamId)?.currentLocation} zoom={mapZooms.high} animate />}
                 <MapEventListener onDragStart={() => setIsFocusing(false)}/>
                 <Zones/>
-                {teams.map((team) => gameState == GameState.PLACEMENT && team.startingArea &&
-                    <Circle key={team.id} center={team.startingArea.center} radius={team.startingArea.radius} color="blue" fillColor="blue">
-                        <Tooltip permanent direction="top" offset={[0.5, -15]} className="custom-tooltip">{team.name}</Tooltip>
-                    </Circle>
-                )}
-                {teams.map((team) => team.currentLocation && !team.captured && <>
-                    <Marker key={team.id} position={team.currentLocation} icon={positionIcon} eventHandlers={{click: () => onSelected(team.id)}}>
-                        {showNames && <Tooltip permanent direction="top" offset={[0.5, -15]} className="custom-tooltip">{team.name}</Tooltip>}
-                    </Marker>
-                    {showArrows && <Arrow key={team.id} pos1={team.currentLocation} pos2={getTeam(team.chased).currentLocation}/>}
-                </>)}
+                {teams.map((team) => team && <Fragment key={team.id}>
+                    <CircleZone circle={team.startingArea} color="blue" display={gameState == GameState.PLACEMENT && showZones}>
+                        <Tag text={team.name} display={showNames} />
+                    </CircleZone>
+                    <Arrow pos1={team.currentLocation} pos2={getTeam(team.chased)?.currentLocation} display={showArrows}/>
+                    <Position position={team.currentLocation} color={"blue"} onClick={() => onSelected(team.id)} display={!team.captured}>
+                        <Tag text={team.name} display={showNames} />
+                    </Position>
+                </Fragment>)}
             </CustomMapContainer>
         </div>
     )

@@ -55,9 +55,9 @@ export function initAdminSocketHandler() {
             socket.emit("current_zone", {
                 begin: zoneManager.getCurrentZone(),
                 end: zoneManager.getNextZone(),
-                endDate: zoneManager.currentZoneEndDate,
+                endDate: zoneManager.currentZone.endDate,
             });
-            socket.emit("settings", game.getSettings());
+            socket.emit("settings", game.getAdminSettings());
         });
 
         socket.on("add_team", (teamName) => {

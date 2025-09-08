@@ -17,6 +17,7 @@ export function MapPan({center, zoom, animate=false}) {
 
 export function MapEventListener({ onLeftClick, onRightClick, onMouseMove, onDragStart }) {
     const map = useMap();
+    // TODO use useMapEvents instead of this + detect when zoom
 
     // Handle the mouse click left
     useEffect(() => {

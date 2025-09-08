@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { CustomButton } from "@/components/button";
 import { ReorderList } from "@/components/list";
 import { CustomMapContainer, MapEventListener } from "@/components/map";
-import { TextInput } from "@/components/input";
-import { Node, LabeledPolygon } from "@/components/layer";
+import { NumberInput } from "@/components/input";
+import { Node, PolygonZone, Label } from "@/components/layer";
 import useAdmin from "@/hook/useAdmin";
 import useMapPolygonDraw from "@/hook/usePolygonDraw";
 import useLocalVariable from "@/hook/useLocalVariable";
@@ -22,25 +21,45 @@ function Drawings({ localZoneSettings, addZone, removeZone }) {
         }
     }, [localZoneSettings]);
 
+    function getLabelPosition(polygon) {
+        const sum = polygon.reduce(
+            (acc, coord) => ({
+                lat: acc.lat + coord.lat,
+                lng: acc.lng + coord.lng
+            }),
+            { lat: 0, lng: 0 }
+        );
+
+        // The calculated mean point can be out of the polygon
+        // Idea : take the mean point of the largest convex subpolygon
+        return {lat: sum.lat / polygon.length, lng: sum.lng / polygon.length};
+    }
+
     return (<>
         <MapEventListener onLeftClick={handleLeftClick}  onRightClick={handleRightClick} onMouseMove={handleMouseMove} />
-        {localZoneSettings.polygons.map((zone, i) => <LabeledPolygon key={i} polygon={zone.polygon} label={zone.id} />)}
+        {localZoneSettings.polygons.map(zone =>
+            <PolygonZone key={zone.id} polygon={zone.polygon} color="black" opacity='0.5' >
+                <Label position={getLabelPosition(zone.polygon)} label={zone.id} color="white" />
+            </PolygonZone>
+        )}
         { currentPolygon.length > 0 && <>
-            <Node pos={currentPolygon[0]} color={"red"} />
             <Polyline positions={currentPolygon} pathOptions={{ color: "red", weight: 3 }} />
+            <Node position={currentPolygon[0]} color="red" />
         </>}
-        {highlightNodes.map((node, i) => <Node key={i} pos={node} color={"black"} />)}
+        {highlightNodes.map((node, i) =>
+            <Node key={i} position={node} color="black" />
+        )}
     </>);
 }
 
-export default function PolygonZoneSelector() {
+export default function PolygonZoneSelector({ display }) {
     const defaultDuration = 10;
     const {zoneSettings, outOfZoneDelay, updateSettings} = useAdmin();
     const [localZoneSettings, setLocalZoneSettings, applyLocalZoneSettings] = useLocalVariable(zoneSettings, (e) => updateSettings({zone: e}));
     const [localOutOfZoneDelay, setLocalOutOfZoneDelay, applyLocalOutOfZoneDelay] = useLocalVariable(outOfZoneDelay, (e) => updateSettings({outOfZoneDelay: e}));
 
     useEffect(() => {
-        if (localZoneSettings.type != ZoneTypes.POLYGON) {
+        if (!localZoneSettings || localZoneSettings.type != ZoneTypes.POLYGON) {
             setLocalZoneSettings(defaultZoneSettings.polygon);
         }
     }, [localZoneSettings]);
@@ -76,14 +95,10 @@ export default function PolygonZoneSelector() {
         applyLocalZoneSettings();
         applyLocalOutOfZoneDelay();
     }
-
-    function customStringToInt(e) {
-        return parseInt(e, 10) || null;
-    }
     
     return (
-        <div className='h-full w-full gap-3 flex flex-row'>
-            {localZoneSettings.type == ZoneTypes.POLYGON && <>
+        <div className={display ? 'w-full h-full gap-3 flex flex-row' : "hidden"}>
+            {localZoneSettings && localZoneSettings.type == ZoneTypes.POLYGON && <>
                 <div className="h-full flex-1">
                     <CustomMapContainer>
                         <Drawings localZoneSettings={localZoneSettings} addZone={addZone} removeZone={removeZone} />
@@ -95,23 +110,17 @@ export default function PolygonZoneSelector() {
                     </div>
                     <ReorderList droppableId="zones-order" array={localZoneSettings.polygons} setArray={setLocalZoneSettingsPolygons}>
                         { (zone) =>
-                            <div className="w-full p-2 bg-white flex flex-row gap-2 items-center justify-between">
+                            <div key={zone.id} className="w-full p-2 bg-white flex flex-row gap-2 items-center justify-between">
                                 <p>Zone {zone.id}</p>
-                                <div className="w-16 h-10">
-                                    <TextInput value={zone.duration || ""} onChange={(e) => updateDuration(zone.id, customStringToInt(e.target.value))}/>
-                                </div>
+                                <NumberInput id={zone.id} value={zone.duration || ""} onChange={value => updateDuration(zone.id, value)}/>
                             </div>
                         }
                     </ReorderList>
                     <div className="w-full flex flex-row gap-2 items-center justify-between">
                         <p>Timeout</p>
-                        <div className="w-16 h-10">
-                            <TextInput id="timeout" value={localOutOfZoneDelay ?? ""} onChange={(e) => setLocalOutOfZoneDelay(customStringToInt(e.target.value))}/>
-                        </div>
+                        <NumberInput id="timeout-polygon-selector" value={localOutOfZoneDelay ?? ""} onChange={setLocalOutOfZoneDelay}/>
                     </div>
-                    <div className="w-full h-15">
-                        <CustomButton color="green" onClick={handleSubmit}>Apply</CustomButton>
-                    </div>
+                    <button className="w-full h-16 text-lg text-white rounded bg-green-600 hover:bg-green-500" onClick={handleSubmit}>Apply</button>
                 </div>
             </>}
         </div>

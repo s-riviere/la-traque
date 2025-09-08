@@ -31,6 +31,7 @@ const defaultCircleSettings = {type: zoneTypes.circle, min: null, max: null, red
 
 function circleZone(center, radius, duration) {
     return {
+        type: zoneTypes.circle,
         center: center,
         radius: radius,
         duration: duration,
@@ -84,18 +85,19 @@ function circleSettingsToZones(settings) {
 
 const defaultPolygonSettings = {type: zoneTypes.polygon, polygons: []}
 
-function polygonZone(points, duration) {
+function polygonZone(polygon, duration) {
     return {
-        points: points,
+        type: zoneTypes.polygon,
+        polygon: polygon,
         duration: duration,
 
         isInZone(location) {
             const {lat: x, lng: y} = location;
             let inside = false;
 
-            for (let i = 0, j = this.points.length - 1; i < this.points.length; j = i++) {
-                const {lat: xi, lng: yi} = this.points[i];
-                const {lat: xj, lng: yj} = this.points[j];
+            for (let i = 0, j = this.polygon.length - 1; i < this.polygon.length; j = i++) {
+                const {lat: xi, lng: yi} = this.polygon[i];
+                const {lat: xj, lng: yj} = this.polygon[j];
 
                 const intersects = ((yi > y) !== (yj > y)) && (x < ((xj - xi) * (y - yi)) / (yj - yi) + xi);
 
@@ -156,7 +158,7 @@ function polygonSettingsToZones(settings) {
             ));
         } else {
             zones.push(polygonZone(
-                mergePolygons(zones[length-1].points, polygon),
+                mergePolygons(zones[length-1].polygon, polygon),
                 duration
             ));
         }
@@ -233,12 +235,11 @@ export default {
     
     zoneBroadcast() {
         const zone = {
-            type: this.settings.type,
             begin: this.getCurrentZone(),
             end: this.getNextZone(),
             endDate:this.currentZone.endDate,
         };
-        playersBroadcast("zone", zone);
+        playersBroadcast("current_zone", zone);
         secureAdminBroadcast("current_zone", zone);
     },
 }

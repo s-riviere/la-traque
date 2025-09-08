@@ -1,12 +1,9 @@
-const className = "block w-full h-full p-4 rounded text-center ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600";
+export function NumberInput({onChange, ...props}) {
+    function customStringToInt(e) {
+        return parseInt(e, 10) || null;
+    }
 
-export function TextInput({...props}) {
-  return (
-    <input {...props} type="text" className={className} />
-  )
-}
-export function TextArea({...props}) {
-  return (
-    <textarea {...props} className={className} />
-  )
+    return (
+        <input className="w-12 h-10 text-center rounded ring-1 ring-inset ring-black placeholder:text-gray-400" onChange={(e) => onChange(customStringToInt(e.target.value))} {...props} />
+    )
 }

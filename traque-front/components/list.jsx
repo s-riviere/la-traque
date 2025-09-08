@@ -9,14 +9,14 @@ export function List({array, selectedId, onSelected, children}) {
     return (
         <div className='w-full h-full bg-gray-300 overflow-y-scroll'>
             <ul className="w-full p-1 pb-0">
-                {array.map((elem, i) => (
+                {array?.map((elem, i) => (
                     <li className="w-full" key={elem.id}>
                         <div className={"w-full" + cursor() + outline(elem.id)} onClick={() => canSelect && onSelected(elem.id)}>
                             {children(elem, i)}
                         </div>
                         <div className="w-full h-1"/>
                     </li>
-                ))}
+                )) ?? null}
             </ul>
         </div>
     );
@@ -50,7 +50,7 @@ export function ReorderList({droppableId, array, setArray, children}) {
                 {provided => (
                     <div className='w-full h-full bg-gray-300 overflow-y-scroll' ref={provided.innerRef} {...provided.droppableProps}>
                         <ul className="w-full p-1 pb-0">
-                            {localArray.map((elem, i) => (
+                            {localArray?.map((elem, i) => (
                                 <li className='w-full' key={elem.id}>
                                     <Draggable draggableId={elem.id.toString()} index={i}>
                                         {provided => (
@@ -61,7 +61,7 @@ export function ReorderList({droppableId, array, setArray, children}) {
                                         )}
                                     </Draggable>
                                 </li>
-                            ))}
+                            )) ?? null}
                         </ul>
                         {provided.placeholder}
                     </div>

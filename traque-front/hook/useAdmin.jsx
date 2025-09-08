@@ -11,16 +11,16 @@ export default function useAdmin() {
         return teams.find(team => team.id === teamId);
     }
 
-    function reorderTeams(newOrder) {
-        adminSocket.emit("reorder_teams", newOrder);
-    }
-
     function addTeam(teamName) {
         adminSocket.emit("add_team", teamName);
     }
 
     function removeTeam(teamId) {
         adminSocket.emit("remove_team", teamId);
+    }
+
+    function reorderTeams(newOrder) {
+        adminSocket.emit("reorder_teams", newOrder);
     }
 
     function captureTeam(teamId) {

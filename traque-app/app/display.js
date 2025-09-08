@@ -32,9 +32,9 @@ export default function Display() {
     const [bottomContainerHeight, setBottomContainerHeight] = useState(0);
     const router = useRouter();
     const {SERVER_URL} = useSocket();
-    const {gameSettings, zoneType, zoneExtremities, nextZoneDate, isShrinking, location, startLocationTracking, stopLocationTracking, gameState} = useTeamContext();
+    const {messages, zoneType, zoneExtremities, nextZoneDate, isShrinking, location, startLocationTracking, stopLocationTracking, gameState, startDate} = useTeamContext();
     const {loggedIn, logout, loading} = useTeamConnexion();
-    const {sendCurrentPosition, capture, enemyLocation, enemyName, startingArea, captureCode, name, ready, captured, lastSentLocation, locationSendDeadline, teamId, outOfZone, outOfZoneDeadline, distance, startDate, finishDate, nCaptures, nSentLocation} = useGame();
+    const {sendCurrentPosition, capture, enemyLocation, enemyName, startingArea, captureCode, name, ready, captured, lastSentLocation, locationSendDeadline, teamId, outOfZone, outOfZoneDeadline, distance, finishDate, nCaptures, nSentLocation} = useGame();
     const [enemyCaptureCode, setEnemyCaptureCode] = useState("");
     const [timeLeftSendLocation] = useTimeDifference(locationSendDeadline, 1000);
     const [timeLeftNextZone] = useTimeDifference(nextZoneDate, 1000);
@@ -225,7 +225,7 @@ export default function Display() {
     const CapturedMessage = () => {
         return (
             <View style={[styles.timersContainer, {height: 61}]}>
-                <Text style={{fontSize: 20}}>{gameSettings?.capturedMessage || "Vous avez été éliminé..."}</Text>
+                <Text style={{fontSize: 20}}>{messages?.captured || "Vous avez été éliminé..."}</Text>
             </View>    
         );
     }
@@ -233,26 +233,28 @@ export default function Display() {
     const EndGameMessage = () => { 
         return (
             <View style={[styles.timersContainer, {height: 61}]}>
-                {captured && <Text style={{fontSize: 20}}>{gameSettings?.loserEndGameMessage || "Vous avez perdu..."}</Text>}
-                {!captured && <Text style={{fontSize: 20}}>{gameSettings?.winnerEndGameMessage || "Vous avez gagné !"}</Text>}
+                {captured && <Text style={{fontSize: 20}}>{messages?.loser || "Vous avez perdu..."}</Text>}
+                {!captured && <Text style={{fontSize: 20}}>{messages?.winner || "Vous avez gagné !"}</Text>}
             </View>
         );
     }
 
     const Zones = () => {
+        const latToLatitude = (pos) => ({latitude: pos.lat, longitude: pos.lng});
+
         switch (zoneType) {
             case zoneTypes.circle:
                 return (
                     <View>
-                        { zoneExtremities.begin && <Circle center={zoneExtremities.begin.center} radius={zoneExtremities.begin.radius} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} />}
-                        { zoneExtremities.end && <Circle center={zoneExtremities.end.center} radius={zoneExtremities.end.radius} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} />}
+                        { zoneExtremities.begin && <Circle center={latToLatitude(zoneExtremities.begin.center)} radius={zoneExtremities.begin.radius} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} />}
+                        { zoneExtremities.end && <Circle center={latToLatitude(zoneExtremities.end.center)} radius={zoneExtremities.end.radius} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} />}
                     </View>
                 );
             case zoneTypes.polygon:
                 return (
                     <View>
-                        { zoneExtremities.begin && <Polygon coordinates={zoneExtremities.begin.points} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} /> }
-                        { zoneExtremities.end && <Polygon coordinates={zoneExtremities.end.points} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} /> }
+                        { zoneExtremities.begin && <Polygon coordinates={zoneExtremities.begin.polygon.map(pos => latToLatitude(pos))} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} /> }
+                        { zoneExtremities.end && <Polygon coordinates={zoneExtremities.end.polygon.map(pos => latToLatitude(pos))} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} /> }
                     </View>
                 );
             default:

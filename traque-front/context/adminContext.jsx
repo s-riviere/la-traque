@@ -27,11 +27,10 @@ export function AdminProvider({ children }) {
 
     useSocketListener(adminSocket, "game_state", (data) => {
         setGameState(data.state);
-        setStartDate(data.date)
+        setStartDate(data.date);
     });
 
     useSocketListener(adminSocket, "current_zone", (data) => {
-        setZoneType(data.type);
         setZoneExtremities({begin: data.begin, end: data.end});
         setNextZoneDate(data.endDate);
     });
@@ -39,6 +38,7 @@ export function AdminProvider({ children }) {
     useSocketListener(adminSocket, "settings", (data) => {
         setMessages(data.messages);
         setZoneSettings(data.zone);
+        setZoneType(data.zone.type);
         setSendPositionDelay(data.sendPositionDelay);
         setOutOfZoneDelay(data.outOfZoneDelay);
     });

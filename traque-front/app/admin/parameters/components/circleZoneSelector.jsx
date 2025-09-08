@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
-import { Circle } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { CustomButton } from "@/components/button";
 import { CustomMapContainer, MapEventListener } from "@/components/map";
-import { TextInput } from "@/components/input";
+import { NumberInput } from "@/components/input";
 import useAdmin from "@/hook/useAdmin";
 import useMapCircleDraw from "@/hook/useCircleDraw";
 import useLocalVariable from "@/hook/useLocalVariable";
 import { defaultZoneSettings } from "@/util/configurations";
 import { ZoneTypes } from "@/util/types";
+import { CircleZone } from "@/components/layer";
 
 const EditMode = {
     MIN: 0,
@@ -16,8 +15,24 @@ const EditMode = {
 }
 
 function Drawings({ minZone, setMinZone, maxZone, setMaxZone, editMode }) {
-    const { center: maxCenter, radius: maxRadius, handleLeftClick: maxLeftClick, handleRightClick: maxRightClick, handleMouseMove: maxHover } = useMapCircleDraw(maxZone, setMaxZone);
-    const { center: minCenter, radius: minRadius, handleLeftClick: minLeftClick, handleRightClick: minRightClick, handleMouseMove: minHover } = useMapCircleDraw(minZone, setMinZone);
+    const { drawingCircle: drawingMaxCircle, handleLeftClick: maxLeftClick, handleRightClick: maxRightClick, handleMouseMove: maxHover } = useMapCircleDraw(maxZone, setMaxZone);
+    const { drawingCircle: drawingMinCircle, handleLeftClick: minLeftClick, handleRightClick: minRightClick, handleMouseMove: minHover } = useMapCircleDraw(minZone, setMinZone);
+
+    function MaxCircleZone() {
+        return (
+            drawingMaxCircle
+            ? <CircleZone circle={drawingMaxCircle} color="blue" />
+            : <CircleZone circle={maxZone} color="blue" />
+        );
+    }
+
+    function MinCircleZone() {
+        return (
+            drawingMinCircle
+            ? <CircleZone circle={drawingMinCircle} color="red" />
+            : <CircleZone circle={minZone} color="red" />
+        );
+    }
 
     return (<>
         <MapEventListener
@@ -25,33 +40,31 @@ function Drawings({ minZone, setMinZone, maxZone, setMaxZone, editMode }) {
             onRightClick={editMode == EditMode.MAX ? maxRightClick : minRightClick}
             onMouseMove={editMode == EditMode.MAX ? maxHover : minHover}
         />
-        {minCenter && minRadius && <Circle center={minCenter} radius={minRadius} color="red" fillColor="red" />}
-        {maxCenter && maxRadius && <Circle center={maxCenter} radius={maxRadius} color="blue" fillColor="blue" />}
+        <MaxCircleZone/>
+        <MinCircleZone/>
     </>);
 }
 
-export default function CircleZoneSelector() {
+export default function CircleZoneSelector({ display }) {
     const {zoneSettings, outOfZoneDelay, updateSettings} = useAdmin();
     const [localZoneSettings, setLocalZoneSettings, applyLocalZoneSettings] = useLocalVariable(zoneSettings, (e) => updateSettings({zone: e}));
     const [localOutOfZoneDelay, setLocalOutOfZoneDelay, applyLocalOutOfZoneDelay] = useLocalVariable(outOfZoneDelay, (e) => updateSettings({outOfZoneDelay: e}));
-    const [editMode, setEditMode] = useState(EditMode.MIN);
+    const [editMode, setEditMode] = useState(EditMode.MAX);
 
     useEffect(() => {
-        if (localZoneSettings.type != ZoneTypes.CIRCLE) {
+        if (!localZoneSettings || localZoneSettings.type != ZoneTypes.CIRCLE) {
             setLocalZoneSettings(defaultZoneSettings.circle);
         }
     }, [localZoneSettings]);
 
-    useEffect(() => {
-        setEditMode(editMode == EditMode.MIN ? EditMode.MAX : EditMode.MIN);
-    }, [localZoneSettings.min, localZoneSettings.max]);
-
     function setMinZone(minZone) {
         setLocalZoneSettings({...localZoneSettings, min: minZone});
+        setEditMode(EditMode.MAX);
     }
 
     function setMaxZone(maxZone) {
         setLocalZoneSettings({...localZoneSettings, max: maxZone});
+        setEditMode(EditMode.MIN);
     }
 
     function updateReductionCount(reductionCount) {
@@ -67,44 +80,30 @@ export default function CircleZoneSelector() {
         applyLocalOutOfZoneDelay();
     }
 
-    function customStringToInt(e) {
-        return parseInt(e, 10) || null;
-    }
-
     return (
-        <div className='h-full w-full gap-3 flex flex-row'>
-            {localZoneSettings.type == ZoneTypes.CIRCLE && <>
+        <div className={display ? 'w-full h-full gap-3 flex flex-row' : "hidden"}>
+            {localZoneSettings && localZoneSettings.type == ZoneTypes.CIRCLE && <>
                 <div className="h-full flex-1">
                     <CustomMapContainer>
                         <Drawings minZone={localZoneSettings.min} setMinZone={setMinZone} maxZone={localZoneSettings.max} setMaxZone={setMaxZone} editMode={editMode} />
                     </CustomMapContainer>
                 </div>
                 <div className="h-full w-1/6 flex flex-col gap-3">
-                    <div className="w-full h-15">
-                        {editMode == EditMode.MIN && <CustomButton color="blue" onClick={() => setEditMode(EditMode.MAX)}>Click to edit first zone</CustomButton>}
-                        {editMode == EditMode.MAX && <CustomButton color="red" onClick={() => setEditMode(EditMode.MIN)}>Click to edit last zone</CustomButton>}
-                    </div>
+                    {editMode == EditMode.MIN && <button className="w-full h-16 text-lg text-white rounded bg-blue-600 hover:bg-blue-500" onClick={() => setEditMode(EditMode.MAX)}>Click to edit first zone</button>}
+                    {editMode == EditMode.MAX && <button className="w-full h-16 text-lg text-white rounded bg-red-600 hover:bg-red-500" onClick={() => setEditMode(EditMode.MIN)}>Click to edit last zone</button>}
                     <div className="w-full flex flex-row gap-2 items-center justify-between">
                         <p>Reduction number</p>
-                        <div className="w-16 h-10">
-                            <TextInput id="reduction-number" value={localZoneSettings.reductionCount ?? ""} onChange={(e) => updateReductionCount(customStringToInt(e.target.value))} />
-                        </div>
+                        <NumberInput id="reduction-number" value={localZoneSettings.reductionCount ?? ""} onChange={updateReductionCount} />
                     </div>
                     <div className="w-full flex flex-row gap-2 items-center justify-between">
                         <p>Zone duration</p>
-                        <div className="w-16 h-10">
-                            <TextInput id="duration" value={localZoneSettings.duration ?? ""} onChange={(e) => updateDuration(customStringToInt(e.target.value))} />
-                        </div>
+                        <NumberInput id="duration" value={localZoneSettings.duration ?? ""} onChange={updateDuration} />
                     </div>
                     <div className="w-full flex flex-row gap-2 items-center justify-between">
                         <p>Timeout</p>
-                        <div className="w-16 h-10">
-                            <TextInput id="timeout" value={localOutOfZoneDelay ?? ""} onChange={(e) => setLocalOutOfZoneDelay(customStringToInt(e.target.value))} />
-                        </div>
+                        <NumberInput id="timeout-circle-selector" value={localOutOfZoneDelay ?? ""} onChange={setLocalOutOfZoneDelay} />
                     </div>
-                    <div className="w-full h-15">
-                        <CustomButton color="green" onClick={handleSubmit}>Apply</CustomButton>
-                    </div>
+                    <button className="w-full h-16 text-lg text-white rounded bg-green-600 hover:bg-green-500" onClick={handleSubmit}>Apply</button>
                 </div>
             </>}
         </div>

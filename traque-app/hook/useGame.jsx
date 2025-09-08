@@ -5,8 +5,8 @@ import { useTeamContext } from "../context/teamContext";
 export default function useGame() {
     const { teamSocket } = useSocket();
     const { teamId } = useTeamConnexion();
-    const { teamInfos, gameState } = useTeamContext();
-
+    const { teamInfos } = useTeamContext();
+    
     function sendCurrentPosition() {
         console.log("Reveal position.")
         teamSocket.emit("send_position");
@@ -29,5 +29,5 @@ export default function useGame() {
         });
     }
 
-    return {...teamInfos, sendCurrentPosition, capture, teamId, gameState};
+    return {...teamInfos, sendCurrentPosition, capture, teamId};
 }

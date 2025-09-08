@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ReorderList } from '@/components/list';
 import useAdmin from '@/hook/useAdmin';
 import useLocalVariable from "@/hook/useLocalVariable";
-import { TextInput } from "@/components/input";
+import { NumberInput } from "@/components/input";
 import { Section } from "@/components/section";
 
 function TeamManagerItem({ team }) {
@@ -52,9 +52,7 @@ export default function TeamManager() {
             </div>
             <div className="w-full flex flex-row gap-2 items-center justify-between">
                 <p>Interval between position updates</p>
-                <div className="w-16 h-10">
-                    <TextInput id="position-update" value={localSendPositionDelay ?? ""} onChange={(e) => setLocalSendPositionDelay(parseInt(e.target.value, 10))} onBlur={applyLocalSendPositionDelay} />
-                </div>
+                <NumberInput id="position-update" value={localSendPositionDelay ?? ""} onChange={setLocalSendPositionDelay} onBlur={applyLocalSendPositionDelay} />
             </div>
         </Section>
     );

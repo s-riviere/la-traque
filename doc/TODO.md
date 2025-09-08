@@ -34,18 +34,19 @@
 - [x] Pouvoir changer les paramètres du jeu pendant une partie.
 - [x] Implémenter les wireframes
 - [x] Ajouter une région par défaut si pas de position
-- [ ] Pouvoir faire pause dans la partie
-- [ ] Voir les traces et évènements des teams
-- [ ] Voir l'incertitude de position des teams
 - [x] Focus une team cliquée
 - [x] Refaire les flèches de chasse sur la map
-- [ ] Mettre en évidence le menu paramètre (configuration)
-- [ ] Afficher un feedback quand un paramètre est sauvegardé
 - [x] Pouvoir définir la zone de départ de chaque équipe
 - [x] Nommer les polygons par des lettres de l'alphabet
+- [ ] Plein écran
+- [ ] Pouvoir faire pause dans la partie
+- [ ] Mettre en évidence le menu paramètre
+- [ ] Afficher un feedback quand un paramètre est sauvegardé
+- [ ] Améliorer le système de création zone (cercle et polygone)
+- [ ] Voir les traces et évènements des teams
+- [ ] Voir l'incertitude de position des teams
 - [ ] Faire un menu quand on arrive sur la traque
 - [ ] Pouvoir load des paramètres enregistrés
-- [ ] Améliorer le système de création zone (cercle et polygone)
 - [ ] Penser l'affichage en fin de traque
 
 ### Améliorations du jeu de la traque

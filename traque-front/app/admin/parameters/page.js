@@ -37,14 +37,14 @@ function TabButton({title, onClick, isSelected}) {
     );
 }
 
-export default function ConfigurationPage() {
+export default function ParametersPage() {
     const { useProtect } = useAdminConnexion();
     const [currentTab, setCurrentTab] = useState(Tabs.PLACEMENT_ZONES);
 
     useProtect();
 
     return (
-        <div className='h-full bg-gray-200 p-3 flex flex-row gap-3'>
+        <div className='w-full h-full p-3 flex flex-row gap-3'>
             <div className="h-full w-2/6 gap-3 flex flex-col">
                 <ParametersTitle/>
                 <Messages/>
@@ -56,12 +56,8 @@ export default function ConfigurationPage() {
                     <TabButton title="Zones de jeu" onClick={() => setCurrentTab(Tabs.PLAYING_ZONES)} isSelected={currentTab == Tabs.PLAYING_ZONES}/>
                 </div>
                 <div className="w-full flex-1 p-3 bg-white">
-                    { currentTab == Tabs.PLAYING_ZONES &&
-                        <PlayingZoneSelector />
-                    }  
-                    { currentTab == Tabs.PLACEMENT_ZONES &&
-                        <PlacementZoneSelector />
-                    }  
+                    <PlacementZoneSelector display={currentTab == Tabs.PLACEMENT_ZONES} />
+                    <PlayingZoneSelector display={currentTab == Tabs.PLAYING_ZONES} />
                 </div>
             </div>
         </div>

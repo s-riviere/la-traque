@@ -1,4 +1,4 @@
-import { ZoneTypes } from "./types";
+import { ZoneTypes, Colors } from "./types";
 
 export const mapLocations = {
     paris: [48.86, 2.33]
@@ -26,10 +26,11 @@ export const defaultZoneSettings = {
 }
 
 export const teamStatus = {
-    playing:    { label: "En jeu",          color: "text-custom-green"  },
-    captured:   { label: "Capturée",        color: "text-custom-red"    },
-    outofzone:  { label: "Hors zone",       color: "text-custom-orange" },
-    ready:      { label: "Placée",          color: "text-custom-green"  },
-    notready:   { label: "Non placée",      color: "text-custom-red"    },
-    waiting:    { label: "En attente",      color: "text-custom-grey"   },
+    default:    { label: "Indisponible",    color: Colors.black  },
+    playing:    { label: "En jeu",          color: Colors.green  },
+    captured:   { label: "Capturée",        color: Colors.red    },
+    outofzone:  { label: "Hors zone",       color: Colors.orange },
+    ready:      { label: "Placée",          color: Colors.green  },
+    notready:   { label: "Non placée",      color: Colors.red    },
+    waiting:    { label: "En attente",      color: Colors.grey   },
 }

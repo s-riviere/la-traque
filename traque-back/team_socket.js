@@ -92,14 +92,16 @@ export function initTeamSocket() {
                 return;
             }
             sendUpdatedTeamInformations(loginTeamId);
-            socket.emit("game_state", game.state);
-            socket.emit("game_settings", game.messages);
-            socket.emit("zone", {
-                type: zoneManager.settings.type,
+            socket.emit("game_state", {
+                state: game.state,
+                date: game.stateDate
+            });
+            socket.emit("current_zone", {
                 begin: zoneManager.getCurrentZone(),
                 end: zoneManager.getNextZone(),
-                endDate: zoneManager.currentZoneEndDate,
+                endDate: zoneManager.currentZone.endDate,
             });
+            socket.emit("settings", game.getPlayerSettings());
             callback({ isLoggedIn : true, message: "Logged in"});
         });
 

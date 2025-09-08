@@ -17,23 +17,19 @@ function ZoneTypeButton({title, onClick, isSelected}) {
     );
 }
 
-export default function PlayingZoneSelector() {
+export default function PlayingZoneSelector({ display }) {
     const [zoneType, setZoneType] = useState(ZoneTypes.POLYGON);
 
     return (
-        <div className="w-full h-full flex flex-col gap-3">
+        <div className={display ? 'w-full h-full gap-3 flex flex-col' : "hidden"}>
             <div className="w-full flex flex-row gap-3 items-center">
                 <p className="text-l">Type de zone :</p>
                 <ZoneTypeButton title="Cercles" onClick={() => setZoneType(ZoneTypes.CIRCLE)} isSelected={zoneType == ZoneTypes.CIRCLE} />
                 <ZoneTypeButton title="Polygones" onClick={() => setZoneType(ZoneTypes.POLYGON)} isSelected={zoneType == ZoneTypes.POLYGON} />
             </div>
             <div className="w-full flex-1">
-                {zoneType == ZoneTypes.CIRCLE &&
-                    <CircleZoneSelector/>
-                }
-                {zoneType == ZoneTypes.POLYGON &&
-                    <PolygonZoneSelector/>
-                }
+                <CircleZoneSelector display={zoneType == ZoneTypes.CIRCLE} />
+                <PolygonZoneSelector display={zoneType == ZoneTypes.POLYGON} />
             </div>
         </div>
     );

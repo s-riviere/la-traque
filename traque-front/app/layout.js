@@ -1,24 +1,25 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import SocketProvider from "@/context/socketContext";
-
 import { PublicEnvScript } from 'next-runtime-env';
+import SocketProvider from "@/context/socketContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "La Traque",
+    title: "La Traque",
 };
 
 export default function RootLayout({ children }) {
-  return (
-    <html lang="en">
-      <head>
-        <PublicEnvScript />
-      </head>
-      <SocketProvider>
-        <body className={inter.className + " h-screen"}>{children}</body>
-      </SocketProvider>
-    </html>
-  );
+    return (
+        <html lang="en">
+            <head>
+                <PublicEnvScript />
+            </head>
+            <body className={inter.className + " w-screen h-screen bg-gray-200"}>
+                <SocketProvider>
+                    {children}
+                </SocketProvider>
+            </body>
+        </html>
+    );
 }
