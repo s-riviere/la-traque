@@ -5,6 +5,10 @@ class TimeoutManager {
         this.timeouts = new Map();
     }
 
+    has(key) {
+        return this.timeouts.has(key);
+    }
+
     set(key, callback, delay) {
         const newCallback = () => {
             this.timeouts.delete(key);
@@ -32,6 +36,10 @@ export const sendPositionTimeouts = {
     timeoutManager: new TimeoutManager(),
     delay: 10, // Minutes
 
+    has(teamID) {
+        return this.timeoutManager.has(teamID);
+    },
+
     set(teamID) {
         const callback = () => {
             game.sendLocation(teamID);
@@ -57,6 +65,10 @@ export const sendPositionTimeouts = {
 export const outOfZoneTimeouts = {
     timeoutManager: new TimeoutManager(),
     delay: 10, // Minutes
+
+    has(teamID) {
+        return this.timeoutManager.has(teamID);
+    },
 
     set(teamID) {
         const callback = () => {

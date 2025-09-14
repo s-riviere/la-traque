@@ -31,15 +31,18 @@ export function playersBroadcast(event, data) {
  * @param {String} teamId The team that will receive the message
  */
 export function sendUpdatedTeamInformations(teamId) {
+    // Test of parameters
+    if (!game.hasTeam(teamId)) return false;
+    // Variables
     const team = game.getTeam(teamId);
-    if (!team) return;
+    const enemyTeam = game.getTeam(team.chasing);
     teamBroadcast(teamId, "update_team", {
         // Identification
         name: team.name,
         captureCode: team.captureCode,
         // Chasing
         captured: team.captured,
-        enemyName: game.getTeam(team.chasing)?.name ?? null,
+        enemyName: enemyTeam?.name,
         // Locations
         lastSentLocation: team.lastSentLocation,
         enemyLocation: team.enemyLocation,
@@ -50,6 +53,8 @@ export function sendUpdatedTeamInformations(teamId) {
         outOfZone: team.outOfZone,
         outOfZoneDeadline: team.outOfZoneDeadline,
         locationSendDeadline: team.locationSendDeadline,
+        hasHandicap: team.hasHandicap,
+        enemyHasHandicap: enemyTeam?.hasHandicap,
         // Stats
         distance: team.distance,
         nCaptures: team.nCaptures,

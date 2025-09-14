@@ -1,5 +1,5 @@
 // React
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Fragment } from 'react';
 import { ScrollView, View, Text, Image, Alert, StyleSheet, TouchableOpacity, TouchableHighlight } from 'react-native';
 import MapView, { Marker, Circle, Polygon } from 'react-native-maps';
 // Expo
@@ -34,7 +34,7 @@ export default function Display() {
     const {SERVER_URL} = useSocket();
     const {messages, zoneType, zoneExtremities, nextZoneDate, isShrinking, location, startLocationTracking, stopLocationTracking, gameState, startDate} = useTeamContext();
     const {loggedIn, logout, loading} = useTeamConnexion();
-    const {sendCurrentPosition, capture, enemyLocation, enemyName, startingArea, captureCode, name, ready, captured, lastSentLocation, locationSendDeadline, teamId, outOfZone, outOfZoneDeadline, distance, finishDate, nCaptures, nSentLocation} = useGame();
+    const {sendCurrentPosition, capture, enemyLocation, enemyName, startingArea, captureCode, name, ready, captured, lastSentLocation, locationSendDeadline, teamId, outOfZone, outOfZoneDeadline, distance, finishDate, nCaptures, nSentLocation, hasHandicap, enemyHasHandicap} = useGame();
     const [enemyCaptureCode, setEnemyCaptureCode] = useState("");
     const [timeLeftSendLocation] = useTimeDifference(locationSendDeadline, 1000);
     const [timeLeftNextZone] = useTimeDifference(nextZoneDate, 1000);
@@ -175,7 +175,8 @@ export default function Display() {
                 { gameState == GameState.SETUP && <Text style={styles.gameState}>Préparation de la partie</Text>}
                 { gameState == GameState.PLACEMENT && <Text style={styles.gameState}>Phase de placement</Text>}
                 { gameState == GameState.PLAYING && !outOfZone && <Text style={styles.gameState}>La partie est en cours</Text>}
-                { gameState == GameState.PLAYING && outOfZone && <Text style={styles.gameStateOutOfZone}>Hors zone (pénalité dans {formatTimeMinutes(-timeLeftOutOfZone)})</Text>}
+                { gameState == GameState.PLAYING && outOfZone && !hasHandicap && <Text style={styles.gameStateOutOfZone}>Hors zone (handicap dans {formatTimeMinutes(-timeLeftOutOfZone)})</Text>}
+                { gameState == GameState.PLAYING && hasHandicap && <Text style={styles.gameStateOutOfZone}>Hors zone (position révélée en continue)</Text>}
                 { gameState == GameState.FINISHED && <Text style={styles.gameState}>La partie est terminée</Text>}
             </TouchableOpacity>
         );
@@ -191,10 +192,10 @@ export default function Display() {
     }
 
     const TimeBeforeNextPosition = () => {
-        return (
+        return ( 
             <View style={{width: "100%", alignItems: "center", justifyContent: "center"}}>
                 <Text style={{fontSize: 15}}>Position envoyée dans</Text>
-                <Text style={{fontSize: 30, fontWeight: "bold"}}>{formatTimeMinutes(-timeLeftSendLocation)}</Text>
+                <Text style={{fontSize: 30, fontWeight: "bold"}}>{ !hasHandicap ? formatTimeMinutes(-timeLeftSendLocation) : "00:00"}</Text>
             </View>
         );
     }
@@ -245,17 +246,17 @@ export default function Display() {
         switch (zoneType) {
             case zoneTypes.circle:
                 return (
-                    <View>
+                    <Fragment>
                         { zoneExtremities.begin && <Circle center={latToLatitude(zoneExtremities.begin.center)} radius={zoneExtremities.begin.radius} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} />}
                         { zoneExtremities.end && <Circle center={latToLatitude(zoneExtremities.end.center)} radius={zoneExtremities.end.radius} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} />}
-                    </View>
+                    </Fragment>
                 );
             case zoneTypes.polygon:
                 return (
-                    <View>
+                    <Fragment>
                         { zoneExtremities.begin && <Polygon coordinates={zoneExtremities.begin.polygon.map(pos => latToLatitude(pos))} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} /> }
                         { zoneExtremities.end && <Polygon coordinates={zoneExtremities.end.polygon.map(pos => latToLatitude(pos))} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} /> }
-                    </View>
+                    </Fragment>
                 );
             default:
                 return null;
@@ -272,12 +273,12 @@ export default function Display() {
                         <Image source={require("../assets/images/marker/blue.png")} style={{width: 24, height: 24}} resizeMode="contain"/>
                     </Marker>
                 }
-                { gameState == GameState.PLAYING && lastSentLocation &&
+                { gameState == GameState.PLAYING && lastSentLocation && !hasHandicap &&
                     <Marker coordinate={{ latitude: lastSentLocation[0], longitude: lastSentLocation[1] }} anchor={{ x: 0.33, y: 0.33 }}>
                         <Image source={require("../assets/images/marker/grey.png")} style={{width: 24, height: 24}} resizeMode="contain"/>
                     </Marker>
                 }
-                { gameState == GameState.PLAYING && enemyLocation &&
+                { gameState == GameState.PLAYING && enemyLocation && !hasHandicap &&
                     <Marker coordinate={{ latitude: enemyLocation[0], longitude: enemyLocation[1] }} anchor={{ x: 0.33, y: 0.33 }}>
                         <Image source={require("../assets/images/marker/red.png")} style={{width: 24, height: 24}} resizeMode="contain"/>
                     </Marker>
@@ -287,7 +288,7 @@ export default function Display() {
     }
 
     const UpdatePositionButton = () => {
-        return (
+        return ( !hasHandicap &&
             <TouchableOpacity style={styles.updatePositionContainer} onPress={sendCurrentPosition}>
                 <Image source={require("../assets/images/update_position.png")} style={{width: 40, height: 40}} resizeMode="contain"></Image>
             </TouchableOpacity>
@@ -327,8 +328,9 @@ export default function Display() {
     const ChasedTeamImage = () => {
         return (
             <View style={styles.imageContainer}>
-                <Text style={{fontSize: 15, margin: 5}}>{"Cible (" + (enemyName ?? "Indisponible") + ")"}</Text>
-                <CustomImage source={{ uri : enemyImageURI }} canZoom/>
+                {<Text style={{fontSize: 15, margin: 5}}>{"Cible (" + (enemyName ?? "Indisponible") + ")"}</Text>}
+                {enemyHasHandicap && <Text style={{fontSize: 15, margin: 5}}>Position ennemie révélée en continue</Text>}
+                {<CustomImage source={{ uri : enemyImageURI }} canZoom/>}
             </View>
         );
     }
@@ -417,11 +419,13 @@ export default function Display() {
                             <Collapsible style={[styles.collapsibleWindow, {height: bottomContainerHeight - 44}]} title="Collapse" collapsed={collapsibleState}>
                                 <ScrollView contentContainerStyle={styles.collapsibleContent}>
                                     { TeamCaptureCode() }
-                                    { ChasedTeamImage() }
-                                    <View style={styles.actionsContainer}>
-                                        { CaptureCode() }
-                                        { CaptureButton() }
-                                    </View>
+                                    { !hasHandicap && <Fragment>
+                                        { ChasedTeamImage() }
+                                        <View style={styles.actionsContainer}>
+                                            { CaptureCode() }
+                                            { CaptureButton() }
+                                        </View>
+                                    </Fragment>}
                                     { Stats() }
                                 </ScrollView>
                             </Collapsible>
@@ -504,7 +508,6 @@ const styles = StyleSheet.create({
     },
     bottomContainer: {
         flex: 1,
-        alignItems: 'center'
     },
     mapContainer: {
         flex: 1,
@@ -518,11 +521,9 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        alignItems: 'center'
     },
     innerDrawerContainer: {
         width: "100%",
-        alignItems: 'center',
         backgroundColor: backgroundColor,
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
@@ -536,13 +537,11 @@ const styles = StyleSheet.create({
     },
     collapsibleWindow: {
         width: "100%",
-        alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: backgroundColor,
     },
     collapsibleContent: {
         paddingHorizontal: 15,
-        alignItems: 'center'
     },
     centerMapContainer: {
         position: 'absolute',

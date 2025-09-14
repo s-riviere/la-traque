@@ -106,6 +106,7 @@ export default {
             // Zone
             team.outOfZone = false;
             team.outOfZoneDeadline = null;
+            team.hasHandicap = false;
             // Stats
             team.distance = 0;
             team.nCaptures = 0;
@@ -274,6 +275,7 @@ export default {
             // Zone
             outOfZone: false,
             outOfZoneDeadline: null,
+            hasHandicap: false,
             // Stats
             distance: 0,
             nCaptures: 0,
@@ -362,7 +364,17 @@ export default {
     },
 
     handicapTeam(teamId) {
-        // TODO
+        // Test of parameters
+        if (!this.hasTeam(teamId)) return false;
+        // Variables
+        const team = this.getTeam(teamId);
+        // Make the capture
+        team.hasHandicap = true;
+        sendPositionTimeouts.clear(team.id);
+        // Broadcast new infos
+        secureAdminBroadcast("teams", this.teams);
+        sendUpdatedTeamInformations(team.id);
+        return true;
     },
 
 
@@ -375,12 +387,20 @@ export default {
         if (!location) return false;
         // Variables
         const team = this.getTeam(teamId);
+        const enemyTeam = this.getTeam(team.chasing);
         const dateNow = Date.now();
         // Update distance
         if (team.currentLocation) team.distance += Math.floor(getDistanceFromLatLon({lat: location[0], lng: location[1]}, {lat: team.currentLocation[0], lng: team.currentLocation[1]}));
         // Update of currentLocation
         team.currentLocation = location;
         team.lastCurrentLocationDate = dateNow;
+        if (team.hasHandicap) {
+            team.lastSentLocation = team.currentLocation;
+        }
+        // Update of enemyLocation
+        if (enemyTeam.hasHandicap) {
+            team.enemyLocation = enemyTeam.currentLocation;
+        }
         // Update of ready
         if (this.state == GameState.PLACEMENT && team.startingArea) {
             team.ready = isInCircle({ lat: location[0], lng: location[1] }, team.startingArea.center, team.startingArea.radius);
@@ -394,6 +414,11 @@ export default {
         } else if (!teamCurrentlyOutOfZone && team.outOfZone) {
             team.outOfZone = false;
             team.outOfZoneDeadline = null;
+            team.hasHandicap = false;
+            if (!sendPositionTimeouts.has(team.id)) {
+                team.locationSendDeadline = dateNow + sendPositionTimeouts.delay * 60 * 1000;
+                sendPositionTimeouts.set(team.id);
+            }
             outOfZoneTimeouts.clear(teamId);
         }
         // Broadcast new infos
