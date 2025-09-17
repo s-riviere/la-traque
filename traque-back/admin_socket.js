@@ -50,14 +50,15 @@ export function initAdminSocketHandler() {
             socket.emit("teams", game.teams);
             socket.emit("game_state", {
                 state: game.state,
-                date: game.stateDate
+                date: game.startDate
             });
             socket.emit("current_zone", {
                 begin: zoneManager.getCurrentZone(),
                 end: zoneManager.getNextZone(),
-                endDate: zoneManager.currentZone.endDate,
+                endDate: zoneManager.currentZone?.endDate,
             });
             socket.emit("settings", game.getAdminSettings());
+            socket.emit("login_response", true);
         });
 
         socket.on("add_team", (teamName) => {
@@ -77,7 +78,7 @@ export function initAdminSocketHandler() {
 
         socket.on("capture_team", (teamId) => {
             if (!loggedIn) return;
-            game.captureTeam(teamId);
+            game.switchCapturedTeam(teamId);
         });
 
         socket.on("placement_team", (teamId, placementZone) => {

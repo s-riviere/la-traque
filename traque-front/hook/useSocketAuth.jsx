@@ -14,15 +14,13 @@ export default function useSocketAuth(socket, passwordName) {
     const [savedPassword, setSavedPassword, savedPasswordLoading] = useLocalStorage(passwordName, null);
     
     useEffect(() => {
-        console.log("Checking saved password", savedPassword, loggedIn);
         if (savedPassword && !loggedIn) {
-            console.log("Logging in with saved password", savedPassword);
+            console.log("Try to log with :", savedPassword);
             socket.emit(LOGIN_MESSAGE, savedPassword);
         }
     }, [savedPassword]);
 
     function login(password) {
-        console.log("Logging", password);
         setSavedPassword(password)
     }
 
@@ -32,9 +30,10 @@ export default function useSocketAuth(socket, passwordName) {
         socket.emit(LOGOUT_MESSAGE)
     }
 
-    useSocketListener(socket, LOGIN_RESPONSE_MESSAGE,(loginResponse) => {
+    useSocketListener(socket, LOGIN_RESPONSE_MESSAGE, (loginResponse) => {
         setWaitingForResponse(false);
         setLoggedIn(loginResponse);
+        console.log(loginResponse ? "Logged in" : "Not logged in");
     });
 
     useEffect(() => {

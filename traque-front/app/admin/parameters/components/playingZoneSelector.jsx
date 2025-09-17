@@ -1,6 +1,7 @@
-import { useState } from "react";
 import dynamic from "next/dynamic";
 import { ZoneTypes } from "@/util/types";
+import useLocalVariable from "@/hook/useLocalVariable";
+import useAdmin from "@/hook/useAdmin";
 
 // Imported at runtime and not at compile time
 const CircleZoneSelector = dynamic(() => import('./circleZoneSelector'), { ssr: false });
@@ -18,18 +19,19 @@ function ZoneTypeButton({title, onClick, isSelected}) {
 }
 
 export default function PlayingZoneSelector({ display }) {
-    const [zoneType, setZoneType] = useState(ZoneTypes.POLYGON);
+    const { zoneType } = useAdmin();
+    const [localZoneType, setLocalZoneType] = useLocalVariable(zoneType, () => {});
 
     return (
         <div className={display ? 'w-full h-full gap-3 flex flex-col' : "hidden"}>
             <div className="w-full flex flex-row gap-3 items-center">
                 <p className="text-l">Type de zone :</p>
-                <ZoneTypeButton title="Cercles" onClick={() => setZoneType(ZoneTypes.CIRCLE)} isSelected={zoneType == ZoneTypes.CIRCLE} />
-                <ZoneTypeButton title="Polygones" onClick={() => setZoneType(ZoneTypes.POLYGON)} isSelected={zoneType == ZoneTypes.POLYGON} />
+                <ZoneTypeButton title="Cercles" onClick={() => setLocalZoneType(ZoneTypes.CIRCLE)} isSelected={localZoneType == ZoneTypes.CIRCLE} />
+                <ZoneTypeButton title="Polygones" onClick={() => setLocalZoneType(ZoneTypes.POLYGON)} isSelected={localZoneType == ZoneTypes.POLYGON} />
             </div>
             <div className="w-full flex-1">
-                <CircleZoneSelector display={zoneType == ZoneTypes.CIRCLE} />
-                <PolygonZoneSelector display={zoneType == ZoneTypes.POLYGON} />
+                <CircleZoneSelector display={localZoneType == ZoneTypes.CIRCLE} />
+                <PolygonZoneSelector display={localZoneType == ZoneTypes.POLYGON} />
             </div>
         </div>
     );

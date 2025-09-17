@@ -54,7 +54,7 @@ export default function PlacementZoneSelector({ display }) {
             </div>
             <div className="h-full w-1/6 flex flex-col gap-3">
                 <div className="w-full text-center">
-                    <h2 className="text-xl">Teams</h2>
+                    <h2 className="text-xl">Équipes</h2>
                 </div>
                 <List array={teams} selectedId={selectedTeamId} onSelected={(id) => setSelectedTeamId(selectedTeamId != id ? id : null)}>
                     { (team) =>

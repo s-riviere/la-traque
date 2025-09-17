@@ -8,11 +8,6 @@ import { useTeamConnexion } from "./teamConnexionContext";
 
 const teamContext = createContext();
 
-const zoneTypes = {
-    circle: "circle",
-    polygon: "polygon"
-}
-
 function TeamProvider({children}) {
     const {teamSocket} = useSocket();
     const [location, getLocationAuthorization, startLocationTracking, stopLocationTracking] = useLocation(5000, 10);

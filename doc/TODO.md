@@ -38,7 +38,7 @@
 - [x] Refaire les flèches de chasse sur la map
 - [x] Pouvoir définir la zone de départ de chaque équipe
 - [x] Nommer les polygons par des lettres de l'alphabet
-- [ ] Plein écran
+- [x] Plein écran
 - [ ] Pouvoir faire pause dans la partie
 - [ ] Mettre en évidence le menu paramètre
 - [ ] Afficher un feedback quand un paramètre est sauvegardé

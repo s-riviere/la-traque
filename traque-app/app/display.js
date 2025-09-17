@@ -58,7 +58,7 @@ export default function Display() {
 
     // Activating geolocation tracking
     useEffect(() => {
-        if (loggedIn && (gameState == GameState.SETUP || gameState == GameState.PLAYING || gameState == GameState.PLACEMENT) && !captured) {
+        if (loggedIn) {
             startLocationTracking();
         } else {
             stopLocationTracking();
@@ -89,8 +89,9 @@ export default function Display() {
 
     // Update the average speed
     useEffect(() => {
-        const time = finishDate ? (finishDate - startDate) : timeSinceStart;
-        setAvgSpeed(distance/time);
+        const hours = (finishDate ? (finishDate - startDate) : timeSinceStart*1000) / 1000 / 3600;
+        const km = distance / 1000;
+        setAvgSpeed(Math.floor(km / hours * 10) / 10);
     }, [distance, finishDate, timeSinceStart]);
 
     function toggleCollapsible() {
@@ -172,11 +173,11 @@ export default function Display() {
     const GameLog = () => {
         return (
             <TouchableOpacity style={{width:"100%"}}>
-                { gameState == GameState.SETUP && <Text style={styles.gameState}>Préparation de la partie</Text>}
+                { gameState == GameState.SETUP && <Text style={styles.gameState}>{messages?.waiting || "Préparation de la partie"}</Text>}
                 { gameState == GameState.PLACEMENT && <Text style={styles.gameState}>Phase de placement</Text>}
                 { gameState == GameState.PLAYING && !outOfZone && <Text style={styles.gameState}>La partie est en cours</Text>}
-                { gameState == GameState.PLAYING && outOfZone && !hasHandicap && <Text style={styles.gameStateOutOfZone}>Hors zone (handicap dans {formatTimeMinutes(-timeLeftOutOfZone)})</Text>}
-                { gameState == GameState.PLAYING && hasHandicap && <Text style={styles.gameStateOutOfZone}>Hors zone (position révélée en continue)</Text>}
+                { gameState == GameState.PLAYING && outOfZone && !hasHandicap && <Text style={styles.gameStateOutOfZone}>{`Veuillez retourner dans la zone\nHandicap dans ${formatTimeMinutes(-timeLeftOutOfZone)}`}</Text>}
+                { gameState == GameState.PLAYING && hasHandicap && <Text style={styles.gameStateOutOfZone}>{`Veuillez retourner dans la zone\nVotre position est révélée en continue`}</Text>}
                 { gameState == GameState.FINISHED && <Text style={styles.gameState}>La partie est terminée</Text>}
             </TouchableOpacity>
         );
@@ -243,44 +244,34 @@ export default function Display() {
     const Zones = () => {
         const latToLatitude = (pos) => ({latitude: pos.lat, longitude: pos.lng});
 
-        switch (zoneType) {
-            case zoneTypes.circle:
-                return (
-                    <Fragment>
-                        { zoneExtremities.begin && <Circle center={latToLatitude(zoneExtremities.begin.center)} radius={zoneExtremities.begin.radius} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} />}
-                        { zoneExtremities.end && <Circle center={latToLatitude(zoneExtremities.end.center)} radius={zoneExtremities.end.radius} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} />}
-                    </Fragment>
-                );
-            case zoneTypes.polygon:
-                return (
-                    <Fragment>
-                        { zoneExtremities.begin && <Polygon coordinates={zoneExtremities.begin.polygon.map(pos => latToLatitude(pos))} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} /> }
-                        { zoneExtremities.end && <Polygon coordinates={zoneExtremities.end.polygon.map(pos => latToLatitude(pos))} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} /> }
-                    </Fragment>
-                );
-            default:
-                return null;
-        }
+        return (
+            <Fragment>
+                { zoneType == zoneTypes.circle && zoneExtremities.begin && <Circle center={latToLatitude(zoneExtremities.begin.center)} radius={zoneExtremities.begin.radius} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} />}
+                { zoneType == zoneTypes.circle && zoneExtremities.end && <Circle center={latToLatitude(zoneExtremities.end.center)} radius={zoneExtremities.end.radius} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} />}
+                { zoneType == zoneTypes.polygon && zoneExtremities.begin && <Polygon coordinates={zoneExtremities.begin.polygon.map(pos => latToLatitude(pos))} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} /> }
+                { zoneType == zoneTypes.polygon && zoneExtremities.end && <Polygon coordinates={zoneExtremities.end.polygon.map(pos => latToLatitude(pos))} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} /> }
+            </Fragment>
+        );
     }
 
     const Map = () => {
         return (
-            <MapView ref={mapRef} style={{flex: 1}} initialRegion={initialRegion} mapType="standard" onTouchMove={() => setCenterMap(false)}>
+            <MapView ref={mapRef} style={{flex: 1}} initialRegion={initialRegion} mapType="standard" onTouchMove={() => setCenterMap(false)} toolbarEnabled={false}>
                 { gameState == GameState.PLACEMENT && startingArea && circle("0, 0, 255", startingArea)}
                 { gameState == GameState.PLAYING && zoneExtremities && <Zones/>}
                 { location &&
-                    <Marker coordinate={{ latitude: location[0], longitude: location[1] }} anchor={{ x: 0.33, y: 0.33 }}>
+                    <Marker coordinate={{ latitude: location[0], longitude: location[1] }} anchor={{ x: 0.33, y: 0.33 }} onPress={() => Alert.alert("Position actuelle", "Ceci est votre position")}>
                         <Image source={require("../assets/images/marker/blue.png")} style={{width: 24, height: 24}} resizeMode="contain"/>
                     </Marker>
                 }
                 { gameState == GameState.PLAYING && lastSentLocation && !hasHandicap &&
-                    <Marker coordinate={{ latitude: lastSentLocation[0], longitude: lastSentLocation[1] }} anchor={{ x: 0.33, y: 0.33 }}>
+                    <Marker coordinate={{ latitude: lastSentLocation[0], longitude: lastSentLocation[1] }} anchor={{ x: 0.33, y: 0.33 }} onPress={() => Alert.alert("Position envoyée", "Ceci est votre dernière position connue par le serveur")}>
                         <Image source={require("../assets/images/marker/grey.png")} style={{width: 24, height: 24}} resizeMode="contain"/>
                     </Marker>
                 }
                 { gameState == GameState.PLAYING && enemyLocation && !hasHandicap &&
                     <Marker coordinate={{ latitude: enemyLocation[0], longitude: enemyLocation[1] }} anchor={{ x: 0.33, y: 0.33 }}>
-                        <Image source={require("../assets/images/marker/red.png")} style={{width: 24, height: 24}} resizeMode="contain"/>
+                        <Image source={require("../assets/images/marker/red.png")} style={{width: 24, height: 24}} resizeMode="contain" onPress={() => Alert.alert("Position ennemie", "Ceci est la dernière position de vos ennemis connue")}/>
                     </Marker>
                 }
             </MapView>
@@ -329,7 +320,6 @@ export default function Display() {
         return (
             <View style={styles.imageContainer}>
                 {<Text style={{fontSize: 15, margin: 5}}>{"Cible (" + (enemyName ?? "Indisponible") + ")"}</Text>}
-                {enemyHasHandicap && <Text style={{fontSize: 15, margin: 5}}>Position ennemie révélée en continue</Text>}
                 {<CustomImage source={{ uri : enemyImageURI }} canZoom/>}
             </View>
         );
@@ -357,9 +347,9 @@ export default function Display() {
         return (
             <View style={{gap: 15, width: "100%", marginVertical: 15}}>
                 <View style={{flexDirection: "row", justifyContent: "space-around"}}>
-                    <Stat source={require('../assets/images/distance.png')} description={"Distance parcourue"}>{(distance / 1000).toFixed(1)}km</Stat>
+                    <Stat source={require('../assets/images/distance.png')} description={"Distance parcourue"}>{Math.floor(distance / 100) / 10}km</Stat>
                     <Stat source={require('../assets/images/time.png')} description={"Temps écoulé au format HH:MM:SS"}>{formatTimeHours((finishDate ? Math.floor((finishDate - startDate) / 1000) : timeSinceStart))}</Stat>
-                    <Stat source={require('../assets/images/running.png')} description={"Vitesse moyenne"}>{(avgSpeed*3.6).toFixed(1)}km/h</Stat>
+                    <Stat source={require('../assets/images/running.png')} description={"Vitesse moyenne"}>{avgSpeed}km/h</Stat>
                 </View>
                 <View style={{flexDirection: "row", justifyContent: "space-around"}}>
                     <Stat source={require('../assets/images/target/black.png')} description={"Nombre total de captures par votre équipe"}>{nCaptures}</Stat>
@@ -394,6 +384,7 @@ export default function Display() {
                 { gameState == GameState.FINISHED &&
                     EndGameMessage()
                 }
+                {enemyHasHandicap && <Text style={{fontSize: 18, marginTop: 6, fontWeight: "bold"}}>Position ennemie révélée en continue !</Text>}
             </View>
             <View style={styles.bottomContainer} onLayout={(event) => {setBottomContainerHeight(event.nativeEvent.layout.height)}}>
                 <View style={styles.mapContainer}>
@@ -411,15 +402,15 @@ export default function Display() {
                         </View>
                     }
                 </View>
-                { gameState == GameState.PLAYING && !captured &&
+                { (gameState == GameState.PLAYING || gameState == GameState.FINISHED) &&
                     <View style={styles.outerDrawerContainer}>
                         <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.5)']} style={{height: 70, width: "100%", position: "absolute", top: -30}}/>
                         <View style={styles.innerDrawerContainer}>
                             { CollapsibleButton() }
                             <Collapsible style={[styles.collapsibleWindow, {height: bottomContainerHeight - 44}]} title="Collapse" collapsed={collapsibleState}>
                                 <ScrollView contentContainerStyle={styles.collapsibleContent}>
-                                    { TeamCaptureCode() }
-                                    { !hasHandicap && <Fragment>
+                                    { gameState == GameState.PLAYING && TeamCaptureCode() }
+                                    { gameState == GameState.PLAYING && !hasHandicap && <Fragment>
                                         { ChasedTeamImage() }
                                         <View style={styles.actionsContainer}>
                                             { CaptureCode() }
@@ -468,7 +459,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         width: "100%",
         backgroundColor: 'white',
-        fontSize: 20,
+        fontSize: 18,
         padding: 10,
     },
     gameStateOutOfZone: {
@@ -476,7 +467,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         width: "100%",
         backgroundColor: 'white',
-        fontSize: 20,
+        fontSize: 18,
         padding: 10,
         borderColor: 'red'
     },

@@ -45,7 +45,7 @@ export default function AdminPage() {
     const [mapStyle, setMapStyle] = useState(mapStyles.default);
     const [showZones, setShowZones] = useState(true);
     const [showNames, setShowNames] = useState(true);
-    const [showArrows, setShowArrows] = useState(false);
+    const [showArrows, setShowArrows] = useState(true);
     const [isFocusing, setIsFocusing] = useState(true);
 
     useProtect();

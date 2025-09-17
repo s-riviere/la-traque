@@ -59,7 +59,6 @@ export function sendUpdatedTeamInformations(teamId) {
         distance: team.distance,
         nCaptures: team.nCaptures,
         nSentLocation: team.nSentLocation,
-        stateDate: game.stateDate,
         finishDate: team.finishDate,
     });
 }
@@ -99,12 +98,12 @@ export function initTeamSocket() {
             sendUpdatedTeamInformations(loginTeamId);
             socket.emit("game_state", {
                 state: game.state,
-                date: game.stateDate
+                date: game.startDate
             });
             socket.emit("current_zone", {
                 begin: zoneManager.getCurrentZone(),
                 end: zoneManager.getNextZone(),
-                endDate: zoneManager.currentZone.endDate,
+                endDate: zoneManager.currentZone?.endDate,
             });
             socket.emit("settings", game.getPlayerSettings());
             callback({ isLoggedIn : true, message: "Logged in"});

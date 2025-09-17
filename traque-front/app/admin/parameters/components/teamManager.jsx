@@ -34,7 +34,7 @@ export default function TeamManager() {
     }
 
     return (
-        <Section title="Équipe" outerClassName="flex-1 min-h-0" innerClassName="flex flex-col items-center gap-3">
+        <Section title="Équipes" outerClassName="flex-1 min-h-0" innerClassName="flex flex-col items-center gap-3">
             <form className='w-full flex flex-row gap-3' onSubmit={handleTeamSubmit}>
                 <div className='w-full'>
                     <input name="teamName" label='Team name' value={teamName} onChange={(e) => setTeamName(e.target.value)} type="text" className="w-full h-full p-4 ring-1 ring-inset ring-gray-300" />
@@ -51,7 +51,7 @@ export default function TeamManager() {
                 </ReorderList>
             </div>
             <div className="w-full flex flex-row gap-2 items-center justify-between">
-                <p>Interval between position updates</p>
+                <p>Intervalle entre les envois de position</p>
                 <NumberInput id="position-update" value={localSendPositionDelay ?? ""} onChange={setLocalSendPositionDelay} onBlur={applyLocalSendPositionDelay} />
             </div>
         </Section>

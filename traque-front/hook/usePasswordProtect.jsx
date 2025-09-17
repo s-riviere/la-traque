@@ -10,7 +10,7 @@ export default function usePasswordProtect(loginPath, redirectPath, loading, log
             redirect(loginPath);
         }
         if(loggedIn && !loading && path === loginPath) {
-            redirect(redirectPath)
+            redirect(redirectPath);
         }
     }, [loggedIn, loading, path]);
 }

@@ -8,6 +8,8 @@ import { mapZooms } from "@/util/configurations";
 export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsFocusing, mapStyle, showZones, showNames, showArrows }) {
     const { zoneType, zoneExtremities, teams, nextZoneDate, getTeam, gameState } = useAdmin();
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
+    const [isFullScreen, setIsFullScreen] = useState(false);
+
 
     useEffect(() => {
         if (nextZoneDate) {
@@ -50,8 +52,7 @@ export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsF
     }
 
     return (
-        <div className='h-full w-full flex flex-col'>
-            {gameState == GameState.PLAYING && <p>{`Next zone in : ${formatTime(timeLeftNextZone)}`}</p>}
+        <div className={`${isFullScreen ? "fixed inset-0 z-[9999]" : "relative h-full w-full"}`}>
             <CustomMapContainer mapStyle={mapStyle}>
                 {isFocusing && <MapPan center={getTeam(selectedTeamId)?.currentLocation} zoom={mapZooms.high} animate />}
                 <MapEventListener onDragStart={() => setIsFocusing(false)}/>
@@ -60,12 +61,21 @@ export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsF
                     <CircleZone circle={team.startingArea} color="blue" display={gameState == GameState.PLACEMENT && showZones}>
                         <Tag text={team.name} display={showNames} />
                     </CircleZone>
-                    <Arrow pos1={team.currentLocation} pos2={getTeam(team.chased)?.currentLocation} display={showArrows}/>
+                    <Arrow pos1={team.currentLocation} pos2={getTeam(team.chasing)?.currentLocation} display={showArrows}/>
                     <Position position={team.currentLocation} color={"blue"} onClick={() => onSelected(team.id)} display={!team.captured}>
                         <Tag text={team.name} display={showNames} />
                     </Position>
                 </Fragment>)}
             </CustomMapContainer>
+            { gameState == GameState.PLAYING &&
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] pointer-events-none flex flex-col items-center bg-white p-2 rounded-lg shadow-lg drop-shadow">
+                    <p className="text-sm">Durée zone</p>
+                    <p className="text-2xl font-bold">{formatTime(timeLeftNextZone)}</p>
+                </div>
+            }
+            <button className="absolute top-4 right-4 z-[1000] cursor-pointer bg-white p-3 rounded-full shadow-lg drop-shadow" onClick={() => setIsFullScreen(!isFullScreen)}>
+                <img src={`/icons/fullscreen.png`} className="w-8 h-8" />
+            </button>
         </div>
     )
 }

@@ -89,21 +89,21 @@ export default function CircleZoneSelector({ display }) {
                     </CustomMapContainer>
                 </div>
                 <div className="h-full w-1/6 flex flex-col gap-3">
-                    {editMode == EditMode.MIN && <button className="w-full h-16 text-lg text-white rounded bg-blue-600 hover:bg-blue-500" onClick={() => setEditMode(EditMode.MAX)}>Click to edit first zone</button>}
-                    {editMode == EditMode.MAX && <button className="w-full h-16 text-lg text-white rounded bg-red-600 hover:bg-red-500" onClick={() => setEditMode(EditMode.MIN)}>Click to edit last zone</button>}
+                    {editMode == EditMode.MAX && <button className="w-full h-16 text-lg text-white rounded bg-blue-600 hover:bg-blue-500" onClick={() => setEditMode(EditMode.MIN)}>Édition première zone</button>}
+                    {editMode == EditMode.MIN && <button className="w-full h-16 text-lg text-white rounded bg-red-600 hover:bg-red-500" onClick={() => setEditMode(EditMode.MAX)}>Édition dernière zone</button>}
                     <div className="w-full flex flex-row gap-2 items-center justify-between">
-                        <p>Reduction number</p>
+                        <p>Nombre de rétrécissements</p>
                         <NumberInput id="reduction-number" value={localZoneSettings.reductionCount ?? ""} onChange={updateReductionCount} />
                     </div>
                     <div className="w-full flex flex-row gap-2 items-center justify-between">
-                        <p>Zone duration</p>
+                        <p>Durée d'une zone</p>
                         <NumberInput id="duration" value={localZoneSettings.duration ?? ""} onChange={updateDuration} />
                     </div>
                     <div className="w-full flex flex-row gap-2 items-center justify-between">
-                        <p>Timeout</p>
+                        <p>Temps permis hors zone</p>
                         <NumberInput id="timeout-circle-selector" value={localOutOfZoneDelay ?? ""} onChange={setLocalOutOfZoneDelay} />
                     </div>
-                    <button className="w-full h-16 text-lg text-white rounded bg-green-600 hover:bg-green-500" onClick={handleSubmit}>Apply</button>
+                    <button className="w-full h-16 text-lg text-white rounded bg-green-600 hover:bg-green-500" onClick={handleSubmit}>Appliquer</button>
                 </div>
             </>}
         </div>

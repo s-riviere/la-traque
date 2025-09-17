@@ -173,21 +173,25 @@ function polygonSettingsToZones(settings) {
 export default {
     isRunning: false,
     zones: [], // A zone has to be connected space that doesn't contain an earth pole
-    currentZone: { id: 0, timeoutId: null, endDate: null },
+    currentZone: null,
     settings: defaultPolygonSettings,
 
     start() {
+        if (this.isRunning) return;
         this.isRunning = true;
-        this.currentZone.id = -1;
+        this.currentZone = { id: -1, timeoutId: null, endDate: null };
         this.goNextZone();
     },
 
     stop() {
-        this.isRunning = false;
+        if (!this.isRunning) return;
         clearTimeout(this.currentZone.timeoutId);
+        this.isRunning = false;
+        this.currentZone = null;
     },
 
     goNextZone() {
+        if (!this.isRunning) return;
         this.currentZone.id++;
         if (this.currentZone.id >= this.zones.length - 1) {
             this.currentZone.endDate = Date.now();
@@ -199,10 +203,12 @@ export default {
     },
 
     getCurrentZone() {
+        if (!this.isRunning) return null;
         return this.zones[this.currentZone.id];
     },
 
     getNextZone() {
+        if (!this.isRunning) return null;
         if (this.currentZone.id + 1 < this.zones.length) {
             return this.zones[this.currentZone.id + 1];
         } else {
@@ -211,6 +217,7 @@ export default {
     },
 
     isInZone(location) {
+        if (!this.isRunning) return false;
         if (this.zones.length == 0) {
             return true;
         } else {
@@ -227,13 +234,17 @@ export default {
                 this.zones = polygonSettingsToZones(settings);
                 break;
             default:
-                return;
+                this.zones = [];
+                break;
         }
         this.settings = settings;
+        this.stop();
+        this.start();
         this.zoneBroadcast();
     },
     
     zoneBroadcast() {
+        if (!this.isRunning) return;
         const zone = {
             begin: this.getCurrentZone(),
             end: this.getNextZone(),

@@ -11,7 +11,7 @@ export function getStatus(team, gamestate) {
         case GameState.PLAYING:
             return team.captured ? teamStatus.captured : team.outOfZone ? teamStatus.outofzone : teamStatus.playing;
         case GameState.FINISHED:
-            return team.captured ? teamStatus.captured : teamStatus.playing;
+            return team.captured ? teamStatus.defeat : teamStatus.victory;
         default:
             return teamStatus.default;
     }

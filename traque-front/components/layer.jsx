@@ -158,7 +158,7 @@ export function Arrow({ pos1, pos2, color = 'black', weight = 5, arrowSize = 20,
             map.removeLayer(polyline);
             map.removeLayer(decorator);
         };
-    }, [insetPositions])
+    }, [display, insetPositions])
 
     return null;
 }

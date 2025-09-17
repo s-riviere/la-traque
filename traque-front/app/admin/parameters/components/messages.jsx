@@ -20,7 +20,7 @@ export default function Messages() {
     };
 
     return (
-        <Section title="Message" innerClassName="w-full h-full flex flex-col gap-3 items-center">
+        <Section title="Messages" innerClassName="w-full h-full flex flex-col gap-3 items-center">
             <MessageInput id="waiting" title="Attente  :" value={localGameSettings?.waiting ?? ""} onChange={(e) => modifyLocalZoneSettings("waiting", e.target.value)} onBlur={applyLocalGameSettings}/>
             <MessageInput id="captured" title="Capture :" value={localGameSettings?.captured ?? ""} onChange={(e) => modifyLocalZoneSettings("captured", e.target.value)} onBlur={applyLocalGameSettings}/>
             <MessageInput id="winner" title="Victoire :" value={localGameSettings?.winner ?? ""} onChange={(e) => modifyLocalZoneSettings("winner", e.target.value)} onBlur={applyLocalGameSettings}/>

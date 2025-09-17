@@ -33,4 +33,6 @@ export const teamStatus = {
     ready:      { label: "Placée",          color: Colors.green  },
     notready:   { label: "Non placée",      color: Colors.red    },
     waiting:    { label: "En attente",      color: Colors.grey   },
+    victory:    { label: "Victoire",        color: Colors.green  },
+    defeat:     { label: "Défaite",         color: Colors.red    },
 }

@@ -106,7 +106,7 @@ export default function PolygonZoneSelector({ display }) {
                 </div>
                 <div className="h-full w-1/6 flex flex-col gap-3">
                     <div className="w-full text-center">
-                        <h2 className="text-xl">Reduction order</h2>
+                        <h2 className="text-xl">Ordre de réduction</h2>
                     </div>
                     <ReorderList droppableId="zones-order" array={localZoneSettings.polygons} setArray={setLocalZoneSettingsPolygons}>
                         { (zone) =>
@@ -117,10 +117,10 @@ export default function PolygonZoneSelector({ display }) {
                         }
                     </ReorderList>
                     <div className="w-full flex flex-row gap-2 items-center justify-between">
-                        <p>Timeout</p>
+                        <p>Temps permis hors zone</p>
                         <NumberInput id="timeout-polygon-selector" value={localOutOfZoneDelay ?? ""} onChange={setLocalOutOfZoneDelay}/>
                     </div>
-                    <button className="w-full h-16 text-lg text-white rounded bg-green-600 hover:bg-green-500" onClick={handleSubmit}>Apply</button>
+                    <button className="w-full h-16 text-lg text-white rounded bg-green-600 hover:bg-green-500" onClick={handleSubmit}>Appliquer</button>
                 </div>
             </>}
         </div>

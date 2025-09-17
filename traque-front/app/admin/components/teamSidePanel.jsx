@@ -2,8 +2,7 @@ import { env } from 'next-runtime-env';
 import { useEffect, useState } from "react";
 import useAdmin from "@/hook/useAdmin";
 import { getStatus } from '@/util/functions';
-import { Colors } from '@/util/types';
-import { teamStatus } from '@/util/configurations';
+import { Colors, GameState } from '@/util/types';
 
 function DotLine({ label, value }) {
     return (
@@ -32,6 +31,7 @@ function IconValue({ color, icon, value }) {
 export default function TeamSidePanel({ selectedTeamId, onClose }) {
     const { getTeam, startDate, gameState } = useAdmin();
     const [imgSrc, setImgSrc] = useState("");
+    const [_, setRefreshKey] = useState(0);
     const team = getTeam(selectedTeamId);
     const NO_VALUE = "XX";
     const NEXT_PUBLIC_SOCKET_HOST = env("NEXT_PUBLIC_SOCKET_HOST");
@@ -42,6 +42,14 @@ export default function TeamSidePanel({ selectedTeamId, onClose }) {
     }, [selectedTeamId]);
 
     if (!team) return null;
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setRefreshKey(prev => prev + 1);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     function formatTime(startDate, endDate) {
         // startDate in milliseconds
@@ -92,18 +100,22 @@ export default function TeamSidePanel({ selectedTeamId, onClose }) {
                 <DotLine label="ID d'équipe" value={String(selectedTeamId).padStart(6, '0').replace(/(\d{3})(\d{3})/, "$1 $2")} />
                 <DotLine label="ID de capture" value={team.captureCode ? String(team.captureCode).padStart(4, '0') : NO_VALUE} />
             </div>
-            <div>
-                <DotLine label="Chasse" value={getTeam(team.chasing)?.name ?? NO_VALUE} />
-                <DotLine label="Chassé par" value={getTeam(team.chased)?.name ?? NO_VALUE} />
-            </div>
-            <div>
-                <DotLine label="Distance" value={formatDistance(team.distance)} />
-                <DotLine label="Temps de survie" value={formatTime(startDate, team.captured ? team.finishDate : Date.now())} />
-                <DotLine label="Vitesse moyenne" value={formatSpeed(team.distance, startDate, team.captured ? team.finishDate : Date.now())} />
-                <DotLine label="Captures" value={team.nCaptures ?? NO_VALUE} />
-                <DotLine label="Observations" value={team.nSentLocation ?? NO_VALUE} />
-                <DotLine label="Observé" value={team.nObserved ?? NO_VALUE} />
-            </div>
+            { gameState != GameState.FINISHED &&
+                <div>
+                    <DotLine label="Chasse" value={getTeam(team.chasing)?.name ?? NO_VALUE} />
+                    <DotLine label="Chassé par" value={getTeam(team.chased)?.name ?? NO_VALUE} />
+                </div>
+            }
+            { (gameState == GameState.PLAYING || gameState == GameState.FINISHED) &&
+                <div>
+                    <DotLine label="Distance" value={formatDistance(team.distance)} />
+                    <DotLine label="Temps de survie" value={formatTime(startDate, team.finishDate || Date.now())} />
+                    <DotLine label="Vitesse moyenne" value={formatSpeed(team.distance, startDate, team.finishDate || Date.now())} />
+                    <DotLine label="Captures" value={team.nCaptures ?? NO_VALUE} />
+                    <DotLine label="Observations" value={team.nSentLocation ?? NO_VALUE} />
+                    <DotLine label="Observé" value={team.nObserved ?? NO_VALUE} />
+                </div>
+            }
             <div>
                 <DotLine label="Modèle" value={team.phoneModel ?? NO_VALUE} />
                 <DotLine label="Nom" value={team.phoneName ?? NO_VALUE} />
