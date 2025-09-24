@@ -1,10 +1,9 @@
 import { createContext, useContext, useMemo } from "react";
 import { io } from "socket.io-client";
+import { URLS } from "../util/urls"
 
-const HOST = 'traque.rezel.net'; // IP of the machine hosting the server
-
-const SOCKET_URL = (HOST == "traque.rezel.net" ? "wss://" : "ws://") + HOST + "/player";
-const SERVER_URL = (HOST == "traque.rezel.net" ? "https://" : "http://") + HOST + "/back";
+const SOCKET_URL = `wss://${URLS.HOST}/player`;
+const SERVER_URL = `https://${URLS.HOST}/back`;
 
 export const teamSocket = io(SOCKET_URL, {
     path: "/back/socket.io",

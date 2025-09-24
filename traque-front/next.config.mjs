@@ -9,7 +9,7 @@ const nextConfig = {
             {
                 source: '/',
                 destination: '/admin',
-                permanent: true, // The browser will save the redirect in its cache, empty the cache to change the redirect
+                permanent: false, // The browser will not save the redirect in its cache
             },
         ]
     },

@@ -1,0 +1,29 @@
+compte rendu traque 20-09-2025
+
+
+Problèmes
+
+[ ] une équipe était déconnectée sans arrêt
+[ ] la position en arrière n'avait pas l'air de fonctionner (une équipe n'avait pas de notif)
+[ ] toutes les équipes ont été déconnectée en même temps mais ont pu se reconnecter
+[ ] le focus sur une équipe est à revoir
+[ ] mettre en avant les équipes encore en jeu et leurs voyants
+[ ] problème de synchronisation des zones de départ ????
+[ ] visibilité en satellite (notamment zones et flèches)
+[ ] corriger affichages des zones polygonales sur mobile
+[ ] problème envoi photo pour une équipe
+[ ] une équipe avait deux connections sauf que la première était mauvaise (et ils disaient n'avoir qu'une connection ????)
+
+
+À faire
+
+[ ] corriger les problèmes du dessus
+[x] refaire le doc explicatif de la traque
+[x] mettre les règles au clair
+[x] compléter la doc pour s'occuper de l'exploitation
+[ ] profiter d'avoir plusieurs membres d'une équipe connectés pour affiner la position et les données
+[ ] gérer les positions aberrantes
+[ ] détecter et gérer les déconnections (aussi voir d'où elles pourraient venir)
+[ ] mettre en place un système de logs et de débug pour mieux tester la traque
+[ ] s'assurer que la traque fonctionne avec le minimum de positions envoyées
+[ ] s'assurer qu'un crash serveur se résolve tout seul (ne pas garder les anciennes données par exemple)

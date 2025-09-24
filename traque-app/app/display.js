@@ -136,18 +136,6 @@ export default function Display() {
         return String(hours).padStart(2,"0") + ":" + String(minutes).padStart(2,"0") + ":" + String(seconds).padStart(2,"0");
     }
 
-    function circle(color, circle) {
-        return (
-            <Circle
-                center={{ latitude: circle.center.lat, longitude: circle.center.lng }}
-                radius={circle.radius}
-                strokeWidth={2}
-                strokeColor={`rgba(${color}, 1)`}
-                fillColor={`rgba(${color}, 0.2)`}
-            />
-        );
-    }
-
     const Logout = () => {
         return (
             <TouchableOpacity style={{width: 40, height: 40}} onPress={logout}>
@@ -257,7 +245,7 @@ export default function Display() {
     const Map = () => {
         return (
             <MapView ref={mapRef} style={{flex: 1}} initialRegion={initialRegion} mapType="standard" onTouchMove={() => setCenterMap(false)} toolbarEnabled={false}>
-                { gameState == GameState.PLACEMENT && startingArea && circle("0, 0, 255", startingArea)}
+                { gameState == GameState.PLACEMENT && startingArea && <Circle center={{ latitude: startingArea.center.lat, longitude: startingArea.center.lng }} radius={startingArea.radius} strokeWidth={2} strokeColor={`rgba(0, 0, 255, 1)`} fillColor={`rgba(0, 0, 255, 0.2)`}/>}
                 { gameState == GameState.PLAYING && zoneExtremities && <Zones/>}
                 { location &&
                     <Marker coordinate={{ latitude: location[0], longitude: location[1] }} anchor={{ x: 0.33, y: 0.33 }} onPress={() => Alert.alert("Position actuelle", "Ceci est votre position")}>
@@ -375,16 +363,16 @@ export default function Display() {
                 { gameState == GameState.PLACEMENT &&
                     Ready()
                 }
-                { gameState == GameState.PLAYING && !captured &&
-                    Timers()
-                }
+                { gameState == GameState.PLAYING && !captured && <Fragment>
+                    {Timers()}
+                    {enemyHasHandicap && <Text style={{fontSize: 18, marginTop: 6, fontWeight: "bold"}}>Position ennemie révélée en continue !</Text>}
+                </Fragment>}
                 { gameState == GameState.PLAYING && captured &&
                     CapturedMessage()
                 }
                 { gameState == GameState.FINISHED &&
                     EndGameMessage()
                 }
-                {enemyHasHandicap && <Text style={{fontSize: 18, marginTop: 6, fontWeight: "bold"}}>Position ennemie révélée en continue !</Text>}
             </View>
             <View style={styles.bottomContainer} onLayout={(event) => {setBottomContainerHeight(event.nativeEvent.layout.height)}}>
                 <View style={styles.mapContainer}>

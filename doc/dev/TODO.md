@@ -1,10 +1,10 @@
-## TODO
+# TODO
 
-### Général
+## Général
 
 - [x] Tester avec 2+ équipes : vérifier que l'on voit la position des autres équipes et qu'on reçoit la leur quand on envoi notre position.
 
-### Team (Application)
+## Team (Application)
 
 - [x] Rendre plus claire le code de capture dans l'interface utilisateur (bien préciser que c'est l'id de capture).
 - [x] Ajouter timer du rétrécissement des zones.
@@ -26,7 +26,7 @@
 - [ ] Avoir un récap des évènement de la partie
 - [ ] Publier sur le playstore
 
-### Admin (Pageweb)
+## Admin (Pageweb)
 
 - [x] Clarifier qui est qui sur l'interface.
 - [x] Clarifier qui chasse qui sur l'interface.
@@ -49,13 +49,13 @@
 - [ ] Pouvoir load des paramètres enregistrés
 - [ ] Penser l'affichage en fin de traque
 
-### Améliorations du jeu de la traque
+## Améliorations du jeu de la traque
 
 - [x] Supprimer la pénalité de non envoi de position : envoyer la position automatiquement à la fin du timer.
 - [x] Supprimer la pénalité d'hors zone : révéler la position de la team hors zone au bout d'un certain temps.
 - [x] Changer le système de zone de jeu pour qu'il soit fait d'un pavage de zones qui se ferment successivement.
 
-### Autres idées
+## Autres idées
 
 - Améliorer l'accessibilité du site et de l'appli (traduction anglaise notamment).
 - Nettoyer le code, le commenter, créer des tests, le rendre maintenable après la fin du projet.

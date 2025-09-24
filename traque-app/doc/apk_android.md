@@ -14,7 +14,6 @@ Follow this tutorial : https://reactnative.dev/docs/set-up-your-environment?os=l
 
 ### Precisions
 
-* Android Studio and its dependancies can take up to 15 Go of space.
 * The `.bashrc` file is located in your home directory (`cd ~`).
 * The Watchman installation isn't necessary.
 * If you want to test your app on a physical android device, follow the next section.
@@ -28,8 +27,8 @@ This section will cover the creation of the android folder if it isn't created y
 ### Tutorial
 
 * Go in your project folder (`traque-app`).
-* Run `npx expo install expo-dev-client`. This install the `expo-dev-client` package if it isn't already.
-* Run `npx expo prebuild --platform android`. This will add an android folder in your project taking about 1 Go of space.
+* Run `npm i`
+* Run `npx expo prebuild --platform android`
 
 
 
@@ -70,6 +69,7 @@ android {
     ...
 }
 ```
+
 
 
 ## Create the apk

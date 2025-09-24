@@ -2,59 +2,56 @@
 lang: en-GB
 ---
 
-# The game
-### General principle
-La traque is an IRL team game where the goal is to catch another team without being caught by another team.
-Each team starts with the starting position of the tracked team as well as a picture of them, they don't know who they are being tracked by.
-To get the latest known position of the tracked team, a team can update their latest known position as their own position.
-Once the tracked team is captured, the tracked team becomes the team previously tracked by the captured team, the game continues until two teams are left.
-Each team has to update their location at a given interval, if they don't, they receive a penalty.
-The game is played in a zone, if a team goes outside the zone for a given time, they receive a penalty.
-For further information see the pdf in the doc folder.
+# La Traque
 
-### The zone
-The zone is similar to the one in Fortnite, it is a circle that gets smaller and smaller as the game goes on.
-The zone is defined by two circles, the starting zone and the final zone, a number of reductions, the delay between two reductions, and the duration of a reduction.
+La Traque is an outdoor survival game where several teams, usually made up of three players, compete in a shrinking play zone until only two remain. Each team starts in a different location within the play zone. Once the game begins, each team must track and capture their target while being hunted by another team. Teams can obtain information about their target's location in exchange for revealing information about their own position. See the documentation for the complete explaination.
 
-### The penalties
-A penalty can be given to a team for going outside the zone or not updating their position. After 3 penalties a team is eliminated.
-
-# Structure of the app
-The app is divided in three parts, a Next.js front end, a Node.js back end and a reverse proxy.
-- The front end is divided in a team section and an admin section.
-- The backend manages the game state and the teams, and communicates with the front end through `socket.io`.
-- You need a reverse proxy to redirect requests to the right service (frontend or backend). Requests with URL starting with `/back/` are redirected to the backend (usually port 3001), all others to the front (usually port 3000).
-
-# Setting up the app
-## Configuration
-You can edit the front and back environment in the docker-compose file you plan to use.
-- The `docker-compose.yaml` and `Dockerfile` files are used for deployment.
-- The `docker-compose.dev.yaml` and `Dockerfile.dev` files are used for development.
-
-### Back
-```
-HOST : host of the server
-PORT : port of the server
-SSL_KEY : path to the key file
-SSL_CERT : path to the certificate file
-ADMIN_PASSWORD_HASH : hash of the password for the admin user
-```
-
-The SSL_KEY and SSL_CERT are used for HTTPS and are required for the server to work. This is because the browser will block the GeoLocation API if the connection is not secure.
-
-### Front
-```
-NEXT_PUBLIC_SOCKET_HOST : host of the socket server
-NEXT_PUBLIC_SOCKET_PORT : port of the socket server (has to be the same as the port of the server)
-```
+The next sections will help you to set up your environment in order to develop on the project or deploy it.
 
 ## Development
-Run `docker compose -f docker-compose.dev.yaml up --build` to start the docker application in development mode. This means that each modification in the frontend or backend will be applied without the need to restart the server.
+
+This section will cover how to set up the server, the website and the app in development mode so the changes made in the project take effect immediately.
+
+### Server and website
+
+The server and the website use Docker. When the containers are up, you can access the website by searching for localhost on the web.
+
+Main commands :
+
+- Create the containers : `docker compose -f docker-compose.dev.yaml up`
+- Remove the containers : `docker compose down`
+
+Other commands :
+
+- Add the `-d` flag to create the containers in the background
+- Stop the running containers : `docker compose stop`
+- Start the stopped containers : `docker compose start`
+- See all containers : `docker ps -a`
+- See all images : `docker images`
+- Remove an image : `docker rmi IMAGE_ID`
+
+### Android app
+
+- Follow the `traque-app/doc/dev_build_android.md` tutorial to set up your environment and start the development server.
 
 ## Deployment
-Run `docker compose up` to deploy the docker application.
 
-# Authors
+This section will cover how to deploy the server and the website on a rezel virtual machine, and how to create an apk of the Android app.
+
+### Server and website
+
+- On git.rezel.net create an access token for your account allowing in writing package, repository and user. Save the token password.
+- On your machine run `docker login git.rezel.net` and connect with your token password.
+- On your machine run `./build_push_images.sh` to build and push the latest images on the remote.
+- Connect to the local network of Telecom Paris, then connect to the virtual machine by running `ssh admin@137.194.13.69`. Make sure your ssh key is in the `.ssh/authorized_keys` file of the virtual machine.
+- Finally create the containers by running `docker compose -f docker-compose.dev.yaml up -d`
+
+### Android app
+
+- Follow the `traque-app/doc/apk_android.md` tutorial to create an apk of the Android app.
+
+## Authors
+
 - [Quentin Roussel](mailto:quentin.roussel11@gmail.com) (initial version)
 - Mathieu Oriol
-- Sébastien Rivière
+- [Sébastien Rivière](mailto:sebriviere2004@gmail.com)
