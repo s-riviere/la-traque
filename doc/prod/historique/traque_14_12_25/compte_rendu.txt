@@ -1,21 +1,16 @@
-compte rendu traque 20-09-2025
+compte rendu traque 14-12-2025
 
 Contexte
 
-Cette traque est la première à se faire avec le nouveau site web et la version redesignée de l'app.
+Cette traque s'est déroulé avec le même site et la même application que la traque de septembre.
+Météo : 8°C, pas de pluie, brouillard (visibilité <400m), vent 10km/h
 
 
 Problèmes
 
 [ ] Une équipe perdait sans arrêt la connection avec le serveur
 [ ] La position en arrière plan, téléphone éteint par exemple, n'avait pas l'air de fonctionner (une équipe n'avait pas de notif)
-[ ] Aux deux tiers de la partie toutes les équipes ont été déconnectée en même temps mais ont pu se reconnecter. Ça s'est produit
-sans raisons apparentes
-[ ] Une équipe avait deux téléphones connectés sauf que le premier ne marchait pas bien. Par ailleurs, l'équipe disaient n'avoir
-qu'un seul téléphone connecté.
 [ ] La photo d'une des équipes ne parvenait pas jusqu'au serveur. Tout semblait normal pour l'équipe.
-[ ] Il y a apparement eu un problème de synchronisation de l'affichage entre admin concernant les zones de départs. Il s'est résolu
-de lui même. Peut être un problème passager de connection.
 [ ] Le focus sur une équipe dans la page principale des admins est à revoir. Par exemple, le zoom seul devrait désactiver le focus
 automatique.
 [ ] Il est pas évident de voir qu'elles équipes sont encore en jeu sur la page principale admin. Notamment, on voudrait que les
@@ -27,9 +22,6 @@ voyants des équipes encore en jeu soit mis en avant.
 À faire
 
 [ ] Corriger les problèmes du dessus.
-[x] Refaire le doc explicatif de la traque.
-[x] Mettre les règles au clair.
-[x] Compléter la doc pour s'occuper de l'exploitation.
 [ ] Profiter d'avoir plusieurs membres d'une équipe connectés pour affiner la position et les données.
 [ ] Gérer les positions des équipes aberrantes.
 [ ] Détecter et gérer les déconnections (aussi voir d'où elles pourraient venir).
@@ -40,4 +32,4 @@ voyants des équipes encore en jeu soit mis en avant.
 
 Conclusion
 
-La traque s'est déroulée sans accro majeur 
+La traque s'est déroulée sans accro majeur et avec apparement moins de problèmes qu'en septembre.

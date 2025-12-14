@@ -43,7 +43,7 @@ This section will cover how to deploy the server and the website on a rezel virt
 - On git.rezel.net create an access token for your account allowing in writing package, repository and user. Save the token password.
 - On your machine run `docker login git.rezel.net` and connect with your token password.
 - On your machine run `./build_push_images.sh` to build and push the latest images on the remote.
-- Connect to the local network of Telecom Paris, then connect to the virtual machine by running `ssh admin@137.194.13.69`. Make sure your ssh key is in the `.ssh/authorized_keys` file of the virtual machine.
+- Connect to the local network of Telecom Paris, then connect to the virtual machine by running `ssh admin@2a09:6847:fa10:1410::207`. Make sure your ssh key is in the `.ssh/authorized_keys` file of the virtual machine.
 - Finally create the containers by running `docker compose -f docker-compose.dev.yaml up -d`
 
 ### Android app

@@ -2,23 +2,19 @@
 
 An apk is an app file that can be installed on an android device without the need of google play store. This tutorial will explain the steps to create the apk of the current project and download it on an android device. Each step has precisions, however some of those precisions may not be suited for your device, don't hesitate to find help on the Internet or ask ChapGPT.
 
-
-
 ## Set up your environnement
 
 This section will cover the set up of your environnement in order to have the tools to either send the apk of your app on your device or create a virtual android device.
 
 ### Tutorial
 
-Follow this tutorial : https://reactnative.dev/docs/set-up-your-environment?os=linux&platform=android
+Follow this [tutorial](https://reactnative.dev/docs/set-up-your-environment?os=linux&platform=android).
 
 ### Precisions
 
 * The `.bashrc` file is located in your home directory (`cd ~`).
 * The Watchman installation isn't necessary.
 * If you want to test your app on a physical android device, follow the next section.
-
-
 
 ## Create the android folder
 
@@ -29,8 +25,6 @@ This section will cover the creation of the android folder if it isn't created y
 * Go in your project folder (`traque-app`).
 * Run `npm i`
 * Run `npx expo prebuild --platform android`
-
-
 
 ## Create and add the app key
 
@@ -45,9 +39,9 @@ This section will cover the creation of the app key which is required by google 
 
 * Go in the folder `traque-app/android/app/`.
 * Here paste the `.keystore` file associated with your app.
-* Modify the android bracket of the `traque-app/android/app/build.gradle` file as follows : 
+* Modify the android bracket of the `traque-app/android/app/build.gradle` file as follows :
 
-```
+```txt
 android {
     ...
     signingConfigs {
@@ -70,8 +64,6 @@ android {
 }
 ```
 
-
-
 ## Create the apk
 
 This section will cover the creation of the apk of the app that can be download and installed on any android device.
@@ -85,10 +77,12 @@ This section will cover the creation of the apk of the app that can be download 
 ### Precisions
 
 While running `./gradlew assembleRelease`, you can have this error :
-```
+
+```txt
 Task :expo-modules-core:compileDebugKotlin FAILED
 e: This version (1.5.15) of the Compose Compiler requires Kotlin version 1.9.25 but you appear to be using Kotlin version 1.9.24 which is not known to be compatible.
 ```
+
 Follow these steps to fix it :
 
 * In the `android/build.gradle` file, replace the line `classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')` by `classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25')`.
@@ -96,7 +90,7 @@ Follow these steps to fix it :
 
 ### Other precisions
 
-If the build fail for obscure reasons, it may be usefull to delete entirely the `node_modules/` folder and recreate it by running `npm i`. 
-If problems persist, you may also delete entirely the `android/` folder and recreate it.
-If the problem persist, you may also delete the `~/.gradle/caches/` folder.
-If the problem persist, stop working on the project, you can't go against god's will.
+If the build fail for obscure reasons, it may be usefull to delete entirely the `node_modules/` folder and recreate it by running `npm i`.  
+If problems persist, you may also delete entirely the `android/` folder and recreate it.  
+If the problem persist, you may also delete the `~/.gradle/caches/` folder.  
+If the problem persist, stop working on the project, you can't go against god's will.  
