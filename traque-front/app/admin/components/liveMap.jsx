@@ -10,7 +10,6 @@ export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsF
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
     const [isFullScreen, setIsFullScreen] = useState(false);
 
-
     useEffect(() => {
         if (nextZoneDate) {
             const updateTime = () => {
@@ -38,13 +37,13 @@ export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsF
         switch (zoneType) {
             case ZoneTypes.CIRCLE:
                 return (<>
-                    <CircleZone circle={zoneExtremities.begin} color="red" />
-                    <CircleZone circle={zoneExtremities.end} color="green" />
+                    <CircleZone circle={zoneExtremities.begin} color={mapStyle.currentZoneColor} />
+                    <CircleZone circle={zoneExtremities.end} color={mapStyle.nextZoneColor} />
                 </>);
             case ZoneTypes.POLYGON:
                 return (<>
-                    <PolygonZone polygon={zoneExtremities.begin?.polygon} color="red" />
-                    <PolygonZone polygon={zoneExtremities.end?.polygon} color="green" />
+                    <PolygonZone polygon={zoneExtremities.begin?.polygon} color={mapStyle.currentZoneColor} />
+                    <PolygonZone polygon={zoneExtremities.end?.polygon} color={mapStyle.nextZoneColor} />
                 </>);
             default:
                 return null;
@@ -55,14 +54,14 @@ export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsF
         <div className={`${isFullScreen ? "fixed inset-0 z-[9999]" : "relative h-full w-full"}`}>
             <CustomMapContainer mapStyle={mapStyle}>
                 {isFocusing && <MapPan center={getTeam(selectedTeamId)?.currentLocation} zoom={mapZooms.high} animate />}
-                <MapEventListener onDragStart={() => setIsFocusing(false)}/>
+                <MapEventListener onDragStart={() => setIsFocusing(false)} onWheel={() => setIsFocusing(false)} />
                 <Zones/>
                 {teams.map((team) => team && <Fragment key={team.id}>
-                    <CircleZone circle={team.startingArea} color="blue" display={gameState == GameState.PLACEMENT && showZones}>
+                    <CircleZone circle={team.startingArea} color={mapStyle.placementZoneColor} display={gameState == GameState.PLACEMENT && showZones}>
                         <Tag text={team.name} display={showNames} />
                     </CircleZone>
-                    <Arrow pos1={team.currentLocation} pos2={getTeam(team.chasing)?.currentLocation} display={showArrows}/>
-                    <Position position={team.currentLocation} color={"blue"} onClick={() => onSelected(team.id)} display={!team.captured}>
+                    <Arrow pos1={team.currentLocation} pos2={getTeam(team.chasing)?.currentLocation} color={mapStyle.arrowColor} display={showArrows}/>
+                    <Position position={team.currentLocation} color={mapStyle.playerColor} onClick={() => onSelected(team.id)} display={!team.captured}>
                         <Tag text={team.name} display={showNames} />
                     </Position>
                 </Fragment>)}

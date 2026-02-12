@@ -1,6 +1,7 @@
 import { List } from '@/components/list';
 import useAdmin from '@/hook/useAdmin';
 import { getStatus } from '@/util/functions';
+import { useMemo } from 'react';
 
 function TeamViewerItem({ team }) {
     const { gameState } = useAdmin();
@@ -8,7 +9,7 @@ function TeamViewerItem({ team }) {
     const NO_VALUE = "XX";
 
     return (
-        <div className={'w-full flex flex-row gap-3 p-2 bg-white justify-between'}>
+        <div className={`w-full flex flex-row gap-3 p-2 ${team.captured ? 'bg-gray-200' : 'bg-white'} justify-between`}>
             <div className='flex flex-row items-center gap-3'>
                 <div className='flex flex-row gap-1'>
                     <img src={`/icons/user/${team.sockets.length > 0 ? "green" : "red"}.png`} className="w-4 h-4" />
@@ -27,8 +28,16 @@ function TeamViewerItem({ team }) {
 export default function TeamViewer({selectedTeamId, onSelected}) {
     const { teams } = useAdmin();
 
+    // Uncaptured teams first
+    const sortedTeams = useMemo(() => {
+        return [...teams].sort((a,b) => {
+            if (a.captured === b.captured) return 0;
+            return a.captured ? 1 : -1;
+        });
+    }, [teams]);
+
     return (
-        <List array={teams} selectedId={selectedTeamId} onSelected={onSelected} >
+        <List array={sortedTeams} selectedId={selectedTeamId} onSelected={onSelected} >
             {(team) => (
                 <TeamViewerItem team={team}/>
             )}

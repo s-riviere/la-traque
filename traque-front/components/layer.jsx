@@ -3,13 +3,18 @@ import { Marker, Tooltip, CircleMarker, Circle, Polygon, useMap } from "react-le
 import "leaflet/dist/leaflet.css";
 import 'leaflet-polylinedecorator';
 
-export function Node({position, nodeSize = 5, color = 'black', display = true}) {
+export function Node({position, color = 'black', display = true}) {
+    const nodeSize = 5;
+    const fillOpacity = 1;
+
     return (
-        display && position && <CircleMarker center={position} radius={nodeSize} pathOptions={{ color: color, fillColor: color, fillOpacity: 1 }} />
+        display && position && <CircleMarker center={position} radius={nodeSize} pathOptions={{ color: color, fillColor: color, fillOpacity: fillOpacity }} />
     );
 }
 
-export function Label({position, label, color, size = 24, display = true}) {
+export function Label({position, label = "", color = "black", display = true}) {
+    const size = 24;
+
     const labelIcon = L.divIcon({
         html: `<div style="
             display: flex;
@@ -18,7 +23,7 @@ export function Label({position, label, color, size = 24, display = true}) {
             color: ${color};
             font-weight: bold;
             font-size: ${size}px;
-        ">${label || ""}</div>`,
+        ">${label}</div>`,
         className: 'custom-label-icon',
         iconSize: [size, size],
         iconAnchor: [size / 2, size / 2]
@@ -29,13 +34,19 @@ export function Label({position, label, color, size = 24, display = true}) {
     );
 }
 
-export function Tag({text, display = true}) {
+export function Tag({text = "", display = true}) {
+    const offset = [0.5, -15];
+    const opacity = 1;
+
     return (
-        display && <Tooltip permanent direction="top" offset={[0.5, -15]} className="custom-tooltip">{text || ""}</Tooltip>
+        display && <Tooltip permanent direction="top" offset={offset} opacity={opacity} className="custom-tooltip">{text}</Tooltip>
     );
 }
 
-export function CircleZone({circle, color, opacity = '0.1', border = 3, display = true, children}) {
+export function CircleZone({circle, color = "black", display = true, children}) {
+    const opacity = '0.1';
+    const border = 3;
+
     return (
         display && circle && 
         <Circle center={circle.center} radius={circle.radius}  pathOptions={{ color: color, fillColor: color, fillOpacity: opacity, weight: border }}>
@@ -44,7 +55,10 @@ export function CircleZone({circle, color, opacity = '0.1', border = 3, display 
     );
 }
 
-export function PolygonZone({polygon, color, opacity = '0.1', border = 3, display = true, children}) {
+export function PolygonZone({polygon, color = "black", display = true, children}) {
+    const opacity = '0.1';
+    const border = 3;
+
     return (
         display && polygon && polygon.length >= 3 &&
         <Polygon positions={polygon} pathOptions={{ color: color, fillColor: color, fillOpacity: opacity, weight: border }}>
@@ -53,7 +67,7 @@ export function PolygonZone({polygon, color, opacity = '0.1', border = 3, displa
     );
 }
 
-export function Position({position, color, onClick, display = true, children}) {
+export function Position({position, color = "blue", onClick = () => {}, display = true, children}) {
 
     const positionIcon = new L.Icon({
         iconUrl: `/icons/marker/${color}.png`,
@@ -71,7 +85,10 @@ export function Position({position, color, onClick, display = true, children}) {
     );
 }
 
-export function Arrow({ pos1, pos2, color = 'black', weight = 5, arrowSize = 20, insetPixels = 25, display = true }) {
+export function Arrow({ pos1, pos2, color = 'black', display = true }) {
+    const weight = 5;
+    const arrowSize = 20;
+    const insetPixels = 25;
     const map = useMap();
     const [insetPositions, setInsetPositions] = useState(null);
     

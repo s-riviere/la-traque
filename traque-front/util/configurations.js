@@ -12,11 +12,21 @@ export const mapZooms = {
 export const mapStyles = {
     default: {
         url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        arrowColor: "black",
+        currentZoneColor: "red",
+        nextZoneColor: "green",
+        placementZoneColor: "blue",
+        playerColor: "blue"
     },
     satellite: {
         url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        attribution: 'Tiles &copy; Esri'
+        attribution: 'Tiles &copy; Esri',
+        arrowColor: "white",
+        currentZoneColor: "red",
+        nextZoneColor: "#0F0",
+        placementZoneColor: "#0FF",
+        playerColor: "blue"
     },
 }
 

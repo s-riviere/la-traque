@@ -15,7 +15,7 @@ export function MapPan({center, zoom, animate=false}) {
     return null;
 }
 
-export function MapEventListener({ onLeftClick, onRightClick, onMouseMove, onDragStart }) {
+export function MapEventListener({ onLeftClick, onRightClick, onMouseMove, onDragStart, onWheel }) {
     const map = useMap();
     // TODO use useMapEvents instead of this + detect when zoom
 
@@ -93,6 +93,17 @@ export function MapEventListener({ onLeftClick, onRightClick, onMouseMove, onDra
             map.off('dragstart', onDragStart);
         }
     }, [onDragStart]);
+
+    useEffect(() => {
+        if (!onWheel) return;
+
+        const container = map.getContainer();
+        container.addEventListener('wheel', onWheel);
+
+        return () => {
+            container.removeEventListener('wheel', onWheel);
+        }
+    }, [onWheel]);
     
     // Prevent right click context menu
     useEffect(() => {

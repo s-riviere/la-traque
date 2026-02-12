@@ -29,7 +29,7 @@
       "android"
     ],
     "android": {
-      "package": "com.anonymous.traqueapp",
+      "package": "net.rezel.traque",
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
@@ -48,7 +48,7 @@
       }
     },
     "ios": {
-      "bundleIdentifier": "com.anonymous.traqueapp",
+      "bundleIdentifier": "net.rezel.traque",
       "infoPlist": {
         "UIBackgroundModes": [
           "location"
