@@ -1,5 +1,5 @@
 services:
-  reverse_proxy:
+  proxy:
     image: git.rezel.net/ludotech/traque-proxy:latest
     ports:
       - "80:80"

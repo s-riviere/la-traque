@@ -1,5 +1,5 @@
 services:
-  reverse_proxy:
+  proxy:
     build: ./proxy
     restart: always
     ports:

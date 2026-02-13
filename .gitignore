@@ -136,3 +136,4 @@ ios/
 yarn.lock
 keys/
 temp.*
+temp/

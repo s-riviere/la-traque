@@ -1,8 +1,8 @@
 import { createContext, useContext, useMemo } from "react";
 import { io } from "socket.io-client";
 
-const SOCKET_URL = `ws://172.16.1.180/player`;
-const SERVER_URL = `http://172.16.1.180/back`;
+const SOCKET_URL = `ws://0.0.0.0/player`;
+const SERVER_URL = `http://0.0.0.0/back`;
 
 export const teamSocket = io(SOCKET_URL, {
     path: "/back/socket.io",
