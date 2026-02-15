@@ -43,7 +43,7 @@
       ],
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyD0yuWIHFbsIDVfGQ9wEM3pOtVC2TgEO1U"
+          "apiKey": "AIzaSyAA0Y1vdDMsqtrg18ZaWx098uEgNAyJPq0"
         }
       }
     },
@@ -55,6 +55,9 @@
         ],
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Your location is used to track you in the background.",
         "NSLocationWhenInUseUsageDescription": "Location is used to track your movement."
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyAA0Y1vdDMsqtrg18ZaWx098uEgNAyJPq0"
       }
     }
   }

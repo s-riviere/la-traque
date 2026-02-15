@@ -1,9 +1,11 @@
+// Expo
 import { Slot } from 'expo-router';
-import SocketProvider from "../context/socketContext";
+// Contexts
+import { SocketProvider } from "../context/socketContext";
 import { TeamConnexionProvider } from "../context/teamConnexionContext";
 import { TeamProvider } from "../context/teamContext";
 
-export default function Layout() {
+const Layout = () => {
     return (
         <SocketProvider>
             <TeamConnexionProvider>
@@ -13,4 +15,6 @@ export default function Layout() {
             </TeamConnexionProvider>
         </SocketProvider>
     );
-}
+};
+
+export default Layout;

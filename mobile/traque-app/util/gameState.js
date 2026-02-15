@@ -3,4 +3,4 @@ export const GameState = {
     PLACEMENT: "placement",
     PLAYING: "playing",
     FINISHED: "finished"
-}
+};

@@ -1,14 +1,14 @@
-import { useLocation } from "../hook/useLocation";
-import { useSocketListener } from "../hook/useSocketListener";
 import { createContext, useContext, useMemo, useState } from "react";
 import { useSocket } from "./socketContext";
-import { GameState } from "../util/gameState";
-import useSendDeviceInfo from "../hook/useSendDeviceInfo";
 import { useTeamConnexion } from "./teamConnexionContext";
+import { GameState } from "../util/gameState";
+import { useSendDeviceInfo } from "../hook/useSendDeviceInfo";
+import { useLocation } from "../hook/useLocation";
+import { useSocketListener } from "../hook/useSocketListener";
 
 const teamContext = createContext();
 
-function TeamProvider({children}) {
+export const TeamProvider = ({children}) => {
     const {teamSocket} = useSocket();
     const [location, getLocationAuthorization, startLocationTracking, stopLocationTracking] = useLocation(5000, 10);
     // update_team
@@ -28,7 +28,7 @@ function TeamProvider({children}) {
     useSendDeviceInfo();
 
     useSocketListener(teamSocket, "update_team", (data) => {
-        setTeamInfos(teamInfos => ({...teamInfos, ...data}))
+        setTeamInfos(teamInfos => ({...teamInfos, ...data}));
     });
 
     useSocketListener(teamSocket, "game_state", (data) => {
@@ -54,17 +54,15 @@ function TeamProvider({children}) {
     
     const value = useMemo(() => (
         {teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages, location, getLocationAuthorization, startLocationTracking, stopLocationTracking}
-    ), [teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages, location]);
+    ), [teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages, location, getLocationAuthorization, startLocationTracking, stopLocationTracking]);
 
     return (
         <teamContext.Provider value={value}>
             {children}
         </teamContext.Provider>
     );
-}
+};
 
-function useTeamContext() {
+export const useTeamContext = () => {
     return useContext(teamContext);
-}
-
-export { TeamProvider, useTeamContext };
+};

@@ -3,7 +3,7 @@ import DeviceInfo from 'react-native-device-info';
 import { useSocket } from "../context/socketContext";
 import { useTeamConnexion } from "../context/teamConnexionContext";
 
-export default function useSendDeviceInfo() {
+export const useSendDeviceInfo = () => {
     const batteryUpdateTimeout = 5*60*1000;
     const { teamSocket } = useSocket();
     const {loggedIn} = useTeamConnexion();
@@ -28,8 +28,8 @@ export default function useSendDeviceInfo() {
 
         const batteryCheckInterval = setInterval(() => sendBattery(), batteryUpdateTimeout);
 
-        return () => {clearInterval(batteryCheckInterval)};
-    }, [loggedIn]);
+        return () => clearInterval(batteryCheckInterval);
+    }, [batteryUpdateTimeout, loggedIn, teamSocket]);
 
     return null;
-}
+};

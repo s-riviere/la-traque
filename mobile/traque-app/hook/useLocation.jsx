@@ -4,7 +4,7 @@ import { defineTask, isTaskRegisteredAsync } from "expo-task-manager";
 import * as Location from 'expo-location';
 import { useSocket } from "../context/socketContext";
 
-export function useLocation(timeInterval, distanceInterval) {
+export const useLocation = (timeInterval, distanceInterval) => {
     const [location, setLocation] = useState(null); // [latitude, longitude]
     const { teamSocket } = useSocket();
     const LOCATION_TASK_NAME = "background-location-task";
@@ -40,7 +40,7 @@ export function useLocation(timeInterval, distanceInterval) {
                 console.log("Sending position :", new_location);
                 teamSocket.emit("update_position", new_location);
             } else {
-                console.log("No location measured.")
+                console.log("No location measured.");
             }
         }
     });
@@ -64,7 +64,7 @@ export function useLocation(timeInterval, distanceInterval) {
         if (await getLocationAuthorization()) {
             if (!(await isTaskRegisteredAsync(LOCATION_TASK_NAME))) {
                 await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, locationUpdateParameters);
-                console.log("Location tracking started.")
+                console.log("Location tracking started.");
             }
         }
     }
@@ -72,9 +72,9 @@ export function useLocation(timeInterval, distanceInterval) {
     async function stopLocationTracking() {
         if (await isTaskRegisteredAsync(LOCATION_TASK_NAME)) {
             await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-            console.log("Location tracking stopped.")
+            console.log("Location tracking stopped.");
         }
     }
 
     return [location, getLocationAuthorization, startLocationTracking, stopLocationTracking];
-}
+};

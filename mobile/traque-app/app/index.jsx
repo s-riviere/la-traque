@@ -4,18 +4,19 @@ import { ScrollView, View, Text, StyleSheet, Image, Alert } from 'react-native';
 // Expo
 import { useRouter } from 'expo-router';
 // Components
-import CustomButton from '../components/button';
-import CustomImage from '../components/image';
-import CustomTextInput from '../components/input';
-// Other
-import { useSocket } from '../context/socketContext';
-import { useTeamContext } from '../context/teamContext';
+import { CustomButton } from '../components/button';
+import { CustomImage } from '../components/image';
+import { CustomTextInput } from '../components/input';
+// Contexts
+import { useSocket } from "../context/socketContext";
 import { useTeamConnexion } from "../context/teamConnexionContext";
+import { useTeamContext } from "../context/teamContext";
+// Hooks
 import { usePickImage } from '../hook/usePickImage';
+// Util
+import { Colors } from '../util/colors';
 
-const backgroundColor = '#f5f5f5';
-
-export default function Index() {
+const Index = () => {
     const router = useRouter();
     const {SERVER_URL} = useSocket();
     const {login, loggedIn, loading} = useTeamConnexion();
@@ -27,14 +28,14 @@ export default function Index() {
     // Disbaling location tracking
     useEffect(() => {
         stopLocationTracking();
-    }, []);
+    }, [stopLocationTracking]);
 
     // Routeur
     useEffect(() => {
         if (!loading && loggedIn) {
-            router.replace("/display");
+            router.replace("/interface");
         }
-    }, [loggedIn, loading]);
+    }, [router, loggedIn, loading]);
 
     function handleSubmit() {
         if (!isSubmitting && !loading) {
@@ -69,7 +70,7 @@ export default function Index() {
                     <CustomTextInput value={teamID} inputMode="numeric" placeholder="ID de l'équipe" style={styles.input} onChangeText={setTeamID}/>
                 </View>
                 <View style={styles.subContainer}>
-                    <Text style={{fontSize: 15}}>Appuyer pour changer la photo d'équipe</Text>
+                    <Text style={{fontSize: 15}}>Appuyer pour changer la photo d&apos;équipe</Text>
                     <Text style={{fontSize: 13, marginBottom: 3}}>(Le haut du corps doit être visible)</Text>
                     <CustomImage source={image ? {uri: image.uri} : require('../assets/images/missing_image.jpg')} onPress={pickImage}/>
                 </View>
@@ -79,14 +80,16 @@ export default function Index() {
             </View>
         </ScrollView>
     );
-}
+};
+
+export default Index;
 
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         alignItems: 'center',
         paddingVertical: 20,
-        backgroundColor: backgroundColor
+        backgroundColor: Colors.background
     },
     transitionContainer: {
         flexGrow: 1,

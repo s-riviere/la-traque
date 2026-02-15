@@ -2,7 +2,7 @@ import { useState, } from 'react';
 import { Alert } from 'react-native';
 import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from 'expo-image-picker';
 
-export function usePickImage() {
+export const usePickImage = () => {
     const [image, setImage] = useState(null);
 
     const pickImage = async () => {
@@ -33,7 +33,7 @@ export function usePickImage() {
             console.error('Error picking image;', error);
             Alert.alert('Erreur', "Une erreur est survenue lors de la sélection d'une image.");
         }
-    }
+    };
 
     function sendImage(location) {
         if (image) {
@@ -55,4 +55,4 @@ export function usePickImage() {
     }
 
     return {image, pickImage, sendImage};
-}
+};

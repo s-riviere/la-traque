@@ -1,7 +1,8 @@
+// React
 import { forwardRef } from 'react';
 import { TouchableHighlight, View, Text, StyleSheet } from "react-native";
 
-export default CustomButton = forwardRef(function CustomButton({ label, onPress }, ref) {
+export const CustomButton = forwardRef(function CustomButton({ label, onPress }, ref) {
     return (
         <View style={styles.buttonContainer}>
             <TouchableHighlight style={styles.button} onPress={onPress} ref={ref}>

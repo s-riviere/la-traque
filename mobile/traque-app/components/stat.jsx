@@ -1,6 +1,7 @@
+// React
 import { TouchableOpacity, View, Image, Text, Alert } from 'react-native';
 
-export default function Stat({ children, source, description }) {
+export const Stat = ({ children, source, description }) => {
     return (
         <TouchableOpacity onPress={description ? () => Alert.alert("Info", description) : null}>
             <View style={{height: 30, flexDirection: "row", justifyContent: 'center', alignItems: 'center'}}>

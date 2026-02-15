@@ -2,13 +2,13 @@ import { useSocket } from "../context/socketContext";
 import { useTeamConnexion } from "../context/teamConnexionContext";
 import { useTeamContext } from "../context/teamContext";
 
-export default function useGame() {
+export const useGame = () => {
     const { teamSocket } = useSocket();
     const { teamId } = useTeamConnexion();
     const { teamInfos } = useTeamContext();
     
     function sendCurrentPosition() {
-        console.log("Reveal position.")
+        console.log("Reveal position.");
         teamSocket.emit("send_position");
     }
 
@@ -30,4 +30,4 @@ export default function useGame() {
     }
 
     return {...teamInfos, sendCurrentPosition, capture, teamId};
-}
+};

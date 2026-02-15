@@ -1,8 +1,9 @@
+// React
 import { useState } from 'react';
 import { StyleSheet, View, Image, TouchableOpacity } from "react-native";
 import ImageViewing from 'react-native-image-viewing';
 
-export default function CustomImage({ source, canZoom, onPress }) {
+export const CustomImage = ({ source, canZoom, onPress }) => {
     // canZoom : boolean
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -20,7 +21,7 @@ export default function CustomImage({ source, canZoom, onPress }) {
             />
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {

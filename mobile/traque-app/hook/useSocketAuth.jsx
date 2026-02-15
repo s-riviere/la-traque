@@ -4,7 +4,7 @@ import { useLocalStorage } from './useLocalStorage';
 const LOGIN_MESSAGE = "login";
 const LOGOUT_MESSAGE = "logout";
 
-export function useSocketAuth(socket, passwordName) {
+export const useSocketAuth = (socket, passwordName) => {
     const [loggedIn, setLoggedIn] = useState(false);
     const [loading, setLoading] = useState(true);
     const [waitingForResponse, setWaitingForResponse] = useState(false);
@@ -29,7 +29,7 @@ export function useSocketAuth(socket, passwordName) {
             });
             setHasTriedSavedPassword(true);
         }
-    }, [loading]);
+    }, [hasTriedSavedPassword, loading, savedPassword, socket]);
 
     function login(password) {
         console.log("Try to log in with :", password);
@@ -69,4 +69,4 @@ export function useSocketAuth(socket, passwordName) {
     }, [waitingForResponse, savedPasswordLoading]);
 
     return {login, logout, password: savedPassword, loggedIn, loading};
-}
+};
