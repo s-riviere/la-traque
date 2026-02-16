@@ -1,7 +1,7 @@
 // React
 import { View, Text, StyleSheet } from 'react-native';
 // Util
-import { secondsToMMSS } from '../util/format';
+import { secondsToMMSS } from '../util/functions';
 
 export const TimerMMSS = ({ title, seconds, style }) => {
     return (

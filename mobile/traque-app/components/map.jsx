@@ -1,8 +1,10 @@
 // React
-import { useState, useEffect, useRef, Fragment } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { View, Image, Alert, StyleSheet, TouchableOpacity } from 'react-native';
 import MapView, { Marker, Circle, Polygon } from 'react-native-maps';
 import LinearGradient from 'react-native-linear-gradient';
+// Components
+import { DashedCircle, InvertedCircle, InvertedPolygon } from './layer';
 // Contexts
 import { useTeamContext } from '../context/teamContext';
 // Hooks
@@ -13,77 +15,143 @@ import { ZoneTypes, InitialRegions } from '../util/constants';
 
 export const CustomMap = () => {
     const {zoneType, zoneExtremities, location, gameState} = useTeamContext();
-    const {sendCurrentPosition, enemyLocation, startingArea, captured, lastSentLocation, hasHandicap} = useGame();
-    const mapRef = useRef(null);
+    const {enemyLocation, startingArea, lastSentLocation, hasHandicap} = useGame();
     const [centerMap, setCenterMap] = useState(true);
+    const mapRef = useRef(null);
 
     // Center the map on user position
     useEffect(() => {
         if (centerMap && mapRef.current && location) {
             mapRef.current.animateToRegion({latitude: location[0], longitude: location[1], latitudeDelta: 0, longitudeDelta: 0.02}, 1000);
         }
-    }, [centerMap, mapRef, location]);
-    
+    }, [centerMap, location]);
+
+
+    // Map layers
+
     const latToLatitude = (pos) => ({latitude: pos.lat, longitude: pos.lng});
 
+    const startZone = useMemo(() => {
+        if (gameState != GameState.PLACEMENT || !startingArea) return null;
+
+        return (
+            <Circle key="start-zone" center={{ latitude: startingArea.center.lat, longitude: startingArea.center.lng }} radius={startingArea.radius} strokeWidth={2} strokeColor={`rgba(0, 0, 255, 1)`} fillColor={`rgba(0, 0, 255, 0.2)`}/>
+        );
+    }, [gameState, startingArea]);
+
+    const gameZone = useMemo(() => {
+        if (gameState !== GameState.PLAYING || !zoneExtremities) return null;
+
+        const items = [];
+        
+        const nextZoneStrokeColor = "rgb(90, 90, 90)";
+        const zoneColor = "rgba(25, 83, 169, 0.4)";
+        const strokeWidth = 3;
+        const lineDashPattern = [30, 10];
+
+        if (zoneType === ZoneTypes.circle) {
+            if (zoneExtremities.begin) items.push(
+                <InvertedCircle
+                    key="game-zone-begin-circle"
+                    id="game-zone-begin-circle"
+                    center={latToLatitude(zoneExtremities.begin.center)}
+                    radius={zoneExtremities.begin.radius}
+                    fillColor={zoneColor}
+                />
+            );
+            if (zoneExtremities.end) items.push(
+                <DashedCircle
+                    key="game-zone-end-circle"
+                    id="game-zone-end-circle"
+                    center={latToLatitude(zoneExtremities.end.center)}
+                    radius={zoneExtremities.end.radius}
+                    strokeColor={nextZoneStrokeColor}
+                    strokeWidth={strokeWidth}
+                    lineDashPattern={lineDashPattern}
+                />
+            );
+        } else if (zoneType === ZoneTypes.polygon) {
+            if (zoneExtremities.begin) items.push(
+                <InvertedPolygon
+                    key="game-zone-begin-poly"
+                    id="game-zone-begin-poly"
+                    coordinates={zoneExtremities.begin.polygon.map(pos => latToLatitude(pos))}
+                    fillColor={zoneColor}
+                />
+            );
+            if (zoneExtremities.end) items.push(
+                <Polygon
+                    key="game-zone-end-poly"
+                    coordinates={zoneExtremities.end.polygon.map(pos => latToLatitude(pos))}
+                    strokeColor={nextZoneStrokeColor}
+                    strokeWidth={strokeWidth}
+                    lineDashPattern={lineDashPattern}
+                />
+            );
+        }
+
+        return items.length ? items : null;
+    }, [gameState, zoneType, zoneExtremities]);
+
+    const currentPositionMarker = useMemo(() => {
+        if (!location) return null;
+
+        return (
+            <Marker key={"current-position-marker"} coordinate={{ latitude: location[0], longitude: location[1] }} anchor={{ x: 0.33, y: 0.33 }} onPress={() => Alert.alert("Position actuelle", "Ceci est votre position")}>
+                <Image source={require("../assets/images/marker/blue.png")} style={styles.markerImage} resizeMode="contain"/>
+            </Marker>
+        );
+    }, [location]);
+
+    const lastPositionMarker = useMemo(() => {
+        if (gameState != GameState.PLAYING || !lastSentLocation || hasHandicap) return null;
+
+        return (
+            <Marker key={"last-position-marker"} coordinate={{ latitude: lastSentLocation[0], longitude: lastSentLocation[1] }} anchor={{ x: 0.33, y: 0.33 }} onPress={() => Alert.alert("Position envoyée", "Ceci est votre dernière position connue par le serveur")}>
+                <Image source={require("../assets/images/marker/grey.png")} style={styles.markerImage} resizeMode="contain"/>
+            </Marker>
+        );
+    }, [gameState, hasHandicap, lastSentLocation]);
+
+    const enemyPositionMarker = useMemo(() => {
+        if (gameState != GameState.PLAYING || !enemyLocation || hasHandicap) return null;
+
+        return (
+            <Marker key={"enemy-position-marker"} coordinate={{ latitude: enemyLocation[0], longitude: enemyLocation[1] }} anchor={{ x: 0.33, y: 0.33 }} onPress={() => Alert.alert("Position ennemie", "Ceci est la dernière position de vos ennemis connue")}>
+                <Image source={require("../assets/images/marker/red.png")} style={styles.markerImage} resizeMode="contain"/>
+            </Marker>
+        );
+    }, [gameState, hasHandicap, enemyLocation]);
+
+
     return (
-        <View style={styles.mapContainer}>
+        <View style={styles.container}>
             <MapView ref={mapRef} style={{flex: 1}} initialRegion={InitialRegions.paris} mapType="standard" onTouchMove={() => setCenterMap(false)} toolbarEnabled={false}>
-                { gameState == GameState.PLACEMENT && startingArea &&
-                    <Circle center={{ latitude: startingArea.center.lat, longitude: startingArea.center.lng }} radius={startingArea.radius} strokeWidth={2} strokeColor={`rgba(0, 0, 255, 1)`} fillColor={`rgba(0, 0, 255, 0.2)`}/>
-                }
-                { gameState == GameState.PLAYING && zoneExtremities && 
-                    <Fragment>
-                        { zoneType == ZoneTypes.circle && zoneExtremities.begin && <Circle center={latToLatitude(zoneExtremities.begin.center)} radius={zoneExtremities.begin.radius} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} />}
-                        { zoneType == ZoneTypes.circle && zoneExtremities.end && <Circle center={latToLatitude(zoneExtremities.end.center)} radius={zoneExtremities.end.radius} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} />}
-                        { zoneType == ZoneTypes.polygon && zoneExtremities.begin && <Polygon coordinates={zoneExtremities.begin.polygon.map(pos => latToLatitude(pos))} strokeColor="red" fillColor="rgba(255,0,0,0.1)" strokeWidth={2} /> }
-                        { zoneType == ZoneTypes.polygon && zoneExtremities.end && <Polygon coordinates={zoneExtremities.end.polygon.map(pos => latToLatitude(pos))} strokeColor="green" fillColor="rgba(0,255,0,0.1)" strokeWidth={2} /> }
-                    </Fragment>
-                }
-                { location &&
-                    <Marker coordinate={{ latitude: location[0], longitude: location[1] }} anchor={{ x: 0.33, y: 0.33 }} onPress={() => Alert.alert("Position actuelle", "Ceci est votre position")}>
-                        <Image source={require("../assets/images/marker/blue.png")} style={{width: 24, height: 24}} resizeMode="contain"/>
-                    </Marker>
-                }
-                { gameState == GameState.PLAYING && lastSentLocation && !hasHandicap &&
-                    <Marker coordinate={{ latitude: lastSentLocation[0], longitude: lastSentLocation[1] }} anchor={{ x: 0.33, y: 0.33 }} onPress={() => Alert.alert("Position envoyée", "Ceci est votre dernière position connue par le serveur")}>
-                        <Image source={require("../assets/images/marker/grey.png")} style={{width: 24, height: 24}} resizeMode="contain"/>
-                    </Marker>
-                }
-                { gameState == GameState.PLAYING && enemyLocation && !hasHandicap &&
-                    <Marker coordinate={{ latitude: enemyLocation[0], longitude: enemyLocation[1] }} anchor={{ x: 0.33, y: 0.33 }}>
-                        <Image source={require("../assets/images/marker/red.png")} style={{width: 24, height: 24}} resizeMode="contain" onPress={() => Alert.alert("Position ennemie", "Ceci est la dernière position de vos ennemis connue")}/>
-                    </Marker>
-                }
+                {startZone}
+                {gameZone}
+                {currentPositionMarker}
+                {lastPositionMarker}
+                {enemyPositionMarker}
             </MapView>
             <LinearGradient colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0)']} style={{height: 40, width: "100%", position: "absolute"}}/>
             { !centerMap && 
-                <TouchableOpacity style={styles.centerMapContainer} onPress={() => setCenterMap(true)}>
+                <TouchableOpacity style={styles.centerMap} onPress={() => setCenterMap(true)}>
                     <Image source={require("../assets/images/centerMap.png")} style={{width: 30, height: 30}} resizeMode="contain"></Image>
                 </TouchableOpacity>
-            }
-            { gameState == GameState.PLAYING && !captured &&
-                <View style={styles.toolBarRight}>
-                    { !hasHandicap &&
-                        <TouchableOpacity style={styles.updatePositionContainer} onPress={sendCurrentPosition}>
-                            <Image source={require("../assets/images/update_position.png")} style={{width: 40, height: 40}} resizeMode="contain"></Image>
-                        </TouchableOpacity>
-                    }
-                </View>
             }
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    mapContainer: {
+    container: {
         flex: 1,
         width: '100%',
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
         overflow: 'hidden',
     },
-    centerMapContainer: {
+    centerMap: {
         position: 'absolute',
         right: 20,
         top: 20,
@@ -96,19 +164,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    toolBarRight: {
-        position: 'absolute',
-        right: 30,
-        bottom: 80
-    },
-    updatePositionContainer: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: 'white',
-        borderWidth: 4,
-        borderColor: 'black',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
+    markerImage: {
+        width: 24,
+        height: 24
+    }
 });

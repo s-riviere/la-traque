@@ -1,3 +1,21 @@
+export const circleToPolygon = (circle) => {
+    // circle  : {center: {latitude: ..., longitude: ...}, radius: ...}
+    // polygon : [{latitude: ..., longitude: ...}, ...]
+    const polygon = [];
+    const center = circle.center;
+    const radiusInDegrees = circle.radius / 111320; // Approximation m -> deg
+
+    for (let i = 0; i < 360; i += 5) {
+        const rad = (i * Math.PI) / 180;
+        polygon.push({
+            latitude: center.latitude + radiusInDegrees * Math.sin(rad),
+            longitude: center.longitude + radiusInDegrees * Math.cos(rad) / Math.cos(center.latitude * Math.PI / 180),
+        });
+    }
+
+    return polygon;
+};
+
 export const secondsToMMSS = (seconds) => {
     if (!Number.isInteger(seconds)) return "Inconnue";
     if (seconds < 0) seconds = 0;

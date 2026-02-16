@@ -14,14 +14,14 @@ sans raisons apparentes
 [ ] Une équipe avait deux téléphones connectés sauf que le premier ne marchait pas bien. Par ailleurs, l'équipe disaient n'avoir
 qu'un seul téléphone connecté.
 [ ] La photo d'une des équipes ne parvenait pas jusqu'au serveur. Tout semblait normal pour l'équipe.
-[ ] Il y a apparement eu un problème de synchronisation de l'affichage entre admin concernant les zones de départs. Il s'est résolu
+[x] Il y a apparement eu un problème de synchronisation de l'affichage entre admin concernant les zones de départs. Il s'est résolu
 de lui même. Peut être un problème passager de connection.
 [x] Le focus sur une équipe dans la page principale des admins est à revoir. Par exemple, le zoom seul devrait désactiver le focus
 automatique.
 [x] Il est pas évident de voir qu'elles équipes sont encore en jeu sur la page principale admin. Notamment, on voudrait que les
 voyants des équipes encore en jeu soit mis en avant.
 [x] La visibilité des éléments de la map en calque satellite est mauvaise. Il faut revoir les couleurs.
-[ ] Les zones polygonales s'affichent mal sur la version prod de l'app mobile. Les anciennes n'ont pas l'air de disparaitre.
+[x] Les zones polygonales s'affichent mal sur la version prod de l'app mobile. Les anciennes n'ont pas l'air de disparaitre.
 
 
 À faire

@@ -2,7 +2,7 @@ compte rendu traque 14-12-2025
 
 Contexte
 
-Cette traque s'est déroulé avec le même site et la même application que la traque de septembre.
+Cette traque s'est déroulé avec le même serveur et la même application que la traque de septembre.
 Météo : 8°C, pas de pluie, brouillard (visibilité <400m), vent 10km/h
 
 
@@ -16,7 +16,9 @@ automatique.
 [x] Il est pas évident de voir qu'elles équipes sont encore en jeu sur la page principale admin. Notamment, on voudrait que les
 voyants des équipes encore en jeu soit mis en avant.
 [x] La visibilité des éléments de la map en calque satellite est mauvaise. Il faut revoir les couleurs.
-[ ] Les zones polygonales s'affichent mal sur la version prod de l'app mobile. Les anciennes n'ont pas l'air de disparaitre.
+[x] Les zones polygonales s'affichent mal sur la version prod de l'app mobile. Les anciennes n'ont pas l'air de disparaitre.
+[x] La zone de jeu (en rouge) est mal comprise, les joueurs évitent de rester dedans alors qu'ils ont le droit.
+[ ] L'application n'est pas pleinement intuitive, par exemple le bouton pour actualiser sa position ou alors les icônes des stats.
 
 
 À faire

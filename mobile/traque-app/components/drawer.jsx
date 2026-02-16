@@ -1,5 +1,5 @@
 // React
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, useMemo, Fragment } from 'react';
 import { ScrollView, View, Text, Image, StyleSheet, TouchableOpacity, TouchableHighlight, Alert } from 'react-native';
 import Collapsible from 'react-native-collapsible';
 import LinearGradient from 'react-native-linear-gradient';
@@ -16,7 +16,7 @@ import { useGame } from '../hook/useGame';
 // Util
 import { GameState } from '../util/gameState';
 import { Colors } from '../util/colors';
-import { secondsToHHMMSS } from '../util/format';
+import { secondsToHHMMSS } from '../util/functions';
 
 export const Drawer = ({ height }) => {
     const [collapsibleState, setCollapsibleState] = useState(true);
@@ -25,10 +25,18 @@ export const Drawer = ({ height }) => {
     const {gameState, startDate} = useTeamContext();
     const {capture, enemyName, captureCode, name, teamId, distance, finishDate, nCaptures, nSentLocation, hasHandicap} = useGame();
     const [timeSinceStart] = useTimeDifference(startDate, 1000);
-    const [avgSpeed, setAvgSpeed] = useState(0); // Speed in m/s
     const [enemyImageURI, setEnemyImageURI] = useState("../assets/images/missing_image.jpg");
     const [captureStatus, setCaptureStatus] = useState(0); // 0 : no capture | 1 : waiting for response from server | 2 : capture failed | 3 : capture succesful
     const captureStatusColor = {0: "#777", 1: "#FFA500", 2: "#FF6B6B", 3: "#81C784"};
+
+    const avgSpeed = useMemo(() => {
+        const hours = (finishDate ? (finishDate - startDate) : timeSinceStart*1000) / 1000 / 3600;
+        if (hours <= 0 || distance <= 0) return 0;
+        const km = distance / 1000;
+        const speed = km / hours;
+
+        return parseFloat(speed.toFixed(1));
+    }, [finishDate, startDate, timeSinceStart, distance]);
     
     // Capture state update
     useEffect(() => {
@@ -44,17 +52,8 @@ export const Drawer = ({ height }) => {
     useEffect(() => {
         setEnemyImageURI(`${SERVER_URL}/photo/enemy?team=${teamId}&t=${new Date().getTime()}`);
     }, [SERVER_URL, enemyName, teamId]);
-
-    // Update the average speed
-    useEffect(() => {
-        const hours = (finishDate ? (finishDate - startDate) : timeSinceStart*1000) / 1000 / 3600;
-        const km = distance / 1000;
-        setAvgSpeed(Math.floor(km / hours * 10) / 10);
-    }, [distance, finishDate, startDate, timeSinceStart]);
-
-    if (gameState != GameState.PLAYING) return;
     
-    function handleCapture() {
+    const handleCapture = () => {
         if (captureStatus != 1) {
             setCaptureStatus(1);
             capture(enemyCaptureCode)
@@ -71,7 +70,7 @@ export const Drawer = ({ height }) => {
                 });
             setEnemyCaptureCode("");
         }
-    }
+    };
 
     return (
         <View style={styles.outerDrawerContainer}>
