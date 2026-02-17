@@ -1,34 +1,43 @@
+// React
+import { useEffect, useState, useCallback } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useState } from "react";
 
 export const useLocalStorage = (key, initialValue) => {
     const [storedValue, setStoredValue] = useState(initialValue);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        async function fetchData() {
+        let isMounted = true;
+
+        const fetchData = async () => {
             try {
                 const item = await AsyncStorage.getItem(key);
-                setStoredValue(item ? JSON.parse(item) : initialValue);
+                if (isMounted && item !== null) {
+                    setStoredValue(JSON.parse(item));
+                }
             } catch (error) {
-                console.log(error);
+                console.error(`Error loading key "${key}":`, error);
             }
-            setLoading(false);
-        }
+        };
+
         fetchData();
-    }, [initialValue, key]);
+        return () => { isMounted = false; };
+    }, [key]);
 
-    const setValue = async value => {
+    const setValue = useCallback(async (value) => {
         try {
-            setLoading(true);
-            const valueToStore = value instanceof Function ? value(storedValue) : value;
-            setStoredValue(valueToStore);
-            await AsyncStorage.setItem(key, JSON.stringify(valueToStore));
-            setLoading(false);
+            setStoredValue((prevValue) => {
+                const valueToStore = value instanceof Function ? value(prevValue) : value;
+                
+                AsyncStorage.setItem(key, JSON.stringify(valueToStore)).catch(err => 
+                    console.error(`Error saving key "${key}":`, err)
+                );
+                
+                return valueToStore;
+            });
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
-    };
+    }, [key]);
 
-    return [storedValue, setValue, loading];
+    return [storedValue, setValue];
 };

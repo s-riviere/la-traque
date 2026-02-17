@@ -1,33 +1,28 @@
-import { useSocket } from "../context/socketContext";
-import { useTeamConnexion } from "../context/teamConnexionContext";
-import { useTeamContext } from "../context/teamContext";
+// React
+import { useCallback } from "react";
+// Hook
+import { useSocketCommands } from "./useSocketCommands";
 
 export const useGame = () => {
-    const { teamSocket } = useSocket();
-    const { teamId } = useTeamConnexion();
-    const { teamInfos } = useTeamContext();
+    const { emitSendPosition, emitCapture } = useSocketCommands();
     
-    function sendCurrentPosition() {
-        console.log("Reveal position.");
-        teamSocket.emit("send_position");
-    }
+    const sendCurrentPosition = useCallback(() => {
+        emitSendPosition();
+    }, [emitSendPosition]);
 
-    function capture(captureCode) {
-        console.log("Try to capture :", captureCode);
-    
+    const capture = useCallback((captureCode) => {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
-                console.warn("Server did not respond to capture emit.");
-                reject();
+                console.warn("Server timeout: capture", captureCode);
+                reject(new Error("Timeout"));
             }, 3000);
         
-            teamSocket.emit("capture", captureCode, (response) => {
+            emitCapture(captureCode, (response) => {
                 clearTimeout(timeout);
-                console.log(response.message);
                 resolve(response);
             });
         });
-    }
+    }, [emitCapture]);
 
-    return {...teamInfos, sendCurrentPosition, capture, teamId};
+    return { sendCurrentPosition, capture };
 };

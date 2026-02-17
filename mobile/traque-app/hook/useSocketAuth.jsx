@@ -1,72 +1,60 @@
-import { useEffect, useState } from 'react';
+// React
+import { useState, useEffect, useCallback, useRef } from 'react';
+// Hook
 import { useLocalStorage } from './useLocalStorage';
+import { useSocketCommands } from "./useSocketCommands";
 
-const LOGIN_MESSAGE = "login";
-const LOGOUT_MESSAGE = "logout";
-
-export const useSocketAuth = (socket, passwordName) => {
+export const useSocketAuth = () => {
+    const { emitLogin, emitLogout } = useSocketCommands();
     const [loggedIn, setLoggedIn] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [waitingForResponse, setWaitingForResponse] = useState(false);
-    const [hasTriedSavedPassword, setHasTriedSavedPassword] = useState(false);
-    const [savedPassword, setSavedPassword, savedPasswordLoading] = useLocalStorage(passwordName, null);
+    const [savedPassword, setSavedPassword] = useLocalStorage("team_password", null);
+    const isMounted = useRef(true);
 
     useEffect(() => {
-        if (!loading && !hasTriedSavedPassword) {
-            console.log("Try to log in with saved password :", savedPassword);
-            setWaitingForResponse(true);
+        isMounted.current = true;
+        return () => { 
+            isMounted.current = false;
+        };
+    }, []);
 
-            const timeout = setTimeout(() => {
-                console.warn("Server did not respond to login emit.");
-                setWaitingForResponse(false);
-            }, 3000);
-            
-            socket.emit(LOGIN_MESSAGE, savedPassword, (response) => {
-                clearTimeout(timeout);
-                console.log(response.message);
-                setLoggedIn(response.isLoggedIn);
-                setWaitingForResponse(false);
-            });
-            setHasTriedSavedPassword(true);
-        }
-    }, [hasTriedSavedPassword, loading, savedPassword, socket]);
-
-    function login(password) {
-        console.log("Try to log in with :", password);
-        setSavedPassword(password);
-        setWaitingForResponse(true);
-        
+    const login = useCallback((password) => {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
+                if (!isMounted.current) return;
                 console.warn("Server did not respond to login emit.");
-                setWaitingForResponse(false);
                 reject();
-            }, 3000);
+            }, 2000);
         
-            socket.emit(LOGIN_MESSAGE, password, (response) => {
+            emitLogin(password, (response) => {
                 clearTimeout(timeout);
-                console.log(response.message);
-                setLoggedIn(response.isLoggedIn);
-                setWaitingForResponse(false);
-                resolve(response);
+                
+                if (!isMounted.current) return;
+
+                if (response.isLoggedIn) {
+                    console.log("Log in accepted.");
+                    setLoggedIn(true);
+                    setSavedPassword(password);
+                    resolve(response);
+                } else {
+                    console.log("Log in refused.");
+                    setLoggedIn(false);
+                    reject();
+                }
             });
         });
-    }
-
-    function logout() {
-        console.log("Logout");
-        setSavedPassword(null);
-        setLoggedIn(false);
-        socket.emit(LOGOUT_MESSAGE);
-    }
+    }, [emitLogin, setSavedPassword]);
 
     useEffect(() => {
-        if(!waitingForResponse && !savedPasswordLoading) {
-            setLoading(false);
-        } else {
-            setLoading(true);
+        if (!loggedIn && savedPassword) {
+            login(savedPassword);
         }
-    }, [waitingForResponse, savedPasswordLoading]);
+    }, [loggedIn, login, savedPassword]);
 
-    return {login, logout, password: savedPassword, loggedIn, loading};
+    const logout = useCallback(() => {
+        setLoggedIn(false);
+        setSavedPassword(null);
+        emitLogout();
+    }, [emitLogout, setSavedPassword]);
+
+    return {login, logout, password: savedPassword, loggedIn};
 };

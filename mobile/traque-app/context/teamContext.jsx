@@ -1,12 +1,16 @@
+// React
 import { createContext, useContext, useMemo, useState } from "react";
+// Context
 import { useSocket } from "./socketContext";
 import { useTeamConnexion } from "./teamConnexionContext";
-import { GameState } from "../util/gameState";
+// Hook
 import { useSendDeviceInfo } from "../hook/useSendDeviceInfo";
 import { useLocation } from "../hook/useLocation";
 import { useSocketListener } from "../hook/useSocketListener";
+// Util
+import { GameState } from "../util/gameState";
 
-const teamContext = createContext();
+const TeamContext = createContext();
 
 export const TeamProvider = ({children}) => {
     const {teamSocket} = useSocket();
@@ -51,18 +55,17 @@ export const TeamProvider = ({children}) => {
 
     useSocketListener(teamSocket, "logout", logout);
 
-    
     const value = useMemo(() => (
         {teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages, location, getLocationAuthorization, startLocationTracking, stopLocationTracking}
     ), [teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages, location, getLocationAuthorization, startLocationTracking, stopLocationTracking]);
 
     return (
-        <teamContext.Provider value={value}>
+        <TeamContext.Provider value={value}>
             {children}
-        </teamContext.Provider>
+        </TeamContext.Provider>
     );
 };
 
 export const useTeamContext = () => {
-    return useContext(teamContext);
+    return useContext(TeamContext);
 };

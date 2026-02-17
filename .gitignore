@@ -137,3 +137,6 @@ yarn.lock
 keys/
 temp.*
 temp/
+.env
+.env.development
+.env.production

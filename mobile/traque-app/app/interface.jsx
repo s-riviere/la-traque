@@ -20,9 +20,10 @@ import { Colors } from '../util/colors';
 
 const Interface = () => {
     const router = useRouter();
-    const {messages, nextZoneDate, isShrinking, startLocationTracking, stopLocationTracking, gameState} = useTeamContext();
-    const {loggedIn, logout, loading} = useTeamConnexion();
-    const {name, ready, captured, locationSendDeadline, sendCurrentPosition, outOfZone, outOfZoneDeadline, hasHandicap, enemyHasHandicap} = useGame();
+    const {teamInfos, messages, nextZoneDate, isShrinking, startLocationTracking, stopLocationTracking, gameState} = useTeamContext();
+    const {name, ready, captured, locationSendDeadline, outOfZone, outOfZoneDeadline, hasHandicap, enemyHasHandicap} = teamInfos;
+    const {loggedIn, logout} = useTeamConnexion();
+    const {sendCurrentPosition} = useGame();
     const [timeLeftSendLocation] = useTimeDifference(locationSendDeadline, 1000);
     const [timeLeftNextZone] = useTimeDifference(nextZoneDate, 1000);
     const [timeLeftOutOfZone] = useTimeDifference(outOfZoneDeadline, 1000);
@@ -48,12 +49,10 @@ const Interface = () => {
 
     // Router
     useEffect(() => {
-        if (!loading) {
-            if (!loggedIn) {
-                router.replace("/");
-            }
+        if (!loggedIn) {
+            router.replace("/");
         }
-    }, [router, loggedIn, loading]);
+    }, [router, loggedIn]);
 
     // Activating geolocation tracking
     useEffect(() => {

@@ -10,7 +10,8 @@ Problèmes
 
 [ ] Une équipe perdait sans arrêt la connection avec le serveur
 [ ] La position en arrière plan, téléphone éteint par exemple, n'avait pas l'air de fonctionner (une équipe n'avait pas de notif)
-[ ] La photo d'une des équipes ne parvenait pas jusqu'au serveur. Tout semblait normal pour l'équipe.
+[x] La photo d'une des équipes ne parvenait pas jusqu'au serveur. Tout semblait normal pour l'équipe. (Potentiellement un problème
+de conversion : 046512 -> 46512)
 [x] Le focus sur une équipe dans la page principale des admins est à revoir. Par exemple, le zoom seul devrait désactiver le focus
 automatique.
 [x] Il est pas évident de voir qu'elles équipes sont encore en jeu sur la page principale admin. Notamment, on voudrait que les

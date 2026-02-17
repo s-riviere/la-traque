@@ -1,11 +1,13 @@
-import { useState, } from 'react';
+// React
+import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
+// Expo
 import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from 'expo-image-picker';
 
 export const usePickImage = () => {
     const [image, setImage] = useState(null);
 
-    const pickImage = async () => {
+    const pickImage = useCallback(async () => {
         try {
             const permissionResult = await requestMediaLibraryPermissionsAsync();
           
@@ -13,7 +15,6 @@ export const usePickImage = () => {
                 Alert.alert("Permission refusée", "Activez l'accès au stockage ou à la gallerie dans les paramètres.");
                 return;
             }
-
             let result = await launchImageLibraryAsync({
                 mediaTypes: ['images'],
                 allowsMultipleSelection: false,
@@ -28,31 +29,11 @@ export const usePickImage = () => {
             else {
                 console.log('Image picker cancelled.');
             }
-        }
-        catch (error) {
+        } catch (error) {
             console.error('Error picking image;', error);
             Alert.alert('Erreur', "Une erreur est survenue lors de la sélection d'une image.");
         }
-    };
+    }, []);
 
-    function sendImage(location) {
-        if (image) {
-            let data = new FormData();
-            data.append('file', {
-                uri: image.uri,
-                name: 'photo.jpg',
-                type: 'image/jpeg',
-            });
-
-            fetch(location , {
-                method: 'POST',
-                body: data,
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-        }
-    }
-
-    return {image, pickImage, sendImage};
+    return {image, pickImage};
 };

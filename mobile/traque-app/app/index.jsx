@@ -8,22 +8,22 @@ import { CustomButton } from '../components/button';
 import { CustomImage } from '../components/image';
 import { CustomTextInput } from '../components/input';
 // Contexts
-import { useSocket } from "../context/socketContext";
 import { useTeamConnexion } from "../context/teamConnexionContext";
 import { useTeamContext } from "../context/teamContext";
 // Hooks
 import { usePickImage } from '../hook/usePickImage';
+import { useImageApi } from '../hook/useImageApi';
 // Util
 import { Colors } from '../util/colors';
 
 const Index = () => {
     const router = useRouter();
-    const {SERVER_URL} = useSocket();
-    const {login, loggedIn, loading} = useTeamConnexion();
+    const {login, loggedIn} = useTeamConnexion();
     const {getLocationAuthorization, stopLocationTracking} = useTeamContext();
-    const {image, pickImage, sendImage} = usePickImage();
-    const [teamID, setTeamID] = useState("");
+    const {image, pickImage} = usePickImage();
+    const [teamId, setTeamId] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { uploadTeamImage } = useImageApi();
 
     // Disbaling location tracking
     useEffect(() => {
@@ -32,32 +32,37 @@ const Index = () => {
 
     // Routeur
     useEffect(() => {
-        if (!loading && loggedIn) {
+        if (loggedIn) {
+            uploadTeamImage(image?.uri);
             router.replace("/interface");
         }
-    }, [router, loggedIn, loading]);
+    }, [router, loggedIn, uploadTeamImage, image]);
 
-    function handleSubmit() {
-        if (!isSubmitting && !loading) {
-            setIsSubmitting(true);
-            if (getLocationAuthorization()) {
-                login(parseInt(teamID))
-                    .then((response) => {
-                        if (response.isLoggedIn) {
-                            sendImage(`${SERVER_URL}/upload?team=${teamID}`);
-                        } else {
-                            Alert.alert("Échec", "L'ID d'équipe est inconnu.");
-                        }
-                        setIsSubmitting(false);
-                    })
-                    .catch(() => {
-                        Alert.alert("Échec", "La connection au serveur a échoué.");
-                        setIsSubmitting(false);
-                    });
-            }
-            setTeamID("");
+    const handleSubmit = async () => {
+        if (isSubmitting || !getLocationAuthorization()) return;
+
+        setIsSubmitting(true);
+
+        const regex = /^\d{6}$/;
+        if (!regex.test(teamId)) {
+            setTimeout(() => Alert.alert("Erreur", "Veuillez entrer un ID d'équipe valide."), 100);
+            return;
         }
-    }
+        
+        try {
+            const response = await login(teamId);
+
+            if (response.isLoggedIn) {
+                setTeamId("");
+            } else {
+                setTimeout(() => Alert.alert("Échec", "L'ID d'équipe est inconnu."), 100);
+            }
+        } catch (error) {
+            setTimeout(() => Alert.alert("Échec", "La connexion au serveur a échoué."), 100);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -67,7 +72,7 @@ const Index = () => {
                     <Text style={styles.logoText}>LA TRAQUE</Text>
                 </View>
                 <View style={styles.subContainer}>
-                    <CustomTextInput value={teamID} inputMode="numeric" placeholder="ID de l'équipe" style={styles.input} onChangeText={setTeamID}/>
+                    <CustomTextInput value={teamId} inputMode="numeric" placeholder="ID de l'équipe" style={styles.input} onChangeText={setTeamId}/>
                 </View>
                 <View style={styles.subContainer}>
                     <Text style={{fontSize: 15}}>Appuyer pour changer la photo d&apos;équipe</Text>
@@ -75,7 +80,7 @@ const Index = () => {
                     <CustomImage source={image ? {uri: image.uri} : require('../assets/images/missing_image.jpg')} onPress={pickImage}/>
                 </View>
                 <View style={styles.subContainer}>
-                     <CustomButton label={(isSubmitting || loading) ? "..." : "Valider"} onPress={handleSubmit}/>
+                     <CustomButton label={isSubmitting ? "..." : "Valider"} onPress={handleSubmit}/>
                 </View>
             </View>
         </ScrollView>

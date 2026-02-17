@@ -7,15 +7,13 @@ import LinearGradient from 'react-native-linear-gradient';
 import { DashedCircle, InvertedCircle, InvertedPolygon } from './layer';
 // Contexts
 import { useTeamContext } from '../context/teamContext';
-// Hooks
-import { useGame } from '../hook/useGame';
 // Util
 import { GameState } from '../util/gameState';
 import { ZoneTypes, InitialRegions } from '../util/constants';
 
 export const CustomMap = () => {
-    const {zoneType, zoneExtremities, location, gameState} = useTeamContext();
-    const {enemyLocation, startingArea, lastSentLocation, hasHandicap} = useGame();
+    const {teamInfos, zoneType, zoneExtremities, location, gameState} = useTeamContext();
+    const {enemyLocation, startingArea, lastSentLocation, hasHandicap} = teamInfos;
     const [centerMap, setCenterMap] = useState(true);
     const mapRef = useRef(null);
 

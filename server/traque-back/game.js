@@ -56,7 +56,7 @@ export default {
     getNewTeamId() {
         let id = randint(1_000_000);
         while (this.teams.find(t => t.id === id)) id = randint(1_000_000);
-        return id;
+        return id.toString().padStart(6, '0');
     },
 
     checkEndGame() {

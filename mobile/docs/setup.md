@@ -7,11 +7,29 @@ lang: en-GB
 This tutorial will help you to set up your development environment, use a dev build and create an APK.
 
 ## Table of Contents
-* [Environment](#environment) : Dependencies, packages, app key and device
+* [Environment](#environment) : Dependencies, packages, app key, device and .env
 * [Dev build](#dev-build) : Create, install and use
 * [APK](#apk) : Create and install
 
 ## Environment
+
+### .env files
+
+Some infos like API keys or IP addresses cannot be pushed on the public repository, therefore you have to create the .env files that will store those values. Go in the `traque-app` folder, create those two files and replace the FILL_HERE with the correct values (you can ask someone already working on the project) : 
+
+* `.env.development` :
+
+```.env
+EXPO_PUBLIC_SERVER_URL=FILL_HERE
+EXPO_PUBLIC_SOCKET_URL=FILL_HERE
+```
+
+* `.env.production` :
+
+```.env
+EXPO_PUBLIC_SERVER_URL=FILL_HERE
+EXPO_PUBLIC_SOCKET_URL=FILL_HERE
+```
 
 ### Installing dependencies and preparing the device
 

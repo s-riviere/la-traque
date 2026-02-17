@@ -1,14 +1,17 @@
-import { useEffect, useState } from "react";
+// React
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { Alert } from "react-native";
+// Expo
 import { defineTask, isTaskRegisteredAsync } from "expo-task-manager";
 import * as Location from 'expo-location';
-import { useSocket } from "../context/socketContext";
+// Hook
+import { useSocketCommands } from "./useSocketCommands";
 
 export const useLocation = (timeInterval, distanceInterval) => {
+    const { emitUpdatePosition } = useSocketCommands();
     const [location, setLocation] = useState(null); // [latitude, longitude]
-    const { teamSocket } = useSocket();
     const LOCATION_TASK_NAME = "background-location-task";
-    const locationUpdateParameters = {
+    const locationUpdateParameters = useMemo(() => ({
         accuracy: Location.Accuracy.High,
         distanceInterval: distanceInterval, // Update every 10 meters
         timeInterval: timeInterval, // Minimum interval in ms
@@ -19,7 +22,7 @@ export const useLocation = (timeInterval, distanceInterval) => {
             notificationBody: "L'application utilise votre position en arrière plan.",
             notificationColor: "#FF0000", // (Android) Notification icon color
         },
-    };
+    }), [distanceInterval, timeInterval]);
     
     defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
         if (error) {
@@ -37,19 +40,14 @@ export const useLocation = (timeInterval, distanceInterval) => {
                 } catch (e) {
                     console.warn("setLocation failed (probably in background):", e);
                 }
-                console.log("Sending position :", new_location);
-                teamSocket.emit("update_position", new_location);
+                emitUpdatePosition(new_location);
             } else {
                 console.log("No location measured.");
             }
         }
     });
 
-    useEffect(() => {
-        getLocationAuthorization();
-    }, []);
-
-    async function getLocationAuthorization() {
+    const getLocationAuthorization = useCallback(async () => {
         const { status : statusForeground } = await Location.requestForegroundPermissionsAsync();
         const { status : statusBackground } = await Location.requestBackgroundPermissionsAsync();
         if (statusForeground !== "granted" || statusBackground !== "granted") {
@@ -58,23 +56,27 @@ export const useLocation = (timeInterval, distanceInterval) => {
         } else {
             return true;
         }
-    }
+    }, []);
 
-    async function startLocationTracking() {
+    const startLocationTracking = useCallback(async () => {
         if (await getLocationAuthorization()) {
             if (!(await isTaskRegisteredAsync(LOCATION_TASK_NAME))) {
                 await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, locationUpdateParameters);
                 console.log("Location tracking started.");
             }
         }
-    }
+    }, [getLocationAuthorization, locationUpdateParameters]);
 
-    async function stopLocationTracking() {
+    const stopLocationTracking = useCallback(async () => {
         if (await isTaskRegisteredAsync(LOCATION_TASK_NAME)) {
             await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
             console.log("Location tracking stopped.");
         }
-    }
+    }, []);
+
+    useEffect(() => {
+        getLocationAuthorization();
+    }, [getLocationAuthorization]);
 
     return [location, getLocationAuthorization, startLocationTracking, stopLocationTracking];
 };

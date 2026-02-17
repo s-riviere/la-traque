@@ -1,35 +1,47 @@
-import { useEffect } from 'react';
+// React
+import { useEffect, useRef } from 'react';
 import DeviceInfo from 'react-native-device-info';
-import { useSocket } from "../context/socketContext";
+// Context
 import { useTeamConnexion } from "../context/teamConnexionContext";
+// Hook
+import { useSocketCommands } from "./useSocketCommands";
 
 export const useSendDeviceInfo = () => {
-    const batteryUpdateTimeout = 5*60*1000;
-    const { teamSocket } = useSocket();
-    const {loggedIn} = useTeamConnexion();
+    const { emitBattery, emitDeviceInfo } = useSocketCommands();
+    const { loggedIn } = useTeamConnexion();
+    const isMounted = useRef(true);
 
     useEffect(() => {
+        isMounted.current = true;
+
         if (!loggedIn) return;
 
         const sendInfo = async () => {
-            const brand = DeviceInfo.getBrand();
-            const model = DeviceInfo.getModel();
-            const name = await DeviceInfo.getDeviceName();
-            teamSocket.emit('device_info', {model: brand + " " + model, name: name});
+            const [brand, model, name] = await Promise.all([
+                DeviceInfo.getBrand(),
+                DeviceInfo.getModel(),
+                DeviceInfo.getDeviceName()
+            ]);
+            if (!isMounted) return;
+            emitDeviceInfo({model: brand + " " + model, name: name});
         };
 
         const sendBattery = async () => {
             const level = await DeviceInfo.getBatteryLevel();
-            teamSocket.emit('battery_update', Math.round(level * 100));
+            if (!isMounted) return;
+            emitBattery(Math.round(level * 100));
         };
 
         sendInfo();
         sendBattery();
 
-        const batteryCheckInterval = setInterval(() => sendBattery(), batteryUpdateTimeout);
+        const batteryCheckInterval = setInterval(() => sendBattery(), 5*60*1000); // 5 minutes
 
-        return () => clearInterval(batteryCheckInterval);
-    }, [batteryUpdateTimeout, loggedIn, teamSocket]);
+        return () => {
+            isMounted.current = false;
+            clearInterval(batteryCheckInterval);
+        };
+    }, [emitBattery, emitDeviceInfo, loggedIn]);
 
     return null;
 };

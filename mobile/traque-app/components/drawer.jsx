@@ -9,7 +9,6 @@ import { CustomTextInput } from './input';
 import { Stat } from './stat';
 // Contexts
 import { useTeamContext } from '../context/teamContext';
-import { useSocket } from '../context/socketContext';
 // Hooks
 import { useTimeDifference } from '../hook/useTimeDifference';
 import { useGame } from '../hook/useGame';
@@ -17,17 +16,18 @@ import { useGame } from '../hook/useGame';
 import { GameState } from '../util/gameState';
 import { Colors } from '../util/colors';
 import { secondsToHHMMSS } from '../util/functions';
+import { useImageApi } from '../hook/useImageApi';
 
 export const Drawer = ({ height }) => {
     const [collapsibleState, setCollapsibleState] = useState(true);
     const [enemyCaptureCode, setEnemyCaptureCode] = useState("");
-    const {SERVER_URL} = useSocket();
-    const {gameState, startDate} = useTeamContext();
-    const {capture, enemyName, captureCode, name, teamId, distance, finishDate, nCaptures, nSentLocation, hasHandicap} = useGame();
+    const {teamInfos, gameState, startDate} = useTeamContext();
+    const {enemyName, captureCode, name, distance, finishDate, nCaptures, nSentLocation, hasHandicap} = teamInfos;
+    const {capture} = useGame();
     const [timeSinceStart] = useTimeDifference(startDate, 1000);
-    const [enemyImageURI, setEnemyImageURI] = useState("../assets/images/missing_image.jpg");
     const [captureStatus, setCaptureStatus] = useState(0); // 0 : no capture | 1 : waiting for response from server | 2 : capture failed | 3 : capture succesful
     const captureStatusColor = {0: "#777", 1: "#FFA500", 2: "#FF6B6B", 3: "#81C784"};
+    const { enemyImage } = useImageApi();
 
     const avgSpeed = useMemo(() => {
         const hours = (finishDate ? (finishDate - startDate) : timeSinceStart*1000) / 1000 / 3600;
@@ -47,11 +47,6 @@ export const Drawer = ({ height }) => {
             return () => clearTimeout(timeout);
         }
     }, [captureStatus]);
-    
-    // Refresh the image
-    useEffect(() => {
-        setEnemyImageURI(`${SERVER_URL}/photo/enemy?team=${teamId}&t=${new Date().getTime()}`);
-    }, [SERVER_URL, enemyName, teamId]);
     
     const handleCapture = () => {
         if (captureStatus != 1) {
@@ -86,8 +81,8 @@ export const Drawer = ({ height }) => {
                         }
                         { gameState == GameState.PLAYING && !hasHandicap && <Fragment>
                             <View style={styles.imageContainer}>
-                                {<Text style={{fontSize: 15, margin: 5}}>{"Cible (" + (enemyName ?? "Indisponible") + ")"}</Text>}
-                                {<CustomImage source={{ uri : enemyImageURI }} canZoom/>}
+                                <Text style={{fontSize: 15, margin: 5}}>{"Cible (" + (enemyName ?? "Indisponible") + ")"}</Text>
+                                <CustomImage source={enemyImage} canZoom/>
                             </View>
                             <View style={styles.actionsContainer}>
                                 <View style={styles.actionsLeftContainer}>
