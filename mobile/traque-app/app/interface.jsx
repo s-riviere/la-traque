@@ -6,21 +6,23 @@ import { useRouter } from 'expo-router';
 // Components
 import { CustomMap } from '../components/map';
 import { Drawer } from '../components/drawer';
+import { TimerMMSS } from '../components/timer';
 // Contexts
 import { useTeamConnexion } from '../context/teamConnexionContext';
 import { useTeamContext } from '../context/teamContext';
 // Hooks
 import { useGame } from '../hook/useGame';
 import { useTimeDifference } from '../hook/useTimeDifference';
+// Services
+import { startLocationTracking } from '../services/backgroundLocationTask';
 // Util
-import { GameState } from '../util/gameState';
-import { TimerMMSS } from '../components/timer';
 import { secondsToMMSS } from '../util/functions';
-import { Colors } from '../util/colors';
+// Constants
+import { GAME_STATE, COLORS } from '../constants';
 
 const Interface = () => {
     const router = useRouter();
-    const {teamInfos, messages, nextZoneDate, isShrinking, startLocationTracking, stopLocationTracking, gameState} = useTeamContext();
+    const {teamInfos, messages, nextZoneDate, isShrinking, gameState} = useTeamContext();
     const {name, ready, captured, locationSendDeadline, outOfZone, outOfZoneDeadline, hasHandicap, enemyHasHandicap} = teamInfos;
     const {loggedIn, logout} = useTeamConnexion();
     const {sendCurrentPosition} = useGame();
@@ -31,16 +33,16 @@ const Interface = () => {
     
     const statusMessage = useMemo(() => {
         switch (gameState) {
-            case GameState.SETUP:
+            case GAME_STATE.SETUP:
                 return messages?.waiting || "Préparation de la partie";
-            case GameState.PLACEMENT:
+            case GAME_STATE.PLACEMENT:
                 return "Phase de placement";
-            case GameState.PLAYING:
+            case GAME_STATE.PLAYING:
                 if (captured) return messages?.captured || "Vous avez été éliminé...";
                 if (!outOfZone) return "La partie est en cours";
                 if (!hasHandicap) return `Veuillez retourner dans la zone\nHandicap dans ${secondsToMMSS(-timeLeftOutOfZone)}`;
                 else return `Veuillez retourner dans la zone\nVotre position est révélée en continue`;
-            case GameState.FINISHED:
+            case GAME_STATE.FINISHED:
                 return `Vous avez ${captured ? (messages?.loser || "perdu...") : (messages?.winner || "gagné !")}`;
             default:
                 return "Inconnue";
@@ -56,12 +58,8 @@ const Interface = () => {
 
     // Activating geolocation tracking
     useEffect(() => {
-        if (loggedIn) {
-            startLocationTracking();
-        } else {
-            stopLocationTracking();
-        }
-    }, [startLocationTracking, stopLocationTracking, loggedIn]);
+        startLocationTracking();
+    }, []);
 
     return (
         <View style={styles.globalContainer}>
@@ -83,12 +81,12 @@ const Interface = () => {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.infoContainer}>
-                    { gameState == GameState.PLACEMENT &&
+                    { gameState == GAME_STATE.PLACEMENT &&
                         <View style={[styles.readyIndicator, {backgroundColor: ready ? "#3C3" : "#C33"}]}>
                             <Text style={{color: '#fff', fontSize: 16}}>{ready ? "Placé" : "Non placé"}</Text>
                         </View>
                     }
-                    { gameState == GameState.PLAYING && !captured && <Fragment>
+                    { gameState == GAME_STATE.PLAYING && !captured && <Fragment>
                         <TimerMMSS style={{width: "50%"}} title={isShrinking ? "Réduction de la zone" : "Durée de la zone"} seconds={-timeLeftNextZone} />
                         <TimerMMSS style={{width: "50%"}} title={"Position envoyée dans"} seconds={!hasHandicap ? -timeLeftSendLocation: 0} />
                     </Fragment>}
@@ -99,12 +97,12 @@ const Interface = () => {
             </View>
             <View style={styles.bottomContainer} onLayout={(event) => setBottomContainerHeight(event.nativeEvent.layout.height)}>
                 <CustomMap/>
-                { gameState == GameState.PLAYING && !captured && !hasHandicap &&
+                { gameState == GAME_STATE.PLAYING && !captured && !hasHandicap &&
                     <TouchableOpacity style={styles.updatePosition} onPress={sendCurrentPosition}>
                         <Image source={require("../assets/images/update_position.png")} style={{width: 40, height: 40}} resizeMode="contain"></Image>
                     </TouchableOpacity>
                 }
-                { gameState == GameState.PLAYING && !captured &&
+                { gameState == GAME_STATE.PLAYING && !captured &&
                     <Drawer height={bottomContainerHeight}/>
                 }
             </View>
@@ -116,7 +114,7 @@ export default Interface;
 
 const styles = StyleSheet.create({
     globalContainer: {
-        backgroundColor: Colors.background,
+        backgroundColor: COLORS.background,
         flex: 1,
     },
     topContainer: {

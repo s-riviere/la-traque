@@ -7,20 +7,22 @@ import LinearGradient from 'react-native-linear-gradient';
 import { DashedCircle, InvertedCircle, InvertedPolygon } from './layer';
 // Contexts
 import { useTeamContext } from '../context/teamContext';
+// Hook
+import { useLocation } from '../hook/useLocation';
 // Util
-import { GameState } from '../util/gameState';
-import { ZoneTypes, InitialRegions } from '../util/constants';
+import { ZONE_TYPES, INITIAL_REGIONS, GAME_STATE } from '../constants';
 
 export const CustomMap = () => {
-    const {teamInfos, zoneType, zoneExtremities, location, gameState} = useTeamContext();
+    const { location } = useLocation();
+    const {teamInfos, zoneType, zoneExtremities, gameState} = useTeamContext();
     const {enemyLocation, startingArea, lastSentLocation, hasHandicap} = teamInfos;
     const [centerMap, setCenterMap] = useState(true);
     const mapRef = useRef(null);
 
     // Center the map on user position
     useEffect(() => {
-        if (centerMap && mapRef.current && location) {
-            mapRef.current.animateToRegion({latitude: location[0], longitude: location[1], latitudeDelta: 0, longitudeDelta: 0.02}, 1000);
+        if (centerMap && location && mapRef.current) {
+            mapRef.current.animateToRegion({...location, latitudeDelta: 0, longitudeDelta: 0.02}, 1000);
         }
     }, [centerMap, location]);
 
@@ -30,7 +32,7 @@ export const CustomMap = () => {
     const latToLatitude = (pos) => ({latitude: pos.lat, longitude: pos.lng});
 
     const startZone = useMemo(() => {
-        if (gameState != GameState.PLACEMENT || !startingArea) return null;
+        if (gameState != GAME_STATE.PLACEMENT || !startingArea) return null;
 
         return (
             <Circle key="start-zone" center={{ latitude: startingArea.center.lat, longitude: startingArea.center.lng }} radius={startingArea.radius} strokeWidth={2} strokeColor={`rgba(0, 0, 255, 1)`} fillColor={`rgba(0, 0, 255, 0.2)`}/>
@@ -38,7 +40,7 @@ export const CustomMap = () => {
     }, [gameState, startingArea]);
 
     const gameZone = useMemo(() => {
-        if (gameState !== GameState.PLAYING || !zoneExtremities) return null;
+        if (gameState !== GAME_STATE.PLAYING || !zoneExtremities) return null;
 
         const items = [];
         
@@ -47,7 +49,7 @@ export const CustomMap = () => {
         const strokeWidth = 3;
         const lineDashPattern = [30, 10];
 
-        if (zoneType === ZoneTypes.circle) {
+        if (zoneType === ZONE_TYPES.CIRCLE) {
             if (zoneExtremities.begin) items.push(
                 <InvertedCircle
                     key="game-zone-begin-circle"
@@ -68,7 +70,7 @@ export const CustomMap = () => {
                     lineDashPattern={lineDashPattern}
                 />
             );
-        } else if (zoneType === ZoneTypes.polygon) {
+        } else if (zoneType === ZONE_TYPES.POLYGON) {
             if (zoneExtremities.begin) items.push(
                 <InvertedPolygon
                     key="game-zone-begin-poly"
@@ -95,14 +97,14 @@ export const CustomMap = () => {
         if (!location) return null;
 
         return (
-            <Marker key={"current-position-marker"} coordinate={{ latitude: location[0], longitude: location[1] }} anchor={{ x: 0.33, y: 0.33 }} onPress={() => Alert.alert("Position actuelle", "Ceci est votre position")}>
+            <Marker key={"current-position-marker"} coordinate={location} anchor={{ x: 0.33, y: 0.33 }} onPress={() => Alert.alert("Position actuelle", "Ceci est votre position")}>
                 <Image source={require("../assets/images/marker/blue.png")} style={styles.markerImage} resizeMode="contain"/>
             </Marker>
         );
     }, [location]);
 
     const lastPositionMarker = useMemo(() => {
-        if (gameState != GameState.PLAYING || !lastSentLocation || hasHandicap) return null;
+        if (gameState != GAME_STATE.PLAYING || !lastSentLocation || hasHandicap) return null;
 
         return (
             <Marker key={"last-position-marker"} coordinate={{ latitude: lastSentLocation[0], longitude: lastSentLocation[1] }} anchor={{ x: 0.33, y: 0.33 }} onPress={() => Alert.alert("Position envoyée", "Ceci est votre dernière position connue par le serveur")}>
@@ -112,7 +114,7 @@ export const CustomMap = () => {
     }, [gameState, hasHandicap, lastSentLocation]);
 
     const enemyPositionMarker = useMemo(() => {
-        if (gameState != GameState.PLAYING || !enemyLocation || hasHandicap) return null;
+        if (gameState != GAME_STATE.PLAYING || !enemyLocation || hasHandicap) return null;
 
         return (
             <Marker key={"enemy-position-marker"} coordinate={{ latitude: enemyLocation[0], longitude: enemyLocation[1] }} anchor={{ x: 0.33, y: 0.33 }} onPress={() => Alert.alert("Position ennemie", "Ceci est la dernière position de vos ennemis connue")}>
@@ -124,7 +126,7 @@ export const CustomMap = () => {
 
     return (
         <View style={styles.container}>
-            <MapView ref={mapRef} style={{flex: 1}} initialRegion={InitialRegions.paris} mapType="standard" onTouchMove={() => setCenterMap(false)} toolbarEnabled={false}>
+            <MapView ref={mapRef} style={{flex: 1}} initialRegion={INITIAL_REGIONS.PARIS} mapType="standard" onTouchMove={() => setCenterMap(false)} toolbarEnabled={false}>
                 {startZone}
                 {gameZone}
                 {currentPositionMarker}

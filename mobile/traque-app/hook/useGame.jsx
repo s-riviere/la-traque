@@ -1,14 +1,13 @@
 // React
 import { useCallback } from "react";
-// Hook
-import { useSocketCommands } from "./useSocketCommands";
+// Services
+import { emitSendPosition, emitCapture } from "../services/socketEmitter";
 
 export const useGame = () => {
-    const { emitSendPosition, emitCapture } = useSocketCommands();
     
     const sendCurrentPosition = useCallback(() => {
         emitSendPosition();
-    }, [emitSendPosition]);
+    }, []);
 
     const capture = useCallback((captureCode) => {
         return new Promise((resolve, reject) => {
@@ -22,7 +21,7 @@ export const useGame = () => {
                 resolve(response);
             });
         });
-    }, [emitCapture]);
+    }, []);
 
     return { sendCurrentPosition, capture };
 };

@@ -8,17 +8,20 @@ import { CustomImage } from './image';
 import { CustomTextInput } from './input';
 import { Stat } from './stat';
 // Contexts
+import { useTeamConnexion } from '../context/teamConnexionContext';
 import { useTeamContext } from '../context/teamContext';
 // Hooks
 import { useTimeDifference } from '../hook/useTimeDifference';
 import { useGame } from '../hook/useGame';
+// Services
+import { enemyImage } from '../services/imageService';
 // Util
-import { GameState } from '../util/gameState';
-import { Colors } from '../util/colors';
 import { secondsToHHMMSS } from '../util/functions';
-import { useImageApi } from '../hook/useImageApi';
+// Constants
+import { GAME_STATE, COLORS } from '../constants';
 
 export const Drawer = ({ height }) => {
+    const { teamId } = useTeamConnexion();
     const [collapsibleState, setCollapsibleState] = useState(true);
     const [enemyCaptureCode, setEnemyCaptureCode] = useState("");
     const {teamInfos, gameState, startDate} = useTeamContext();
@@ -27,7 +30,6 @@ export const Drawer = ({ height }) => {
     const [timeSinceStart] = useTimeDifference(startDate, 1000);
     const [captureStatus, setCaptureStatus] = useState(0); // 0 : no capture | 1 : waiting for response from server | 2 : capture failed | 3 : capture succesful
     const captureStatusColor = {0: "#777", 1: "#FFA500", 2: "#FF6B6B", 3: "#81C784"};
-    const { enemyImage } = useImageApi();
 
     const avgSpeed = useMemo(() => {
         const hours = (finishDate ? (finishDate - startDate) : timeSinceStart*1000) / 1000 / 3600;
@@ -76,13 +78,13 @@ export const Drawer = ({ height }) => {
                 </TouchableHighlight>
                 <Collapsible style={[styles.collapsibleWindow, {height: height - 44}]} title="Collapse" collapsed={collapsibleState}>
                     <ScrollView contentContainerStyle={styles.collapsibleContent}>
-                        { gameState == GameState.PLAYING && 
+                        { gameState == GAME_STATE.PLAYING && 
                             <Text style={{fontSize: 22, fontWeight: "bold", textAlign: "center"}}>Code de {(name ?? "Indisponible")} : {String(captureCode).padStart(4,"0")}</Text>
                         }
-                        { gameState == GameState.PLAYING && !hasHandicap && <Fragment>
+                        { gameState == GAME_STATE.PLAYING && !hasHandicap && <Fragment>
                             <View style={styles.imageContainer}>
                                 <Text style={{fontSize: 15, margin: 5}}>{"Cible (" + (enemyName ?? "Indisponible") + ")"}</Text>
-                                <CustomImage source={enemyImage} canZoom/>
+                                <CustomImage source={enemyImage(teamId)} canZoom/>
                             </View>
                             <View style={styles.actionsContainer}>
                                 <View style={styles.actionsLeftContainer}>
@@ -122,7 +124,7 @@ const styles = StyleSheet.create({
     },
     innerDrawerContainer: {
         width: "100%",
-        backgroundColor: Colors.background,
+        backgroundColor: COLORS.background,
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
         overflow: 'hidden',
@@ -136,7 +138,7 @@ const styles = StyleSheet.create({
     collapsibleWindow: {
         width: "100%",
         justifyContent: 'center',
-        backgroundColor: Colors.background,
+        backgroundColor: COLORS.background,
     },
     collapsibleContent: {
         paddingHorizontal: 15,

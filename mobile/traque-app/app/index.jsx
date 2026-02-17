@@ -9,34 +9,33 @@ import { CustomImage } from '../components/image';
 import { CustomTextInput } from '../components/input';
 // Contexts
 import { useTeamConnexion } from "../context/teamConnexionContext";
-import { useTeamContext } from "../context/teamContext";
 // Hooks
 import { usePickImage } from '../hook/usePickImage';
-import { useImageApi } from '../hook/useImageApi';
-// Util
-import { Colors } from '../util/colors';
+// Services
+import { uploadTeamImage } from '../services/imageService';
+import { getLocationAuthorization, stopLocationTracking } from '../services/backgroundLocationTask';
+// Constants
+import { COLORS } from '../constants';
 
 const Index = () => {
     const router = useRouter();
-    const {login, loggedIn} = useTeamConnexion();
-    const {getLocationAuthorization, stopLocationTracking} = useTeamContext();
+    const { login, loggedIn } = useTeamConnexion();
     const {image, pickImage} = usePickImage();
     const [teamId, setTeamId] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { uploadTeamImage } = useImageApi();
 
-    // Disbaling location tracking
+    // Disbaling location tracking and asking permissions
     useEffect(() => {
         stopLocationTracking();
-    }, [stopLocationTracking]);
+        getLocationAuthorization();
+    }, []);
 
     // Routeur
     useEffect(() => {
         if (loggedIn) {
-            uploadTeamImage(image?.uri);
             router.replace("/interface");
         }
-    }, [router, loggedIn, uploadTeamImage, image]);
+    }, [router, loggedIn, image]);
 
     const handleSubmit = async () => {
         if (isSubmitting || !getLocationAuthorization()) return;
@@ -53,6 +52,7 @@ const Index = () => {
             const response = await login(teamId);
 
             if (response.isLoggedIn) {
+                uploadTeamImage(teamId, image?.uri);
                 setTeamId("");
             } else {
                 setTimeout(() => Alert.alert("Échec", "L'ID d'équipe est inconnu."), 100);
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         alignItems: 'center',
         paddingVertical: 20,
-        backgroundColor: Colors.background
+        backgroundColor: COLORS.background
     },
     transitionContainer: {
         flexGrow: 1,

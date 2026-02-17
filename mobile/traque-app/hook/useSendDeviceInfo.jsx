@@ -3,11 +3,10 @@ import { useEffect, useRef } from 'react';
 import DeviceInfo from 'react-native-device-info';
 // Context
 import { useTeamConnexion } from "../context/teamConnexionContext";
-// Hook
-import { useSocketCommands } from "./useSocketCommands";
+// Services
+import { emitBattery, emitDeviceInfo } from "../services/socketEmitter";
 
 export const useSendDeviceInfo = () => {
-    const { emitBattery, emitDeviceInfo } = useSocketCommands();
     const { loggedIn } = useTeamConnexion();
     const isMounted = useRef(true);
 
@@ -41,7 +40,7 @@ export const useSendDeviceInfo = () => {
             isMounted.current = false;
             clearInterval(batteryCheckInterval);
         };
-    }, [emitBattery, emitDeviceInfo, loggedIn]);
+    }, [loggedIn]);
 
     return null;
 };

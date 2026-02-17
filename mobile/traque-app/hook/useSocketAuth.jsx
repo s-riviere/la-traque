@@ -2,10 +2,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 // Hook
 import { useLocalStorage } from './useLocalStorage';
-import { useSocketCommands } from "./useSocketCommands";
+// Services
+import { emitLogin, emitLogout } from "../services/socketEmitter";
 
 export const useSocketAuth = () => {
-    const { emitLogin, emitLogout } = useSocketCommands();
     const [loggedIn, setLoggedIn] = useState(false);
     const [savedPassword, setSavedPassword] = useLocalStorage("team_password", null);
     const isMounted = useRef(true);
@@ -42,7 +42,7 @@ export const useSocketAuth = () => {
                 }
             });
         });
-    }, [emitLogin, setSavedPassword]);
+    }, [setSavedPassword]);
 
     useEffect(() => {
         if (!loggedIn && savedPassword) {
@@ -54,7 +54,7 @@ export const useSocketAuth = () => {
         setLoggedIn(false);
         setSavedPassword(null);
         emitLogout();
-    }, [emitLogout, setSavedPassword]);
+    }, [setSavedPassword]);
 
     return {login, logout, password: savedPassword, loggedIn};
 };

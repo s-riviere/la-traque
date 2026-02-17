@@ -1,24 +1,30 @@
 // React
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState, useEffect } from "react";
 // Context
-import { useSocket } from "./socketContext";
 import { useTeamConnexion } from "./teamConnexionContext";
 // Hook
 import { useSendDeviceInfo } from "../hook/useSendDeviceInfo";
-import { useLocation } from "../hook/useLocation";
-import { useSocketListener } from "../hook/useSocketListener";
-// Util
-import { GameState } from "../util/gameState";
+// Services
+import { socket } from "../services/socket";
+// Constants
+import { GAME_STATE } from "../constants";
 
 const TeamContext = createContext();
 
+const useSocketListener = (event, callback) => {
+    useEffect(() => {
+        socket.on(event, callback);
+        return () => {
+            socket.off(event, callback);
+        };
+    }, [callback, event]);
+};
+
 export const TeamProvider = ({children}) => {
-    const {teamSocket} = useSocket();
-    const [location, getLocationAuthorization, startLocationTracking, stopLocationTracking] = useLocation(5000, 10);
     // update_team
     const [teamInfos, setTeamInfos] = useState({});
     // game_state
-    const [gameState, setGameState] = useState(GameState.SETUP);
+    const [gameState, setGAME_STATE] = useState(GAME_STATE.SETUP);
     const [startDate, setStartDate] = useState(null);
     // current_zone
     const [zoneExtremities, setZoneExtremities] = useState(null);
@@ -31,16 +37,16 @@ export const TeamProvider = ({children}) => {
     
     useSendDeviceInfo();
 
-    useSocketListener(teamSocket, "update_team", (data) => {
+    useSocketListener("update_team", (data) => {
         setTeamInfos(teamInfos => ({...teamInfos, ...data}));
     });
 
-    useSocketListener(teamSocket, "game_state", (data) => {
-        setGameState(data.state);
+    useSocketListener("game_state", (data) => {
+        setGAME_STATE(data.state);
         setStartDate(data.date);
     });
 
-    useSocketListener(teamSocket, "settings", (data) => {
+    useSocketListener("settings", (data) => {
         setMessages(data.messages);
         setZoneType(data.zone.type);
         //TODO
@@ -48,16 +54,16 @@ export const TeamProvider = ({children}) => {
         //setOutOfZoneDelay(data.outOfZoneDelay);
     });
 
-    useSocketListener(teamSocket, "current_zone", (data) => {
+    useSocketListener("current_zone", (data) => {
         setZoneExtremities({begin: data.begin, end: data.end});
         setNextZoneDate(data.endDate);
     });
 
-    useSocketListener(teamSocket, "logout", logout);
+    useSocketListener("logout", logout);
 
     const value = useMemo(() => (
-        {teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages, location, getLocationAuthorization, startLocationTracking, stopLocationTracking}
-    ), [teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages, location, getLocationAuthorization, startLocationTracking, stopLocationTracking]);
+        {teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages}
+    ), [teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages]);
 
     return (
         <TeamContext.Provider value={value}>
