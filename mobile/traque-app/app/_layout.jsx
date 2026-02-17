@@ -1,8 +1,8 @@
 // Expo
 import { Slot } from 'expo-router';
 // Contexts
-import { TeamConnexionProvider } from "../context/teamConnexionContext";
-import { TeamProvider } from "../context/teamContext";
+import { TeamConnexionProvider } from "../src/context/teamConnexionContext";
+import { TeamProvider } from "../src/context/teamContext";
 
 const Layout = () => {
     return (

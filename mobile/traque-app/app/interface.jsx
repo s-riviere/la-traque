@@ -4,21 +4,21 @@ import { View, Text, Image, Alert, StyleSheet, TouchableOpacity } from 'react-na
 // Expo
 import { useRouter } from 'expo-router';
 // Components
-import { CustomMap } from '../components/map';
-import { Drawer } from '../components/drawer';
-import { TimerMMSS } from '../components/timer';
+import { CustomMap } from '../src/components/map';
+import { Drawer } from '../src/components/drawer';
+import { TimerMMSS } from '../src/components/timer';
 // Contexts
-import { useTeamConnexion } from '../context/teamConnexionContext';
-import { useTeamContext } from '../context/teamContext';
+import { useTeamConnexion } from '../src/context/teamConnexionContext';
+import { useTeamContext } from '../src/context/teamContext';
 // Hooks
-import { useGame } from '../hook/useGame';
-import { useTimeDifference } from '../hook/useTimeDifference';
+import { useGame } from '../src/hook/useGame';
+import { useTimeDifference } from '../src/hook/useTimeDifference';
 // Services
-import { startLocationTracking } from '../services/backgroundLocationTask';
+import { startLocationTracking } from '../src/services/backgroundLocationTask';
 // Util
-import { secondsToMMSS } from '../util/functions';
+import { secondsToMMSS } from '../src/util/functions';
 // Constants
-import { GAME_STATE, COLORS } from '../constants';
+import { GAME_STATE, COLORS } from '../src/constants';
 
 const Interface = () => {
     const router = useRouter();
@@ -66,10 +66,10 @@ const Interface = () => {
             <View style={styles.topContainer}>
                 <View style={styles.topheadContainer}>
                     <TouchableOpacity style={{width: 40, height: 40}} onPress={logout}>
-                        <Image source={require('../assets/images/logout.png')} style={{width: 40, height: 40}} resizeMode="contain"></Image>
+                        <Image source={require('../src/assets/images/logout.png')} style={{width: 40, height: 40}} resizeMode="contain"></Image>
                     </TouchableOpacity>
                     <TouchableOpacity style={{width: 40, height: 40}} onPress={() => Alert.alert("Settings")}>
-                        <Image source={require('../assets/images/cogwheel.png')} style={{width: 40, height: 40}} resizeMode="contain"></Image>
+                        <Image source={require('../src/assets/images/cogwheel.png')} style={{width: 40, height: 40}} resizeMode="contain"></Image>
                     </TouchableOpacity>
                 </View>          
                 <View style={styles.teamNameContainer}>
@@ -99,7 +99,7 @@ const Interface = () => {
                 <CustomMap/>
                 { gameState == GAME_STATE.PLAYING && !captured && !hasHandicap &&
                     <TouchableOpacity style={styles.updatePosition} onPress={sendCurrentPosition}>
-                        <Image source={require("../assets/images/update_position.png")} style={{width: 40, height: 40}} resizeMode="contain"></Image>
+                        <Image source={require("../src/assets/images/update_position.png")} style={{width: 40, height: 40}} resizeMode="contain"></Image>
                     </TouchableOpacity>
                 }
                 { gameState == GAME_STATE.PLAYING && !captured &&

@@ -4,18 +4,18 @@ import { ScrollView, View, Text, StyleSheet, Image, Alert } from 'react-native';
 // Expo
 import { useRouter } from 'expo-router';
 // Components
-import { CustomButton } from '../components/button';
-import { CustomImage } from '../components/image';
-import { CustomTextInput } from '../components/input';
+import { CustomButton } from '../src/components/button';
+import { CustomImage } from '../src/components/image';
+import { CustomTextInput } from '../src/components/input';
 // Contexts
-import { useTeamConnexion } from "../context/teamConnexionContext";
+import { useTeamConnexion } from "../src/context/teamConnexionContext";
 // Hooks
-import { usePickImage } from '../hook/usePickImage';
+import { usePickImage } from '../src/hook/usePickImage';
 // Services
-import { uploadTeamImage } from '../services/imageService';
-import { getLocationAuthorization, stopLocationTracking } from '../services/backgroundLocationTask';
+import { uploadTeamImage } from '../src/services/imageService';
+import { getLocationAuthorization, stopLocationTracking } from '../src/services/backgroundLocationTask';
 // Constants
-import { COLORS } from '../constants';
+import { COLORS } from '../src/constants';
 
 const Index = () => {
     const router = useRouter();
@@ -68,7 +68,7 @@ const Index = () => {
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.transitionContainer}>
                 <View style={styles.subContainer}>
-                    <Image style={styles.logoImage} source={require('../assets/images/logo/logo_traque.png')}/>
+                    <Image style={styles.logoImage} source={require('../src/assets/images/logo/logo_traque.png')}/>
                     <Text style={styles.logoText}>LA TRAQUE</Text>
                 </View>
                 <View style={styles.subContainer}>
@@ -77,7 +77,7 @@ const Index = () => {
                 <View style={styles.subContainer}>
                     <Text style={{fontSize: 15}}>Appuyer pour changer la photo d&apos;équipe</Text>
                     <Text style={{fontSize: 13, marginBottom: 3}}>(Le haut du corps doit être visible)</Text>
-                    <CustomImage source={image ? {uri: image.uri} : require('../assets/images/missing_image.jpg')} onPress={pickImage}/>
+                    <CustomImage source={image ? {uri: image.uri} : require('../src/assets/images/missing_image.jpg')} onPress={pickImage}/>
                 </View>
                 <View style={styles.subContainer}>
                      <CustomButton label={isSubmitting ? "..." : "Valider"} onPress={handleSubmit}/>

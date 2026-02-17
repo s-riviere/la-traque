@@ -18,9 +18,9 @@
     "slug": "la-traque",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo/logo_traque.png",
+    "icon": "./src/assets/images/logo/logo_traque.png",
     "splash": {
-      "image": "./assets/images/logo/logo_traque.png",
+      "image": "./src/assets/images/logo/logo_traque.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
