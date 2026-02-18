@@ -8,25 +8,24 @@ import { CustomImage } from './image';
 import { CustomTextInput } from './input';
 import { Stat } from './stat';
 // Contexts
-import { useTeamConnexion } from '../context/teamConnexionContext';
-import { useTeamContext } from '../context/teamContext';
+import { useAuth } from '../contexts/authContext';
+import { useTeam } from '../contexts/teamContext';
 // Hooks
-import { useTimeDifference } from '../hook/useTimeDifference';
-import { useGame } from '../hook/useGame';
+import { useTimeDifference } from '../hooks/useTimeDifference';
 // Services
-import { enemyImage } from '../services/imageService';
+import { emitCapture } from '../services/socket/emitters';
+import { enemyImage } from '../services/api/image';
 // Util
-import { secondsToHHMMSS } from '../util/functions';
+import { secondsToHHMMSS } from '../utils/functions';
 // Constants
 import { GAME_STATE, COLORS } from '../constants';
 
 export const Drawer = ({ height }) => {
-    const { teamId } = useTeamConnexion();
+    const { teamId } = useAuth();
     const [collapsibleState, setCollapsibleState] = useState(true);
     const [enemyCaptureCode, setEnemyCaptureCode] = useState("");
-    const {teamInfos, gameState, startDate} = useTeamContext();
+    const {teamInfos, gameState, startDate} = useTeam();
     const {enemyName, captureCode, name, distance, finishDate, nCaptures, nSentLocation, hasHandicap} = teamInfos;
-    const {capture} = useGame();
     const [timeSinceStart] = useTimeDifference(startDate, 1000);
     const [captureStatus, setCaptureStatus] = useState(0); // 0 : no capture | 1 : waiting for response from server | 2 : capture failed | 3 : capture succesful
     const captureStatusColor = {0: "#777", 1: "#FFA500", 2: "#FF6B6B", 3: "#81C784"};
@@ -53,7 +52,7 @@ export const Drawer = ({ height }) => {
     const handleCapture = () => {
         if (captureStatus != 1) {
             setCaptureStatus(1);
-            capture(enemyCaptureCode)
+            emitCapture(enemyCaptureCode)
                 .then((response) => {
                     if (response.hasCaptured) {
                         setCaptureStatus(3);

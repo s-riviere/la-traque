@@ -2,9 +2,9 @@
 import { defineTask, isTaskRegisteredAsync } from "expo-task-manager";
 import * as Location from 'expo-location';
 // Services
-import { emitUpdatePosition } from "./socketEmitter";
+import { emitUpdatePosition } from "../socket/emitters";
 // Constants
-import { TASKS, LOCATION_PARAMETERS } from "../constants";
+import { TASKS, LOCATION_PARAMETERS } from "../../constants";
 
 
 // Task

@@ -1,26 +1,25 @@
 // React
 import { createContext, useContext, useMemo, useState, useEffect } from "react";
 // Context
-import { useTeamConnexion } from "./teamConnexionContext";
-// Hook
-import { useSendDeviceInfo } from "../hook/useSendDeviceInfo";
+import { useAuth } from "./authContext";
 // Services
-import { socket } from "../services/socket";
+import { socket } from "../services/socket/connection";
 // Constants
 import { GAME_STATE } from "../constants";
 
 const TeamContext = createContext();
 
-const useSocketListener = (event, callback) => {
+const useOnEvent = (event, callback) => {
     useEffect(() => {
         socket.on(event, callback);
         return () => {
             socket.off(event, callback);
         };
-    }, [callback, event]);
+    }, [event, callback]);
 };
 
 export const TeamProvider = ({children}) => {
+    const { logout } = useAuth();
     // update_team
     const [teamInfos, setTeamInfos] = useState({});
     // game_state
@@ -32,21 +31,17 @@ export const TeamProvider = ({children}) => {
     // settings
     const [messages, setMessages] = useState(null);
     const [zoneType, setZoneType] = useState(null);
-    // logout
-    const { logout } = useTeamConnexion();
-    
-    useSendDeviceInfo();
 
-    useSocketListener("update_team", (data) => {
+    useOnEvent("update_team", (data) => {
         setTeamInfos(teamInfos => ({...teamInfos, ...data}));
     });
 
-    useSocketListener("game_state", (data) => {
+    useOnEvent("game_state", (data) => {
         setGAME_STATE(data.state);
         setStartDate(data.date);
     });
 
-    useSocketListener("settings", (data) => {
+    useOnEvent("settings", (data) => {
         setMessages(data.messages);
         setZoneType(data.zone.type);
         //TODO
@@ -54,12 +49,12 @@ export const TeamProvider = ({children}) => {
         //setOutOfZoneDelay(data.outOfZoneDelay);
     });
 
-    useSocketListener("current_zone", (data) => {
+    useOnEvent("current_zone", (data) => {
         setZoneExtremities({begin: data.begin, end: data.end});
         setNextZoneDate(data.endDate);
     });
 
-    useSocketListener("logout", logout);
+    useOnEvent("logout", logout);
 
     const value = useMemo(() => (
         {teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages}
@@ -72,6 +67,6 @@ export const TeamProvider = ({children}) => {
     );
 };
 
-export const useTeamContext = () => {
+export const useTeam = () => {
     return useContext(TeamContext);
 };

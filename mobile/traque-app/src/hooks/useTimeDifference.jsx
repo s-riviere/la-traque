@@ -1,10 +1,12 @@
 // React
 import { useEffect, useState } from "react";
 
+/**
+ * If refTime is in the past, time will be positive
+ * If refTime is in the future, time will be negative
+ * The time is updated every timeout milliseconds
+ */
 export const useTimeDifference = (refTime, timeout) => {
-    // If refTime is in the past, time will be positive
-    // If refTime is in the future, time will be negative
-    // The time is updated every timeout milliseconds
     const [time, setTime] = useState(0);
 
     useEffect(() => {

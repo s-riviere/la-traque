@@ -35,5 +35,5 @@ export const usePickImage = () => {
         }
     }, []);
 
-    return {image, pickImage};
+    return { image, pickImage };
 };

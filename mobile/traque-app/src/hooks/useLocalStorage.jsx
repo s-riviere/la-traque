@@ -6,21 +6,16 @@ export const useLocalStorage = (key, initialValue) => {
     const [storedValue, setStoredValue] = useState(initialValue);
 
     useEffect(() => {
-        let isMounted = true;
-
         const fetchData = async () => {
             try {
                 const item = await AsyncStorage.getItem(key);
-                if (isMounted && item !== null) {
-                    setStoredValue(JSON.parse(item));
-                }
+                if (item !== null) setStoredValue(JSON.parse(item));
             } catch (error) {
                 console.error(`Error loading key "${key}":`, error);
             }
         };
 
         fetchData();
-        return () => { isMounted = false; };
     }, [key]);
 
     const setValue = useCallback(async (value) => {

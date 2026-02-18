@@ -8,19 +8,19 @@ import { CustomButton } from '../src/components/button';
 import { CustomImage } from '../src/components/image';
 import { CustomTextInput } from '../src/components/input';
 // Contexts
-import { useTeamConnexion } from "../src/context/teamConnexionContext";
+import { useAuth } from "../src/contexts/authContext";
 // Hooks
-import { usePickImage } from '../src/hook/usePickImage';
+import { usePickImage } from '../src/hooks/usePickImage';
 // Services
-import { uploadTeamImage } from '../src/services/imageService';
-import { getLocationAuthorization, stopLocationTracking } from '../src/services/backgroundLocationTask';
+import { uploadTeamImage } from '../src/services/api/image';
+import { getLocationAuthorization, stopLocationTracking } from '../src/services/tasks/backgroundLocation';
 // Constants
 import { COLORS } from '../src/constants';
 
 const Index = () => {
     const router = useRouter();
-    const { login, loggedIn } = useTeamConnexion();
-    const {image, pickImage} = usePickImage();
+    const { loggedIn, login } = useAuth();
+    const { image, pickImage } = usePickImage();
     const [teamId, setTeamId] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 

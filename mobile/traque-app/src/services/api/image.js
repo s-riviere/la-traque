@@ -1,5 +1,5 @@
 // Constants
-import { SERVER_URL } from "../constants";
+import { SERVER_URL } from "../../constants";
 
 export const uploadTeamImage = async (id, imageUri) => {
     if (!imageUri || !id) return;

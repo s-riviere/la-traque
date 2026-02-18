@@ -1,7 +1,7 @@
 // React
 import { Fragment } from 'react';
 import { Polygon } from 'react-native-maps';
-import { circleToPolygon } from '../util/functions';
+import { circleToPolygon } from '../utils/functions';
 
 export const InvertedPolygon = ({id, coordinates, fillColor}) => {
     // We create 3 rectangles covering earth, with the first rectangle centered on the hole

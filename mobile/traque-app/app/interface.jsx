@@ -8,24 +8,23 @@ import { CustomMap } from '../src/components/map';
 import { Drawer } from '../src/components/drawer';
 import { TimerMMSS } from '../src/components/timer';
 // Contexts
-import { useTeamConnexion } from '../src/context/teamConnexionContext';
-import { useTeamContext } from '../src/context/teamContext';
+import { useAuth } from '../src/contexts/authContext';
+import { useTeam } from '../src/contexts/teamContext';
 // Hooks
-import { useGame } from '../src/hook/useGame';
-import { useTimeDifference } from '../src/hook/useTimeDifference';
+import { useTimeDifference } from '../src/hooks/useTimeDifference';
 // Services
-import { startLocationTracking } from '../src/services/backgroundLocationTask';
+import { emitSendPosition } from '../src/services/socket/emitters';
+import { startLocationTracking } from '../src/services/tasks/backgroundLocation';
 // Util
-import { secondsToMMSS } from '../src/util/functions';
+import { secondsToMMSS } from '../src/utils/functions';
 // Constants
 import { GAME_STATE, COLORS } from '../src/constants';
 
 const Interface = () => {
     const router = useRouter();
-    const {teamInfos, messages, nextZoneDate, isShrinking, gameState} = useTeamContext();
+    const {teamInfos, messages, nextZoneDate, gameState} = useTeam();
     const {name, ready, captured, locationSendDeadline, outOfZone, outOfZoneDeadline, hasHandicap, enemyHasHandicap} = teamInfos;
-    const {loggedIn, logout} = useTeamConnexion();
-    const {sendCurrentPosition} = useGame();
+    const { loggedIn, logout } = useAuth();
     const [timeLeftSendLocation] = useTimeDifference(locationSendDeadline, 1000);
     const [timeLeftNextZone] = useTimeDifference(nextZoneDate, 1000);
     const [timeLeftOutOfZone] = useTimeDifference(outOfZoneDeadline, 1000);
@@ -87,7 +86,7 @@ const Interface = () => {
                         </View>
                     }
                     { gameState == GAME_STATE.PLAYING && !captured && <Fragment>
-                        <TimerMMSS style={{width: "50%"}} title={isShrinking ? "Réduction de la zone" : "Durée de la zone"} seconds={-timeLeftNextZone} />
+                        <TimerMMSS style={{width: "50%"}} title={"Réduction de la zone dans"} seconds={-timeLeftNextZone} />
                         <TimerMMSS style={{width: "50%"}} title={"Position envoyée dans"} seconds={!hasHandicap ? -timeLeftSendLocation: 0} />
                     </Fragment>}
                 </View>
@@ -98,7 +97,7 @@ const Interface = () => {
             <View style={styles.bottomContainer} onLayout={(event) => setBottomContainerHeight(event.nativeEvent.layout.height)}>
                 <CustomMap/>
                 { gameState == GAME_STATE.PLAYING && !captured && !hasHandicap &&
-                    <TouchableOpacity style={styles.updatePosition} onPress={sendCurrentPosition}>
+                    <TouchableOpacity style={styles.updatePosition} onPress={emitSendPosition}>
                         <Image source={require("../src/assets/images/update_position.png")} style={{width: 40, height: 40}} resizeMode="contain"></Image>
                     </TouchableOpacity>
                 }
