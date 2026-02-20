@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {"@/*": ["src/*"]},
+    "jsx": "react-native",
+    "checkJs": true,
+  },
+  "include": ["src/**/*", "app.json", "assets.d.ts"],
+  "exclude": ["node_modules", ".expo", "android", "ios"],
+}

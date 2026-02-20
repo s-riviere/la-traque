@@ -1,0 +1,61 @@
+{
+    "general": {
+        "no_value": "Indisponible"
+    },
+    "index": {
+        "header": {
+            "title": "LA TRAQUE"
+        },
+        "form": {
+            "team_id_input": "ID de l'équipe",
+            "image_label": "Appuyer pour changer la photo d'équipe",
+            "image_sublabel": "Le haut du corps doit être visible",
+            "validate_button": "Valider"
+        }
+    },
+    "interface": {
+        "placed": "Placé",
+        "not_placed": "Non placé",
+        "zone_reduction_label": "Réduction de la zone dans",
+        "send_position_label": "Position envoyée dans",
+        "enemy_position_revealed": "Position ennemie révélée en continue !",
+        "waiting_default_message": "Préparation de la partie",
+        "placement_default_message": "Phase de placement",
+        "go_in_zone": "Retournez dans la zone !",
+        "team_position_revealed": "Position révélée en continue.",
+        "out_of_zone_message": "Handicap dans {{time}}",
+        "playing_message": "La partie est en cours",
+        "winner_message": "Vous avez gagné !",
+        "loser_message": "Vous avez perdu...",
+        "captured_message": "Vous avez été éliminé...",
+        "map": {
+            "team_marker_title": "Position actuelle",
+            "team_marker_description": "Ceci est votre position",
+            "previous_marker_title": "Position envoyée",
+            "previous_marker_description": "Ceci est votre dernière position connue par le serveur",
+            "enemy_marker_title": "Position ennemie",
+            "enemy_marker_description": "Ceci est la dernière position de vos ennemis connue"
+        },
+        "drawer": {
+            "capture_code": "Code de {{name}} : {{code}}",
+            "target_name": "Cible ({{name}})",
+            "target_code_input": "Code cible",
+            "stat_distance_label": "Distance parcourue",
+            "stat_time_label": "Temps écoulé au format HH:MM:SS",
+            "stat_speed_label": "Vitesse moyenne",
+            "stat_capture_label": "Nombre total de captures par votre équipe",
+            "stat_reveal_label": "Nombre total d'envois de votre position"
+        }
+    },
+    "error": {
+        "title": "Erreur",
+        "invalid_team_id": "Veuillez entrer un ID d'équipe valide.",
+        "unknown_team_id": "L'ID d'équipe est inconnu.",
+        "server_connection": "La connexion au serveur a échoué.",
+        "image_selection": "Une erreur est survenue lors de la sélection d'une image.",
+        "permission": {
+            "title": "Permission refusée",
+            "storage_acces": "Activez l'accès au stockage ou à la gallerie dans les paramètres."
+        }
+    }
+}

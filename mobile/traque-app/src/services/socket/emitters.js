@@ -1,5 +1,5 @@
 // Services
-import { socket } from "./connection";
+import { socket } from "@/services/socket/connection";
 
 const customEmit = (event, ...args) => {
     if (!socket?.connected) return false;
@@ -21,7 +21,8 @@ const customEmitCallback = (event, ...args) => {
     
         socket.emit(event, ...args, (response) => {
             clearTimeout(timeout);
-            resolve(response.length > 1 ? response : response[0]);
+            console.log("Received : ", response);
+            resolve(response);
         });
     });
 };

@@ -2,11 +2,11 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import DeviceInfo from 'react-native-device-info';
 // Hook
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 // Services
-import { emitLogin, emitLogout, emitBattery, emitDeviceInfo } from "../services/socket/emitters";
+import { emitLogin, emitLogout, emitBattery, emitDeviceInfo } from "@/services/socket/emitters";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -34,12 +34,14 @@ export const AuthProvider = ({ children }) => {
         emitLogout();
     }, [loggedIn, setTeamId]);
 
+    /*
     // Try to log in with saved teamId
     useEffect(() => {
         if (!loggedIn && teamId) {
             login(teamId);
         }
     }, [loggedIn, teamId, login]);
+    */
 
     // Emit battery level and phone model at log in
     useEffect(() => {

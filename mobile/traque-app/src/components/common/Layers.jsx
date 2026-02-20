@@ -1,7 +1,25 @@
 // React
 import { Fragment } from 'react';
-import { Polygon } from 'react-native-maps';
-import { circleToPolygon } from '../utils/functions';
+import { Image } from 'react-native';
+import { Marker, Polygon } from 'react-native-maps';
+// Util
+import { circleToPolygon } from '@/utils/functions';
+
+const MARKER_IMAGES = {
+    blue: require('@/assets/images/marker/blue.png'),
+    red: require('@/assets/images/marker/red.png'),
+    grey: require('@/assets/images/marker/grey.png'),
+};
+
+export const PositionMarker = ({ position, color = "blue", onPress = () => {} }) => {
+    if (!position) return null;
+
+    return (
+        <Marker coordinate={{latitude: position[0], longitude: position[1]}} anchor={{ x: 0.33, y: 0.33 }} onPress={onPress}>
+            <Image source={MARKER_IMAGES[color]} style={{width: 24, height: 24}} resizeMode="contain"/>
+        </Marker>
+    );
+};
 
 export const InvertedPolygon = ({id, coordinates, fillColor}) => {
     // We create 3 rectangles covering earth, with the first rectangle centered on the hole
@@ -57,7 +75,7 @@ export const InvertedCircle = ({id, center, radius, fillColor}) => {
     return <InvertedPolygon id={id} coordinates={circleToPolygon({center: center, radius: radius})} fillColor={fillColor} />;
 };
 
-export const DashedCircle = ({id, center, radius, fillColor, strokeColor, strokeWidth, lineDashPattern}) => {
+export const DashedCircle = ({id, center, radius, fillColor = "rgba(0, 0, 0, 0)", strokeColor, strokeWidth, lineDashPattern}) => {
     return (
         <Polygon
             key={id}

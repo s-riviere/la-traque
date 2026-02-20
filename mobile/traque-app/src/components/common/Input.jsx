@@ -1,7 +1,7 @@
 // React
 import { TextInput, StyleSheet } from 'react-native';
 
-export const CustomTextInput = ({ style, value, inputMode, placeholder, onChangeText }) => {
+export const CustomTextInput = ({ style = {}, value, inputMode, placeholder, onChangeText }) => {
     return (
         <TextInput
             value={value}

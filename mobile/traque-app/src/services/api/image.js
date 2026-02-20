@@ -1,10 +1,11 @@
 // Constants
-import { SERVER_URL } from "../../constants";
+import { SERVER_URL } from "@/constants";
 
 export const uploadTeamImage = async (id, imageUri) => {
     if (!imageUri || !id) return;
 
     const data = new FormData();
+    // @ts-ignore
     data.append('file', {
         uri: imageUri,
         name: 'photo.jpg',
@@ -26,7 +27,7 @@ export const uploadTeamImage = async (id, imageUri) => {
 };
 
 export const enemyImage = (id) => {
-    if (!id) return require('../assets/images/missing_image.jpg');
+    if (!id) return require('@/assets/images/missing_image.jpg');
     
     return {uri: `${SERVER_URL}/photo/enemy?team=${id}`};
 };

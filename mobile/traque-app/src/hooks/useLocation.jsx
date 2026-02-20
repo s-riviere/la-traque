@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 // Expo
 import * as Location from 'expo-location';
 // Constants
-import { LOCATION_PARAMETERS } from '../constants';
+import { LOCATION_PARAMETERS } from '@/constants';
 
 export const useLocation = () => {
     const [location, setLocation] = useState(null);
@@ -17,8 +17,8 @@ export const useLocation = () => {
             if (status !== 'granted')  return;
 
             subscription = await Location.watchPositionAsync(
-                LOCATION_PARAMETERS,
-                (location) => setLocation(location.coords)
+                LOCATION_PARAMETERS.LOCAL,
+                (location) => setLocation([location.coords.latitude, location.coords.longitude])
             );
         };
 

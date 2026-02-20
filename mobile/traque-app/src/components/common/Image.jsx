@@ -3,19 +3,28 @@ import { useState } from 'react';
 import { StyleSheet, View, Image, TouchableOpacity } from "react-native";
 import ImageViewing from 'react-native-image-viewing';
 
-export const CustomImage = ({ source, canZoom, onPress }) => {
-    // canZoom : boolean
+export const TouchableImage = ({ source, onPress }) => {
+
+    return (
+        <TouchableOpacity style={styles.container} onPress={onPress}>
+            <Image style={styles.image} resizeMode="contain" source={source}/>
+        </TouchableOpacity>
+    );
+};
+
+export const ExpandableImage = ({ source }) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity onPress={canZoom ? () => setIsModalVisible(true) : onPress}>
+            <TouchableOpacity onPress={() => setIsModalVisible(true)}>
                 <Image style={styles.image} resizeMode="contain" source={source}/>
             </TouchableOpacity>
             <ImageViewing
                 images={[source]}
                 visible={isModalVisible}
                 onRequestClose={() => setIsModalVisible(false)}
+                imageIndex={0}
                 swipeToCloseEnabled={false}
                 doubleTapToZoomEnabled={false}
             />

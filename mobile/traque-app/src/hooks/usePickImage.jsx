@@ -1,10 +1,12 @@
 // React
 import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 // Expo
 import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from 'expo-image-picker';
 
 export const usePickImage = () => {
+    const { t } = useTranslation();
     const [image, setImage] = useState(null);
 
     const pickImage = useCallback(async () => {
@@ -12,7 +14,7 @@ export const usePickImage = () => {
             const permissionResult = await requestMediaLibraryPermissionsAsync();
           
             if (permissionResult.granted === false) {
-                Alert.alert("Permission refusée", "Activez l'accès au stockage ou à la gallerie dans les paramètres.");
+                Alert.alert(t("error.permission.title"), t("error.permission.storage_acces"));
                 return;
             }
             let result = await launchImageLibraryAsync({
@@ -31,9 +33,9 @@ export const usePickImage = () => {
             }
         } catch (error) {
             console.error('Error picking image;', error);
-            Alert.alert('Erreur', "Une erreur est survenue lors de la sélection d'une image.");
+            Alert.alert(t("error.title"), t("error.image_selection"));
         }
-    }, []);
+    }, [t]);
 
     return { image, pickImage };
 };

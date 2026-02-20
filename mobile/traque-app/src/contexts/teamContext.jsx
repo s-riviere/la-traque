@@ -1,13 +1,13 @@
 // React
 import { createContext, useContext, useMemo, useState, useEffect } from "react";
 // Context
-import { useAuth } from "./authContext";
+import { useAuth } from "@/contexts/authContext";
 // Services
-import { socket } from "../services/socket/connection";
+import { socket } from "@/services/socket/connection";
 // Constants
-import { GAME_STATE } from "../constants";
+import { GAME_STATE } from "@/constants";
 
-const TeamContext = createContext();
+const TeamContext = createContext(null);
 
 const useOnEvent = (event, callback) => {
     useEffect(() => {

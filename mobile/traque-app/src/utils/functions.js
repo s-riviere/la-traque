@@ -24,7 +24,7 @@ export const secondsToMMSS = (seconds) => {
     return strMinutes.padStart(2,"0") + ":" + strSeconds.padStart(2,"0");
 };
 
-export const  secondsToHHMMSS = (seconds) => {
+export const secondsToHHMMSS = (seconds) => {
     if (!Number.isInteger(seconds)) return "Inconnue";
     if (seconds < 0) seconds = 0;
     const strHours = String(Math.floor(seconds / 3600));

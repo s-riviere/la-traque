@@ -2,9 +2,9 @@
 import { defineTask, isTaskRegisteredAsync } from "expo-task-manager";
 import * as Location from 'expo-location';
 // Services
-import { emitUpdatePosition } from "../socket/emitters";
+import { emitUpdatePosition } from "@/services/socket/emitters";
 // Constants
-import { TASKS, LOCATION_PARAMETERS } from "../../constants";
+import { TASKS, LOCATION_PARAMETERS } from "@/constants";
 
 
 // Task
@@ -15,6 +15,7 @@ defineTask(TASKS.BACKGROUND_LOCATION, async ({ data, error }) => {
         return;
     }
     if (data) {
+        // @ts-ignore
         const { locations } = data;
         if (locations.length == 0) {
             console.log("No location measured.");

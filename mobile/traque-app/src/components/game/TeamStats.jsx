@@ -1,0 +1,75 @@
+// React
+import { useMemo } from 'react';
+import { StyleSheet, View, TouchableOpacity, Image, Text, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
+// Contexts
+import { useTeam } from '@/contexts/teamContext';
+// Hook
+import { useTimeSinceSeconds } from '@/hooks/useTimeDelta';
+// Util
+import { secondsToHHMMSS } from '@/utils/functions';
+
+const Stat = ({ children, source, description }) => {
+    return (
+        <TouchableOpacity style={styles.statContainer} onPress={description ? () => Alert.alert("Info", description) : null}>
+            <Image style={styles.image} source={source} resizeMode="contain"/>
+            <Text style={styles.text}>{children}</Text>
+        </TouchableOpacity>
+    );
+};
+
+export const TeamStats = () => {
+    const { t } = useTranslation();
+    const { teamInfos, startDate } = useTeam();
+    const { distance, finishDate, nCaptures, nSentLocation } = teamInfos;
+    const timeSinceGameStart = useTimeSinceSeconds(startDate);
+
+    const avgSpeed = useMemo(() => {
+        const hours = (finishDate ? (finishDate - startDate) : timeSinceGameStart*1000) / 1000 / 3600;
+        if (hours <= 0 || distance <= 0) return 0;
+        const km = distance / 1000;
+        const speed = km / hours;
+
+        return parseFloat(speed.toFixed(1));
+    }, [finishDate, startDate, timeSinceGameStart, distance]);
+
+    return (
+        <View style={styles.statsContainer}>
+            <View style={styles.row}>
+                <Stat source={require('@/assets/images/distance.png')} description={t("interface.drawer.stat_distance_label")}>{Math.floor(distance / 100) / 10}km</Stat>
+                <Stat source={require('@/assets/images/time.png')} description={t("interface.drawer.stat_time_label")}>{secondsToHHMMSS((finishDate ? Math.floor((finishDate - startDate) / 1000) : timeSinceGameStart))}</Stat>
+                <Stat source={require('@/assets/images/running.png')} description={t("interface.drawer.stat_speed_label")}>{avgSpeed}km/h</Stat>
+            </View>
+            <View style={styles.row}>
+                <Stat source={require('@/assets/images/target/black.png')} description={t("interface.drawer.stat_capture_label")}>{nCaptures}</Stat>
+                <Stat source={require('@/assets/images/update_position.png')} description={t("interface.drawer.stat_reveal_label")}>{nSentLocation}</Stat>
+            </View>
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    statContainer: {
+        height: 30,
+        flexDirection: "row",
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    image: {
+        width: 30,
+        height: 30,
+        marginRight: 5
+    },
+    text: {
+        fontSize: 15
+    },
+    statsContainer: {
+        gap: 15,
+        width: "100%",
+        marginVertical: 15
+    },
+    row: {
+        flexDirection: "row",
+        justifyContent: "space-around"
+    }
+});
