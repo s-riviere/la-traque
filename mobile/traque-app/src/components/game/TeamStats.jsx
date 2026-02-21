@@ -10,8 +10,10 @@ import { useTimeSinceSeconds } from '@/hooks/useTimeDelta';
 import { secondsToHHMMSS } from '@/utils/functions';
 
 const Stat = ({ children, source, description }) => {
+    const { t } = useTranslation();
+
     return (
-        <TouchableOpacity style={styles.statContainer} onPress={description ? () => Alert.alert("Info", description) : null}>
+        <TouchableOpacity style={styles.statContainer} onPress={description ? () => Alert.alert(t("info.default.title"), description) : null}>
             <Image style={styles.image} source={source} resizeMode="contain"/>
             <Text style={styles.text}>{children}</Text>
         </TouchableOpacity>
@@ -36,13 +38,13 @@ export const TeamStats = () => {
     return (
         <View style={styles.statsContainer}>
             <View style={styles.row}>
-                <Stat source={require('@/assets/images/distance.png')} description={t("interface.drawer.stat_distance_label")}>{Math.floor(distance / 100) / 10}km</Stat>
-                <Stat source={require('@/assets/images/time.png')} description={t("interface.drawer.stat_time_label")}>{secondsToHHMMSS((finishDate ? Math.floor((finishDate - startDate) / 1000) : timeSinceGameStart))}</Stat>
-                <Stat source={require('@/assets/images/running.png')} description={t("interface.drawer.stat_speed_label")}>{avgSpeed}km/h</Stat>
+                <Stat source={require('@/assets/images/distance.png')} description={t("play.drawer.stat_distance_label")}>{Math.floor(distance / 100) / 10}km</Stat>
+                <Stat source={require('@/assets/images/time.png')} description={t("play.drawer.stat_time_label")}>{secondsToHHMMSS((finishDate ? Math.floor((finishDate - startDate) / 1000) : timeSinceGameStart))}</Stat>
+                <Stat source={require('@/assets/images/running.png')} description={t("play.drawer.stat_speed_label")}>{avgSpeed}km/h</Stat>
             </View>
             <View style={styles.row}>
-                <Stat source={require('@/assets/images/target/black.png')} description={t("interface.drawer.stat_capture_label")}>{nCaptures}</Stat>
-                <Stat source={require('@/assets/images/update_position.png')} description={t("interface.drawer.stat_reveal_label")}>{nSentLocation}</Stat>
+                <Stat source={require('@/assets/images/target/black.png')} description={t("play.drawer.stat_capture_label")}>{nCaptures}</Stat>
+                <Stat source={require('@/assets/images/update_position.png')} description={t("play.drawer.stat_reveal_label")}>{nSentLocation}</Stat>
             </View>
         </View>
     );

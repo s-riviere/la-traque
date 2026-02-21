@@ -35,8 +35,8 @@ const Play = () => {
                 <Header/>
                 <Show when={userState == USER_STATE.PLAYING}>
                     <View style={styles.infoContainer}>
-                        <TimerMMSS style={{width: "50%"}} title={t("interface.zone_reduction_label")} date={nextZoneDate} />
-                        <TimerMMSS style={{width: "50%"}} title={t("interface.send_position_label")} date={locationSendDeadline} />
+                        <TimerMMSS style={{width: "50%"}} title={t("play.info.zone_reduction_label")} date={nextZoneDate} />
+                        <TimerMMSS style={{width: "50%"}} title={t("play.info.send_position_label")} date={locationSendDeadline} />
                     </View>
                 </Show>
             </View>
@@ -49,8 +49,8 @@ const Play = () => {
                         <GameZone/>
                     </Show>
                     <Show when={userState == USER_STATE.PLAYING && !hasHandicap}>
-                        <PositionMarker position={lastSentLocation} color={"grey"} onPress={() => Alert.alert(t("interface.map.previous_marker_title"), t("interface.map.previous_marker_description"))} />
-                        <PositionMarker position={enemyLocation} color={"red"} onPress={() => Alert.alert(t("interface.map.enemy_marker_title"), t("interface.map.enemy_marker_description"))} />
+                        <PositionMarker position={lastSentLocation} color={"grey"} onPress={() => Alert.alert(t("play.map.previous_marker_title"), t("play.map.previous_marker_description"))} />
+                        <PositionMarker position={enemyLocation} color={"red"} onPress={() => Alert.alert(t("play.map.enemy_marker_title"), t("play.map.enemy_marker_description"))} />
                     </Show>
                 </Map>
                 <LinearGradient colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0)']} style={styles.gradient}/>

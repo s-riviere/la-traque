@@ -1,6 +1,6 @@
 // React
 import { useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, Image, Alert, TouchableHighlight } from 'react-native';
+import { Keyboard, ScrollView, View, Text, StyleSheet, Image, Alert, TouchableHighlight } from 'react-native';
 import { useTranslation } from 'react-i18next';
 // Components
 import { TouchableImage } from '@/components/common/Image';
@@ -28,7 +28,9 @@ const Login = () => {
 
         const regex = /^\d{6}$/;
         if (!regex.test(teamId)) {
-            setTimeout(() => Alert.alert(t("error.title"), t("error.invalid_team_id")), 100);
+            Keyboard.dismiss();
+            Alert.alert(t("error.default.title"), t("error.default.invalid_team_id"));
+            setIsSubmitting(false);
             return;
         }
         
@@ -39,10 +41,12 @@ const Login = () => {
                 uploadTeamImage(teamId, image?.uri);
                 setTeamId("");
             } else {
-                setTimeout(() => Alert.alert(t("error.title"), t("error.unknown_team_id")), 100);
+                Keyboard.dismiss();
+                Alert.alert(t("error.default.title"), t("error.default.unknown_team_id"));
             }
         } catch (error) {
-            setTimeout(() => Alert.alert(t("error.title"), t("error.server_connection")), 100);
+            Keyboard.dismiss();
+            Alert.alert(t("error.default.title"), t("error.default.server_connection"));
         } finally {
             setIsSubmitting(false);
         }
@@ -53,20 +57,20 @@ const Login = () => {
             <View style={styles.transitionContainer}>
                 <View style={styles.subContainer}>
                     <Image style={styles.logoImage} source={require('@/assets/images/logo/logo_traque.png')}/>
-                    <Text style={styles.logoText}>{t("index.header.title")}</Text>
+                    <Text style={styles.logoText}>{t("login.header.title")}</Text>
                 </View>
                 <View style={styles.subContainer}>
-                    <CustomTextInput value={teamId} inputMode="numeric" placeholder={t("index.form.team_id_input")} style={styles.input} onChangeText={setTeamId}/>
+                    <CustomTextInput value={teamId} inputMode="numeric" placeholder={t("login.form.team_id_input")} style={styles.input} onChangeText={setTeamId}/>
                 </View>
                 <View style={styles.subContainer}>
-                    <Text style={{fontSize: 15}}>{t("index.form.image_label")}</Text>
-                    <Text style={{fontSize: 13, marginBottom: 3}}>{t("index.form.image_sublabel")}</Text>
+                    <Text style={{fontSize: 15}}>{t("login.form.image_label")}</Text>
+                    <Text style={{fontSize: 13, marginBottom: 3}}>{t("login.form.image_sublabel")}</Text>
                     <TouchableImage source={image ? {uri: image.uri} : require('@/assets/images/missing_image.jpg')} onPress={pickImage}/>
                 </View>
                 <View style={styles.subContainer}>
                     <View style={styles.buttonContainer}>
                         <TouchableHighlight style={styles.button} onPress={handleSubmit}>
-                            <Text style={styles.buttonLabel}>{isSubmitting ? "..." : t("index.form.validate_button")}</Text>
+                            <Text style={styles.buttonLabel}>{isSubmitting ? "..." : t("login.form.validate_button")}</Text>
                         </TouchableHighlight>
                     </View>
                 </View>

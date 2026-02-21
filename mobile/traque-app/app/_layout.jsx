@@ -1,17 +1,22 @@
 // React
 import { useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 // Expo
 import { Slot, useRouter, usePathname } from 'expo-router';
+// Components
+import { IconButton } from '@/components/common/IconButton';
 // Contexts
 import { AuthProvider } from "@/contexts/authContext";
 import { TeamProvider } from "@/contexts/teamContext";
+// Hook
+import { useUserState } from '@/hooks/useUserState';
 // Services
 import { startLocationTracking , stopLocationTracking } from '@/services/tasks/backgroundLocation';
 // Constants
 import { USER_STATE } from '@/constants';
 // Traduction
 import '@/i18n/config';
-import { useUserState } from '@/hooks/useUserState';
 
 const NavigationManager = () => {
     const router = useRouter();
@@ -72,15 +77,43 @@ const NavigationManager = () => {
     return null;
 };
 
+const Language = () => {
+    const { i18n } = useTranslation();
+
+    const toggleLanguage = () => {
+        i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
+    };
+
+    return (
+        <View style={styles.languageButton}>
+            <IconButton source={require('@/assets/images/language.png')} onPress={toggleLanguage} />
+        </View>
+    );
+};
+
 const RootLayout = () => {
     return (
         <AuthProvider>
             <TeamProvider>
                 <Slot/>
                 <NavigationManager/>
+                <Language/>
             </TeamProvider>
         </AuthProvider>
     );
 };
 
 export default RootLayout;
+
+const styles = StyleSheet.create({
+    languageButton: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        backgroundColor: "rgb(126, 182, 199)",
+        borderBottomLeftRadius: 20,
+        padding: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
+});

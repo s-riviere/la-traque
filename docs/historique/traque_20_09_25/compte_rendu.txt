@@ -8,7 +8,7 @@ Cette traque est la première à se faire avec le nouveau site web et la version
 Problèmes
 
 [ ] Une équipe perdait sans arrêt la connection avec le serveur
-[ ] La position en arrière plan, téléphone éteint par exemple, n'avait pas l'air de fonctionner (une équipe n'avait pas de notif)
+[x] La position en arrière plan, téléphone éteint par exemple, n'avait pas l'air de fonctionner (une équipe n'avait pas de notif)
 [ ] Aux deux tiers de la partie toutes les équipes ont été déconnectée en même temps mais ont pu se reconnecter. Ça s'est produit
 sans raisons apparentes
 [ ] Une équipe avait deux téléphones connectés sauf que le premier ne marchait pas bien. Par ailleurs, l'équipe disaient n'avoir

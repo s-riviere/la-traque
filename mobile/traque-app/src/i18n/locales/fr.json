@@ -1,8 +1,12 @@
 {
-    "general": {
+    "common": {
         "no_value": "Indisponible"
     },
-    "index": {
+    "location-permission": {
+        "title": "Veuillez activer la localisation en arrière plan dans les paramètres et relancer l'application.",
+        "subtitle": "La localisation de chaque équipe doit être connue par le serveur et les organisateurs pour veiller au bon déroulement du jeu."
+    },
+    "login": {
         "header": {
             "title": "LA TRAQUE"
         },
@@ -13,24 +17,27 @@
             "validate_button": "Valider"
         }
     },
-    "interface": {
-        "placed": "Placé",
-        "not_placed": "Non placé",
-        "zone_reduction_label": "Réduction de la zone dans",
-        "send_position_label": "Position envoyée dans",
-        "enemy_position_revealed": "Position ennemie révélée en continue !",
-        "waiting_default_message": "Préparation de la partie",
-        "placement_default_message": "Phase de placement",
-        "go_in_zone": "Retournez dans la zone !",
-        "team_position_revealed": "Position révélée en continue.",
-        "out_of_zone_message": "Handicap dans {{time}}",
-        "playing_message": "La partie est en cours",
-        "winner_message": "Vous avez gagné !",
-        "loser_message": "Vous avez perdu...",
-        "captured_message": "Vous avez été éliminé...",
+    "wait": {
+        "title": "Rappel des règles !",
+        "placement_rule": "Rejoignez votre zone de départ et attendez le début de la partie.",
+        "capture_rule": "Traquez votre cible grâce à sa photo et aux positions qu'elle révèle. Pour obtenir la dernière position connue de votre cible, vous devrez révéler la vôtre. Une fois capturée, entrez son code dans l'application.",
+        "zone_rule": "Déplacez-vous à pied tout en veillant à rester dans la zone de jeu pour ne pas être pénalisé ! Si vous restez trop longtemps en dehors de la zone, votre interface sera désactivée et votre chasseur connaîtra précisément votre position.",
+        "team_rule": "Mettez en place des stratégies d'équipe ! Mais restez toujours à portée de voix, ne communiquez pas avec les autres équipes et restez dans les lieux publics."
+    },
+    "play": {
+        "info": {
+            "zone_reduction_label": "Réduction de la zone dans",
+            "send_position_label": "Position envoyée dans"
+        },
+        "toast": {
+            "placed": "Placé",
+            "not_placed": "Non placé",
+            "enemy_position_revealed": "Position ennemie révélée en continue !",
+            "go_in_zone": "Retournez dans la zone !",
+            "team_position_revealed": "Position révélée en continue.",
+            "out_of_zone_message": "Handicap dans {{time}}"
+        },
         "map": {
-            "team_marker_title": "Position actuelle",
-            "team_marker_description": "Ceci est votre position",
             "previous_marker_title": "Position envoyée",
             "previous_marker_description": "Ceci est votre dernière position connue par le serveur",
             "enemy_marker_title": "Position ennemie",
@@ -41,18 +48,33 @@
             "target_name": "Cible ({{name}})",
             "target_code_input": "Code cible",
             "stat_distance_label": "Distance parcourue",
-            "stat_time_label": "Temps écoulé au format HH:MM:SS",
+            "stat_time_label": "Temps écoulé (HH:MM:SS)",
             "stat_speed_label": "Vitesse moyenne",
             "stat_capture_label": "Nombre total de captures par votre équipe",
             "stat_reveal_label": "Nombre total d'envois de votre position"
         }
     },
+    "info": {
+        "default": {
+            "title": "Info"
+        },
+        "succes": {
+            "title": "Bravo !",
+            "capture_success": "Vous avez réussi à capturer votre cible. Une nouvelle cible vient de vous être attribuée."
+        },
+        "failure": {
+            "title": "Raté...",
+            "capture_failure": "La capture a échoué. Vérifiez le code et réessayez."
+        }
+    },
     "error": {
-        "title": "Erreur",
-        "invalid_team_id": "Veuillez entrer un ID d'équipe valide.",
-        "unknown_team_id": "L'ID d'équipe est inconnu.",
-        "server_connection": "La connexion au serveur a échoué.",
-        "image_selection": "Une erreur est survenue lors de la sélection d'une image.",
+        "default": {
+            "title": "Erreur",
+            "invalid_team_id": "Veuillez entrer un ID d'équipe valide.",
+            "unknown_team_id": "L'ID d'équipe est inconnu.",
+            "server_connection": "La connexion au serveur a échoué.",
+            "image_selection": "Une erreur est survenue lors de la sélection d'une image."
+        },
         "permission": {
             "title": "Permission refusée",
             "storage_acces": "Activez l'accès au stockage ou à la gallerie dans les paramètres."

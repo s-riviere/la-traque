@@ -11,18 +11,13 @@
 - [x] Centrer la map sur la position à l'ouverture + bouton centrage
 - [x] Indiquer que l'équipe est hors zone.
 - [x] Mettre les stats dans le tiroir (distance, temps, vitesse moy, nb captures, nb envoi)
+- [x] Traduction anglaise
 - [ ] Implémenter des notifs lors du background (hors zone, position envoyée, update zone)
-- [ ] Ajouter les logs de la partie
 - [ ] Créer le menu paramètre (idées de section : langue, photo équipe, notifs, mode sombre, unitées)
 - [ ] Afficher la trajectoire passée sur la carte (désactivable)
 - [ ] Afficher les évènements passés sur la carte (captures, envois, départ) (désactivable)
 - [ ] Permettre le changement du style de la carte (schéma, satellite, relief etc)
 - [ ] Ajouter imprécision de la position au besoin (comme sur google maps)
 - [ ] Synchroniser les horloges sur l'interface
-- [ ] Avoir un récap des évènement de la partie
+- [ ] Améliorer l'intuitivité de l'interface (bouton d'actualisation / stats)
 - [ ] Publier sur le playstore
-
-## Autres idées
-
-- Améliorer l'accessibilité (traduction anglaise notamment).
-- Améliorer l'UI.

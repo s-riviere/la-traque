@@ -13,7 +13,7 @@ export const StartZone = () => {
     const { startingArea } = teamInfos;
 
     return useMemo(() => {
-        if (startingArea) return null;
+        if (!startingArea) return null;
 
         return (
             <Circle

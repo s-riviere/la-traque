@@ -1,3 +1,83 @@
 {
-
+    "common": {
+        "no_value": "Unavailable"
+    },
+    "location-permission": {
+        "title": "Please enable background location in settings and restart the app.",
+        "subtitle": "Each team's location must be known by the server and organizers to ensure the game runs smoothly."
+    },
+    "login": {
+        "header": {
+            "title": "LA TRAQUE"
+        },
+        "form": {
+            "team_id_input": "Team ID",
+            "image_label": "Tap to change team photo",
+            "image_sublabel": "Upper body must be visible",
+            "validate_button": "Validate"
+        }
+    },
+    "wait": {
+        "title": "Rules Reminder !",
+        "placement_rule": "Go to your starting zone and wait for the game to begin.",
+        "capture_rule": "Track your target using their photo and the positions they reveal. To obtain your target's last known position, you must reveal your own. Once captured, enter their code in the app.",
+        "zone_rule": "Move on foot while making sure to stay within the game zone to avoid penalties ! If you stay outside the zone for too long, your interface will be disabled and your hunter will know your exact position.",
+        "team_rule": "Set up team strategies ! But always stay within earshot, do not communicate with other teams, and remain in public areas."
+    },
+    "play": {
+        "info": {
+            "zone_reduction_label": "Zone reduction in",
+            "send_position_label": "Position sent in"
+        },
+        "toast": {
+            "placed": "Placed",
+            "not_placed": "Not placed",
+            "enemy_position_revealed": "Enemy position continuously revealed !",
+            "go_in_zone": "Return to the zone !",
+            "team_position_revealed": "Position continuously revealed.",
+            "out_of_zone_message": "Handicap in {{time}}"
+        },
+        "map": {
+            "previous_marker_title": "Position sent",
+            "previous_marker_description": "This is your last position known by the server",
+            "enemy_marker_title": "Enemy position",
+            "enemy_marker_description": "This is the last known position of your enemies"
+        },
+        "drawer": {
+            "capture_code": "{{name}}'s code : {{code}}",
+            "target_name": "Target ({{name}})",
+            "target_code_input": "Target code",
+            "stat_distance_label": "Distance traveled",
+            "stat_time_label": "Elapsed time (HH:MM:SS)",
+            "stat_speed_label": "Average speed",
+            "stat_capture_label": "Total captures by your team",
+            "stat_reveal_label": "Total times your position was sent"
+        }
+    },
+    "info": {
+        "default": {
+            "title": "Info"
+        },
+        "succes": {
+            "title": "Success !",
+            "capture_success": "You have successfully captured your target. A new target has been assigned to you."
+        },
+        "failure": {
+            "title": "Failure...",
+            "capture_failure": "The capture failed. Please check the code and try again."
+        }
+    },
+    "error": {
+        "default": {
+            "title": "Error",
+            "invalid_team_id": "Please enter a valid team ID.",
+            "unknown_team_id": "Unknown team ID.",
+            "server_connection": "Server connection failed.",
+            "image_selection": "An error occurred during image selection."
+        },
+        "permission": {
+            "title": "Permission denied",
+            "storage_acces": "Enable storage or gallery access in settings."
+        }
+    }
 }

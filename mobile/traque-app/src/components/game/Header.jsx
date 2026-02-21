@@ -1,5 +1,6 @@
 // React
-import { View, Text, Alert, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 // Contexts
 import { useAuth } from '@/contexts/authContext';
 import { useTeam } from '@/contexts/teamContext';
@@ -7,18 +8,16 @@ import { useTeam } from '@/contexts/teamContext';
 import { IconButton } from '@/components/common/IconButton';
 
 export const Header = () => {
+    const { t } = useTranslation();
     const { logout } = useAuth();
     const { teamInfos } = useTeam();
     const { name } = teamInfos;
 
     return (
         <View style={styles.container}>
-            <View style={styles.buttonsContainer}>
-                <IconButton source={require('@/assets/images/logout.png')} onPress={logout} />
-                <IconButton source={require('@/assets/images/cogwheel.png')} onPress={() => Alert.alert("Settings")} />
-            </View>          
+            <IconButton source={require('@/assets/images/logout.png')} onPress={logout} />
             <View style={styles.nameContainer}>
-                <Text style={styles.name}>{name ?? "Inconnue"}</Text>
+                <Text style={styles.name}>{name ?? t("common.no_value")}</Text>
             </View>
         </View>
     );
@@ -27,17 +26,12 @@ export const Header = () => {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        alignItems: 'center'
-    },
-    buttonsContainer: {
-        width: "100%",
-        flexDirection: "row",
-        justifyContent: 'space-between'
     },
     nameContainer: {
         width: '100%',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginBottom: 20
     },
     name: {
         fontSize: 36,

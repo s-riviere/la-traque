@@ -33,7 +33,7 @@ export const usePickImage = () => {
             }
         } catch (error) {
             console.error('Error picking image;', error);
-            Alert.alert(t("error.title"), t("error.image_selection"));
+            Alert.alert(t("error.default.title"), t("error.default.image_selection"));
         }
     }, [t]);
 

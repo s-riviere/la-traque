@@ -1,6 +1,6 @@
 // React
 import { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Keyboard, View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 // Components
 import { ExpandableImage } from '@/components/common/Image';
@@ -31,14 +31,17 @@ export const TargetInfoDrawer = ({ height }) => {
         emitCapture(enemyCaptureCode)
             .then((response) => {
                 if (response.hasCaptured) {
-                    Alert.alert("Bravo !", "Vous avez réussi à capturer votre cible. Une nouvelle cible vient de vous être attribuée.");
+                    Keyboard.dismiss();
+                    Alert.alert(t("info.success.title"), t("info.success.capture_success"));
                     setEnemyCaptureCode("");
                 } else {
-                    Alert.alert("Échec !", "Le code que vous venez de rentrer n'est pas celui de votre cible.");
+                    Keyboard.dismiss();
+                    Alert.alert(t("info.failure.title"), t("info.failure.capture_failure"));
                 }
             })
             .catch(() => {
-                Alert.alert(t("error.title"), t("error.server_connection"));
+                Keyboard.dismiss();
+                Alert.alert(t("error.default.title"), t("error.default.server_connection"));
             })
             .finally(() => setIsCapturing(false));
     };
@@ -46,16 +49,16 @@ export const TargetInfoDrawer = ({ height }) => {
     return (
         <Drawer height={height}>
             <Text style={{fontSize: 22, fontWeight: "bold", textAlign: "center"}}>
-                {t("interface.drawer.capture_code", {name: name ?? t("general.no_value"), code: String(captureCode).padStart(4,"0")})}
+                {t("play.drawer.capture_code", {name: name ?? t("common.no_value"), code: String(captureCode).padStart(4,"0")})}
             </Text>
             <Show when={!hasHandicap}>
                 <View style={styles.imageContainer}>
-                    <Text style={{fontSize: 15, margin: 5}}>{t("interface.drawer.target_name", {name: enemyName ?? t("general.no_value")})}</Text>
+                    <Text style={{fontSize: 15, margin: 5}}>{t("play.drawer.target_name", {name: enemyName ?? t("common.no_value")})}</Text>
                     <ExpandableImage source={enemyImage(teamId)}/>
                 </View>
                 <View style={styles.actionsContainer}>
                     <View style={styles.actionsLeftContainer}>
-                        <CustomTextInput value={enemyCaptureCode} inputMode="numeric" placeholder={t("interface.drawer.target_code_input")}  onChangeText={setEnemyCaptureCode}/>
+                        <CustomTextInput value={enemyCaptureCode} inputMode="numeric" placeholder={t("play.drawer.target_code_input")}  onChangeText={setEnemyCaptureCode}/>
                     </View>
                     <View style={styles.actionsRightContainer}>
                         <TouchableOpacity style={styles.button} onPress={handleCapture}>

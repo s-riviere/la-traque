@@ -22,28 +22,28 @@ export const Toasts = () => {
         {
             condition: userState === USER_STATE.PLACEMENT,
             id: 'placement',
-            text: ready ? t("interface.placed") : t("interface.not_placed"),
+            text: ready ? t("play.toast.placed") : t("play.toast.not_placed"),
             toastColor: ready ? "rgb(25, 165, 25)" : "rgb(204, 51, 51)" ,
             textColor: "white"
         },
         {
             condition: userState === USER_STATE.PLAYING && !outOfZone && enemyHasHandicap,
             id: 'enemy_revealed',
-            text: t("interface.enemy_position_revealed"),
+            text: t("play.toast.enemy_position_revealed"),
             toastColor: "white",
             textColor: "black"
         },
         {
             condition: userState === USER_STATE.PLAYING && outOfZone && hasHandicap,
             id: 'out_of_zone',
-            text: `${t("interface.go_in_zone")}\n${t("interface.team_position_revealed")}`,
+            text: `${t("play.toast.go_in_zone")}\n${t("play.toast.team_position_revealed")}`,
             toastColor: "white",
             textColor: "black"
         },
         {
             condition: userState === USER_STATE.PLAYING && outOfZone && !hasHandicap,
             id: 'has_handicap',
-            text: `${t("interface.go_in_zone")}\n${t("interface.out_of_zone_message", {time: secondsToMMSS(outOfZoneTimeLeft)})}`,
+            text: `${t("play.toast.go_in_zone")}\n${t("play.toast.out_of_zone_message", {time: secondsToMMSS(outOfZoneTimeLeft)})}`,
             toastColor: "white",
             textColor: "black"
         }
