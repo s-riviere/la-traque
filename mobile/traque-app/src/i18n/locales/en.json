@@ -18,7 +18,7 @@
         }
     },
     "wait": {
-        "title": "Rules Reminder !",
+        "title": "While waiting for the game to start, here is a recap of the rules.",
         "placement_rule": "Go to your starting zone and wait for the game to begin.",
         "capture_rule": "Track your target using their photo and the positions they reveal. To obtain your target's last known position, you must reveal your own. Once captured, enter their code in the app.",
         "zone_rule": "Move on foot while making sure to stay within the game zone to avoid penalties ! If you stay outside the zone for too long, your interface will be disabled and your hunter will know your exact position.",
@@ -26,7 +26,8 @@
     },
     "play": {
         "info": {
-            "zone_reduction_label": "Zone reduction in",
+            "placement_title": "Head to your zone !",
+            "zone_reduction_label": "Next zone in",
             "send_position_label": "Position sent in"
         },
         "toast": {
@@ -47,6 +48,7 @@
             "capture_code": "{{name}}'s code : {{code}}",
             "target_name": "Target ({{name}})",
             "target_code_input": "Target code",
+            "stats_section_title": "Your game statistics",
             "stat_distance_label": "Distance traveled",
             "stat_time_label": "Elapsed time (HH:MM:SS)",
             "stat_speed_label": "Average speed",
@@ -54,13 +56,18 @@
             "stat_reveal_label": "Total times your position was sent"
         }
     },
+    "end": {
+        "title_captured": "You have been captured...",
+        "title_win": "You won !",
+        "paragraph": "The game ends here for you ! You can head back to the starting point to grab a snack and watch the rest of the game."
+    },
     "info": {
         "default": {
             "title": "Info"
         },
-        "succes": {
+        "success": {
             "title": "Success !",
-            "capture_success": "You have successfully captured your target. A new target has been assigned to you."
+            "capture_success": "You have successfully captured your target."
         },
         "failure": {
             "title": "Failure...",

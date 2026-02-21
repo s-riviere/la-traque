@@ -16,7 +16,6 @@ export const CustomTextInput = ({ style = {}, value, inputMode, placeholder, onC
 
 const styles = StyleSheet.create({
     input: {
-        width: "100%",
         padding: 15,
         borderColor: '#777',
         borderRadius: 12,

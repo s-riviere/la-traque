@@ -4,6 +4,12 @@ export const INITIAL_REGIONS = {
         longitude: 2.342,
         latitudeDelta: 0,
         longitudeDelta: 50
+    },
+    TELECOM_PARIS : {
+        latitude: 48.715,
+        longitude: 2.203,
+        latitudeDelta: 0, 
+        longitudeDelta: 0.04
     }
 };
 

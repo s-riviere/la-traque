@@ -35,7 +35,7 @@ export const useUserState = () => {
             case GAME_STATE.PLAYING:
                 return captured ? USER_STATE.CAPTURED : USER_STATE.PLAYING;
             case GAME_STATE.FINISHED:
-                return USER_STATE.FINISHED;
+                return captured ? USER_STATE.CAPTURED : USER_STATE.FINISHED;
             default:
                 return USER_STATE.WAITING;
         }

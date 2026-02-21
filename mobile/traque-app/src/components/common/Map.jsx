@@ -25,7 +25,7 @@ export const Map = ({ children }) => {
 
     return (
         <View style={styles.container}>
-            <MapView ref={mapRef} style={styles.mapView} initialRegion={INITIAL_REGIONS.PARIS} mapType={"standard"} onTouchMove={() => setCenterMap(false)} toolbarEnabled={false}>
+            <MapView ref={mapRef} style={styles.mapView} initialRegion={INITIAL_REGIONS.TELECOM_PARIS} mapType={"standard"} onTouchMove={() => setCenterMap(false)} toolbarEnabled={false}>
                 {children}
                 <PositionMarker position={location} />
             </MapView>
@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: 'white',
-        borderWidth: 2,
-        borderColor: 'black'
+        backgroundColor: 'rgba(255, 255, 255, 0.75)',
+        borderWidth: 1,
+        borderColor: 'rgba(64, 64, 64, 0.50)'
     },
 });

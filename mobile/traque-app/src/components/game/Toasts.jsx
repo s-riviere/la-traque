@@ -65,16 +65,16 @@ export const Toasts = () => {
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
-        top: 5,
+        top: 0,
         left: "50%",
         transform: [{ translateX: '-50%' }],
-        maxWidth: "60%"
+        maxWidth: "60%",
+        padding: 10,
+        gap: 5
     },
     toast: {
-        margin: 5,
         padding: 10,
         borderRadius: 15,
-        backgroundColor: 'white',
         elevation: 5
     },
 });

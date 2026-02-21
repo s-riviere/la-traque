@@ -18,7 +18,7 @@
         }
     },
     "wait": {
-        "title": "Rappel des règles !",
+        "title": "En attendant que la partie commence, voici un récap des règles.",
         "placement_rule": "Rejoignez votre zone de départ et attendez le début de la partie.",
         "capture_rule": "Traquez votre cible grâce à sa photo et aux positions qu'elle révèle. Pour obtenir la dernière position connue de votre cible, vous devrez révéler la vôtre. Une fois capturée, entrez son code dans l'application.",
         "zone_rule": "Déplacez-vous à pied tout en veillant à rester dans la zone de jeu pour ne pas être pénalisé ! Si vous restez trop longtemps en dehors de la zone, votre interface sera désactivée et votre chasseur connaîtra précisément votre position.",
@@ -26,7 +26,8 @@
     },
     "play": {
         "info": {
-            "zone_reduction_label": "Réduction de la zone dans",
+            "placement_title": "Placez vous dans votre zone !",
+            "zone_reduction_label": "Prochaine zone dans",
             "send_position_label": "Position envoyée dans"
         },
         "toast": {
@@ -47,6 +48,7 @@
             "capture_code": "Code de {{name}} : {{code}}",
             "target_name": "Cible ({{name}})",
             "target_code_input": "Code cible",
+            "stats_section_title": "Statistiques de votre partie",
             "stat_distance_label": "Distance parcourue",
             "stat_time_label": "Temps écoulé (HH:MM:SS)",
             "stat_speed_label": "Vitesse moyenne",
@@ -54,13 +56,18 @@
             "stat_reveal_label": "Nombre total d'envois de votre position"
         }
     },
+    "end": {
+        "title_captured": "Vous avez été capturé...",
+        "title_win": "Vous avez gagné !",
+        "paragraph": "La partie se termine ici pour vous ! Vous pouvez rejoindre le point de départ pour prendre un goûter et assister au reste de la partie."
+    },
     "info": {
         "default": {
             "title": "Info"
         },
-        "succes": {
+        "success": {
             "title": "Bravo !",
-            "capture_success": "Vous avez réussi à capturer votre cible. Une nouvelle cible vient de vous être attribuée."
+            "capture_success": "Vous avez réussi à capturer votre cible."
         },
         "failure": {
             "title": "Raté...",

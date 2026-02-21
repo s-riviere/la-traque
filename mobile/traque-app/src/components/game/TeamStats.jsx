@@ -37,41 +37,45 @@ export const TeamStats = () => {
 
     return (
         <View style={styles.statsContainer}>
+            <Text style={styles.title}>{t("play.drawer.stats_section_title")}</Text>
             <View style={styles.row}>
-                <Stat source={require('@/assets/images/distance.png')} description={t("play.drawer.stat_distance_label")}>{Math.floor(distance / 100) / 10}km</Stat>
+                <Stat source={require('@/assets/images/distance.png')} description={t("play.drawer.stat_distance_label")}>{Math.floor((distance ?? 0) / 100) / 10}km</Stat>
                 <Stat source={require('@/assets/images/time.png')} description={t("play.drawer.stat_time_label")}>{secondsToHHMMSS((finishDate ? Math.floor((finishDate - startDate) / 1000) : timeSinceGameStart))}</Stat>
                 <Stat source={require('@/assets/images/running.png')} description={t("play.drawer.stat_speed_label")}>{avgSpeed}km/h</Stat>
             </View>
             <View style={styles.row}>
-                <Stat source={require('@/assets/images/target/black.png')} description={t("play.drawer.stat_capture_label")}>{nCaptures}</Stat>
-                <Stat source={require('@/assets/images/update_position.png')} description={t("play.drawer.stat_reveal_label")}>{nSentLocation}</Stat>
+                <Stat source={require('@/assets/images/target/black.png')} description={t("play.drawer.stat_capture_label")}>{nCaptures ?? 0}</Stat>
+                <Stat source={require('@/assets/images/update_position.png')} description={t("play.drawer.stat_reveal_label")}>{nSentLocation ?? 0}</Stat>
             </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
+    statsContainer: {
+        width: "100%",
+        gap: 15,
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+    row: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+    },
     statContainer: {
-        height: 30,
         flexDirection: "row",
         justifyContent: 'center',
         alignItems: 'center',
+        gap: 5,
     },
     image: {
         width: 30,
         height: 30,
-        marginRight: 5
     },
     text: {
-        fontSize: 15
+        fontSize: 15,
     },
-    statsContainer: {
-        gap: 15,
-        width: "100%",
-        marginVertical: 15
-    },
-    row: {
-        flexDirection: "row",
-        justifyContent: "space-around"
-    }
 });

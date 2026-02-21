@@ -1,6 +1,6 @@
 // React
 import { useState } from 'react';
-import { Keyboard, View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Keyboard, View, Text, StyleSheet, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 // Components
 import { ExpandableImage } from '@/components/common/Image';
@@ -14,6 +14,7 @@ import { useTeam } from '@/contexts/teamContext';
 // Services
 import { emitCapture } from '@/services/socket/emitters';
 import { enemyImage } from '@/services/api/image';
+import { IconButton } from '../common/IconButton';
 
 export const TargetInfoDrawer = ({ height }) => {
     const { t } = useTranslation();
@@ -47,24 +48,16 @@ export const TargetInfoDrawer = ({ height }) => {
     };
 
     return (
-        <Drawer height={height}>
-            <Text style={{fontSize: 22, fontWeight: "bold", textAlign: "center"}}>
-                {t("play.drawer.capture_code", {name: name ?? t("common.no_value"), code: String(captureCode).padStart(4,"0")})}
-            </Text>
+        <Drawer contentContainerStyle={styles.drawer} height={height}>
+            <Text style={styles.teamCode}>{t("play.drawer.capture_code", {name: name ?? t("common.no_value"), code: String(captureCode).padStart(4,"0")})}</Text>
             <Show when={!hasHandicap}>
-                <View style={styles.imageContainer}>
-                    <Text style={{fontSize: 15, margin: 5}}>{t("play.drawer.target_name", {name: enemyName ?? t("common.no_value")})}</Text>
+                <View style={styles.targetContainer}>
+                    <Text style={styles.targetName}>{t("play.drawer.target_name", {name: enemyName ?? t("common.no_value")})}</Text>
                     <ExpandableImage source={enemyImage(teamId)}/>
                 </View>
-                <View style={styles.actionsContainer}>
-                    <View style={styles.actionsLeftContainer}>
-                        <CustomTextInput value={enemyCaptureCode} inputMode="numeric" placeholder={t("play.drawer.target_code_input")}  onChangeText={setEnemyCaptureCode}/>
-                    </View>
-                    <View style={styles.actionsRightContainer}>
-                        <TouchableOpacity style={styles.button} onPress={handleCapture}>
-                            <Image source={require("@/assets/images/target/white.png")} style={{width: 40, height: 40}} resizeMode="contain"/>
-                        </TouchableOpacity>
-                    </View>
+                <View style={styles.captureContainer}>
+                    <CustomTextInput style={styles.captureInput} value={enemyCaptureCode} inputMode="numeric" placeholder={t("play.drawer.target_code_input")}  onChangeText={setEnemyCaptureCode}/>
+                    <IconButton style={styles.captureButton} source={require("@/assets/images/target/white.png")} onPress={handleCapture} />
                 </View>
             </Show>
             <TeamStats/>
@@ -73,34 +66,42 @@ export const TargetInfoDrawer = ({ height }) => {
 };
 
 const styles = StyleSheet.create({
-    imageContainer: {
+    drawer: {
+        flexGrow: 1,
+        justifyContent: "space-between",
+        padding: 15,
+        gap: 15,
+    },
+    teamCode: {
+        fontSize: 22,
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    targetContainer: {
         width: "100%", 
         alignItems: "center", 
-        justifyContent: "center", 
-        marginTop: 15
+        justifyContent: "center"
     },
-    actionsContainer: {
+    targetName: {
+        fontSize: 15,
+    },
+    captureContainer: {
         flexDirection: "row",
         width: "100%",
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginTop: 15
+        gap: 15
     },
-    actionsLeftContainer: {
-        flexGrow: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: 15
-    },
-    actionsRightContainer: {
-        width: 100,
+    captureInput: {
+        flex: 3,
         alignItems: 'center',
         justifyContent: 'center'
     },
-    button: {
+    captureButton: {
+        flex: 1,
+        height: 70,
         borderRadius: 12,
-        width: '100%',
-        height: 75,
+        padding: 10,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#444'

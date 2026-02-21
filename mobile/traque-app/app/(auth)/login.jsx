@@ -11,8 +11,6 @@ import { useAuth } from "@/contexts/authContext";
 import { usePickImage } from '@/hooks/usePickImage';
 // Services
 import { uploadTeamImage } from '@/services/api/image';
-// Constants
-import { COLORS } from '@/constants';
 
 const Login = () => {
     const { t } = useTranslation();
@@ -53,28 +51,20 @@ const Login = () => {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.transitionContainer}>
-                <View style={styles.subContainer}>
-                    <Image style={styles.logoImage} source={require('@/assets/images/logo/logo_traque.png')}/>
-                    <Text style={styles.logoText}>{t("login.header.title")}</Text>
-                </View>
-                <View style={styles.subContainer}>
-                    <CustomTextInput value={teamId} inputMode="numeric" placeholder={t("login.form.team_id_input")} style={styles.input} onChangeText={setTeamId}/>
-                </View>
-                <View style={styles.subContainer}>
-                    <Text style={{fontSize: 15}}>{t("login.form.image_label")}</Text>
-                    <Text style={{fontSize: 13, marginBottom: 3}}>{t("login.form.image_sublabel")}</Text>
-                    <TouchableImage source={image ? {uri: image.uri} : require('@/assets/images/missing_image.jpg')} onPress={pickImage}/>
-                </View>
-                <View style={styles.subContainer}>
-                    <View style={styles.buttonContainer}>
-                        <TouchableHighlight style={styles.button} onPress={handleSubmit}>
-                            <Text style={styles.buttonLabel}>{isSubmitting ? "..." : t("login.form.validate_button")}</Text>
-                        </TouchableHighlight>
-                    </View>
-                </View>
+        <ScrollView style={styles.outerScrollContainer} contentContainerStyle={styles.innerScrollContainer} showsVerticalScrollIndicator={false}>
+            <View style={styles.logoContainer}>
+                <Image style={styles.logoImage} source={require('@/assets/images/logo/logo_traque.png')}/>
+                <Text style={styles.logoText}>{t("login.header.title")}</Text>
             </View>
+            <CustomTextInput style={styles.input} value={teamId} inputMode="numeric" placeholder={t("login.form.team_id_input")} onChangeText={setTeamId}/>
+            <View style={styles.imageContainer}>
+                <Text style={styles.imageLabel}>{t("login.form.image_label")}</Text>
+                <Text style={styles.imageSubLabel}>{t("login.form.image_sublabel")}</Text>
+                <TouchableImage source={image ? {uri: image.uri} : require('@/assets/images/missing_image.jpg')} onPress={pickImage}/>
+            </View>
+            <TouchableHighlight style={styles.button} onPress={handleSubmit}>
+                <Text style={styles.buttonLabel}>{isSubmitting ? "..." : t("login.form.validate_button")}</Text>
+            </TouchableHighlight>
         </ScrollView>
     );
 };
@@ -82,55 +72,53 @@ const Login = () => {
 export default Login;
 
 const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        alignItems: 'center',
-        paddingVertical: 20,
-        backgroundColor: COLORS.background
+    outerScrollContainer: {
+        flex: 1,
     },
-    transitionContainer: {
+    innerScrollContainer: {
         flexGrow: 1,
-        width: '80%',
-        maxWidth: 600,
+        justifyContent: 'space-between',
         alignItems: 'center',
+        paddingVertical: 40,
+        paddingHorizontal: 20,
+        gap: 20,
     },
-    subContainer: {
-        flexGrow: 1,
-        width: "100%",
+    logoContainer: {
+        justifyContent: "center",
         alignItems: 'center',
-        justifyContent: 'center',
-        margin: 10,
+        gap: 10,
     },
     logoImage: {
         width: 130,
         height: 130,
-        margin: 10,
     },
     logoText: {
         fontSize: 50,
         fontWeight: 'bold',
     },
-    buttonContainer: {
-        width: "100%",
-        maxWidth: 240,
-        height: 80,
+    input: {
+        width: "80%",
+    },
+    imageContainer: {
+        justifyContent: "center",
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: 3,
-        borderWidth: 4,
-        borderColor: '#888',
-        borderRadius: 18 
+    },
+    imageLabel: {
+        fontSize: 15
+    },
+    imageSubLabel:{
+        fontSize: 13
     },
     button: {
         borderRadius: 10,
-        width: '100%',
-        height: '100%',
+        width: 200,
+        height: 70,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#555' 
     },
     buttonLabel: {
         color: '#fff',
-        fontSize: 16,
+        fontSize: 20,
     },
 });

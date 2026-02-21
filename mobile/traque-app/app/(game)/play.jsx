@@ -1,6 +1,6 @@
 // React
 import { useState } from 'react';
-import { View, Alert, StyleSheet } from 'react-native';
+import { Text, View, Alert, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useTranslation } from 'react-i18next';
 // Components
@@ -9,7 +9,6 @@ import { TimerMMSS } from '@/components/common/Timer';
 import { Show } from '@/components/common/Show';
 import { PositionMarker } from '@/components/common/Layers';
 import { IconButton } from '@/components/common/IconButton';
-import { Header } from '@/components/game/Header';
 import { TargetInfoDrawer } from '@/components/game/TargetInfoDrawer';
 import { Toasts } from '@/components/game/Toasts';
 import { GameZone, StartZone } from '@/components/game/MapLayers';
@@ -20,7 +19,7 @@ import { useUserState } from '@/hooks/useUserState';
 // Services
 import { emitSendPosition } from '@/services/socket/emitters';
 // Constants
-import { COLORS, USER_STATE } from '@/constants';
+import { USER_STATE } from '@/constants';
 
 const Play = () => {
     const { t } = useTranslation();
@@ -31,16 +30,16 @@ const Play = () => {
 
     return (
         <View style={styles.globalContainer}>
-            <View style={styles.topContainer}>
-                <Header/>
-                <Show when={userState == USER_STATE.PLAYING}>
-                    <View style={styles.infoContainer}>
-                        <TimerMMSS style={{width: "50%"}} title={t("play.info.zone_reduction_label")} date={nextZoneDate} />
-                        <TimerMMSS style={{width: "50%"}} title={t("play.info.send_position_label")} date={locationSendDeadline} />
-                    </View>
-                </Show>
-            </View>
-            <View style={styles.bottomContainer} onLayout={(event) => setBottomContainerHeight(event.nativeEvent.layout.height)}>
+            <Show when={userState == USER_STATE.PLACEMENT}>
+                <Text style={styles.placementTitle}>{t("play.info.placement_title")}</Text>
+            </Show>
+            <Show when={userState == USER_STATE.PLAYING}>
+                <View style={styles.timerContainer}>
+                    <TimerMMSS style={styles.timer} title={t("play.info.zone_reduction_label")} date={nextZoneDate} />
+                    <TimerMMSS style={styles.timer} title={t("play.info.send_position_label")} date={locationSendDeadline} />
+                </View>
+            </Show>
+            <View style={styles.mapContainer} onLayout={(event) => setBottomContainerHeight(event.nativeEvent.layout.height)}>
                 <Map>
                     <Show when={userState == USER_STATE.PLACEMENT}>
                         <StartZone/>
@@ -70,22 +69,23 @@ export default Play;
 
 const styles = StyleSheet.create({
     globalContainer: {
-        backgroundColor: COLORS.background,
         flex: 1,
     },
-    topContainer: {
-        width: '100%',
-        alignItems: 'center',
+    placementTitle: {
+        textAlign: "center",
         padding: 15,
+        fontSize: 20,
+        fontWeight: "bold"
     },
-    infoContainer: {
-        width: '100%',
+    timerContainer: {
+        padding: 15,
         alignItems: 'center',
-        justifyContent: 'center',
         flexDirection: 'row',
-        marginTop: 15
     },
-    bottomContainer: {
+    timer: {
+        width: "50%",
+    },
+    mapContainer: {
         flex: 1,
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,

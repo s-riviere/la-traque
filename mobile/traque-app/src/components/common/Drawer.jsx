@@ -6,18 +6,18 @@ import LinearGradient from 'react-native-linear-gradient';
 // Constants
 import { COLORS } from '@/constants';
 
-export const Drawer = ({ height, children }) => {
+export const Drawer = ({ contentContainerStyle = {}, height, children }) => {
     const [collapsibleState, setCollapsibleState] = useState(true);
 
     return (
         <View style={styles.outerDrawerContainer}>
             <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.5)']} style={styles.gradient}/>
             <View style={styles.innerDrawerContainer}>
-                <TouchableHighlight style={styles.collapsibleButton} underlayColor="#d9d9d9" onPress={() => setCollapsibleState(!collapsibleState)}>
+                <TouchableHighlight style={styles.collapsibleButton} underlayColor="#e9e9e9" onPress={() => setCollapsibleState(!collapsibleState)}>
                     <Image source={require('@/assets/images/arrow.png')} style={[styles.arrow, {transform: [{ scaleY: collapsibleState ? 1 : -1 }]}]} resizeMode="contain"/>
                 </TouchableHighlight>
                 <Collapsible style={[styles.collapsibleWindow, {height: height - 44}]} collapsed={collapsibleState}>
-                    <ScrollView contentContainerStyle={styles.collapsibleContent}>
+                    <ScrollView style={styles.outerScrollContainer} contentContainerStyle={contentContainerStyle} showsVerticalScrollIndicator={false}>
                         {children}
                     </ScrollView>
                 </Collapsible>
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: COLORS.background,
     },
-    collapsibleContent: {
-        paddingHorizontal: 15,
+    outerScrollContainer: {
+        flex: 1
     }
 });
