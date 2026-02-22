@@ -1,12 +1,12 @@
 import fs from "fs";
 import path from "path";
-const UPLOAD_DIR = "trajectories";
+const TRAJECTORIES_DIR = path.join(process.cwd(), "trajectories");
 const EXTENSION = "txt";
 
 // Useful functions
 
 function teamIDToPath(teamID) {
-    return path.join(UPLOAD_DIR, teamID + "." + EXTENSION);
+    return path.join(TRAJECTORIES_DIR, teamID + "." + EXTENSION);
 }
 
 function dataToLine(...data) {
@@ -44,8 +44,8 @@ function addLineToFile(teamID, line) {
 }
 
 function initTrajectories() {
-    const files = fs.readdirSync(UPLOAD_DIR);
-    for (const file of files) fs.unlinkSync(path.join(UPLOAD_DIR, file));
+    const files = fs.readdirSync(TRAJECTORIES_DIR);
+    for (const file of files) fs.unlinkSync(path.join(TRAJECTORIES_DIR, file));
 }
 
 // Export functions

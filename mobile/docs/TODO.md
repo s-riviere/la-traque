@@ -20,4 +20,3 @@
 - [ ] Ajouter imprécision de la position au besoin (comme sur google maps)
 - [ ] Synchroniser les horloges sur l'interface
 - [ ] Améliorer l'intuitivité de l'interface (bouton d'actualisation / stats)
-- [ ] Publier sur le playstore

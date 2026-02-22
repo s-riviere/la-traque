@@ -1,8 +1,0 @@
-#Make a self signed certificate for development
-keys: key.pem server.crt
-
-key.pem csr.pem:
-	openssl req -newkey rsa:2048 -new -nodes -keyout key.pem -out csr.pem
-
-server.crt: key.pem csr.pem
-	openssl x509 -req -days 365 -in csr.pem -signkey key.pem -out server.crt

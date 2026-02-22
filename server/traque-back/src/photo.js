@@ -6,7 +6,8 @@ import multer from "multer";
 import fs from "fs";
 import path from "path";
 import game from "./game.js";
-const UPLOAD_DIR = "uploads/"
+const UPLOAD_DIR = path.join(process.cwd(), "uploads");
+const IMAGES_DIR = path.join(process.cwd(), "assets", "images");
 const ALLOWED_MIME = [
     "image/png",
     "image/jpeg",
@@ -60,10 +61,10 @@ export function initPhotoUpload() {
     app.get("/photo/my", (req, res) => {
         let team = game.getTeam(req.query.team);
         if (team) {
-            const imagePath = path.join(process.cwd(), UPLOAD_DIR, team.id);
+            const imagePath = path.join(UPLOAD_DIR, team.id);
             res.set("Content-Type", "image/png")
             res.set("Access-Control-Allow-Origin", "*");
-            res.sendFile(fs.existsSync(imagePath) ? imagePath : path.join(process.cwd(), "images", "missing_image.jpg"));
+            res.sendFile(fs.existsSync(imagePath) ? imagePath : path.join(IMAGES_DIR, "missing_image.jpg"));
         } else {
             res.status(400).send("Team not found")
         }
@@ -72,10 +73,10 @@ export function initPhotoUpload() {
     app.get("/photo/enemy", (req, res) => {
         let team = game.getTeam(req.query.team);
         if (team) {
-            const imagePath = path.join(process.cwd(), UPLOAD_DIR, team.chasing);
+            const imagePath = path.join(UPLOAD_DIR, team.chasing);
             res.set("Content-Type", "image/png")
             res.set("Access-Control-Allow-Origin", "*");
-            res.sendFile(fs.existsSync(imagePath) ? imagePath : path.join(process.cwd(), "images", "missing_image.jpg"));
+            res.sendFile(fs.existsSync(imagePath) ? imagePath : path.join(IMAGES_DIR, "missing_image.jpg"));
         } else {
             res.status(400).send("Team not found")
         }
