@@ -8,8 +8,8 @@ const LocationPermission = () => {
     return (<>
         <View style={styles.container}>
             <Image style={styles.image} source={require("@/assets/images/placement.png")} />
-            <Text style={styles.title}>{t("location-permission.title")}</Text>
-            <Text style={styles.subtitle}>{t("location-permission.subtitle")}</Text>
+            <Text style={styles.title}>{t("location_permission.title")}</Text>
+            <Text style={styles.subtitle}>{t("location_permission.subtitle")}</Text>
         </View>
     </>); 
 };

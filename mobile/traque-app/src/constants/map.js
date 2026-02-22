@@ -16,13 +16,13 @@ export const INITIAL_REGIONS = {
 export const LOCATION_PARAMETERS = {
     LOCAL: {
         accuracy: 4, // High
-        distanceInterval: 3, // meters
-        timeInterval: 1000, // ms
+        distanceInterval: 0, // meters
+        timeInterval: 3000, // ms
     },
     SERVER: {
         accuracy: 4, // High
-        distanceInterval: 5, // meters
-        timeInterval: 5000, // ms
+        distanceInterval: 0, // meters
+        timeInterval: 10000, // ms
         showsBackgroundLocationIndicator: true, // iOS only
         pausesUpdatesAutomatically: false, // (iOS) Prevents auto-pausing of location updates
         foregroundService: {

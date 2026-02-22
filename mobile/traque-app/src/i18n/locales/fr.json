@@ -2,7 +2,7 @@
     "common": {
         "no_value": "Indisponible"
     },
-    "location-permission": {
+    "location_permission": {
         "title": "Veuillez activer la localisation en arrière plan dans les paramètres et relancer l'application.",
         "subtitle": "La localisation de chaque équipe doit être connue par le serveur et les organisateurs pour veiller au bon déroulement du jeu."
     },

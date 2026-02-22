@@ -2,7 +2,7 @@
     "common": {
         "no_value": "Unavailable"
     },
-    "location-permission": {
+    "location_permission": {
         "title": "Please enable background location in settings and restart the app.",
         "subtitle": "Each team's location must be known by the server and organizers to ensure the game runs smoothly."
     },

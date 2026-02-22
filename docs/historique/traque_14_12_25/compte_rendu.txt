@@ -8,7 +8,7 @@ Météo : 8°C, pas de pluie, brouillard (visibilité <400m), vent 10km/h
 
 Problèmes
 
-[ ] Une équipe perdait sans arrêt la connection avec le serveur
+[x] Une équipe perdait sans arrêt la connection avec le serveur
 [x] La position en arrière plan, téléphone éteint par exemple, n'avait pas l'air de fonctionner (une équipe n'avait pas de notif)
 [x] La photo d'une des équipes ne parvenait pas jusqu'au serveur. Tout semblait normal pour l'équipe. (Potentiellement un problème
 de conversion : 046512 -> 46512)
@@ -23,7 +23,7 @@ voyants des équipes encore en jeu soit mis en avant.
 
 À faire
 
-[ ] Corriger les problèmes du dessus.
+[x] Corriger les problèmes du dessus.
 [ ] Profiter d'avoir plusieurs membres d'une équipe connectés pour affiner la position et les données.
 [ ] Gérer les positions des équipes aberrantes.
 [ ] Détecter et gérer les déconnections (aussi voir d'où elles pourraient venir).

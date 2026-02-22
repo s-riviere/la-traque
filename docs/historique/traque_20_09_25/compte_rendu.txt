@@ -7,13 +7,13 @@ Cette traque est la première à se faire avec le nouveau site web et la version
 
 Problèmes
 
-[ ] Une équipe perdait sans arrêt la connection avec le serveur
-[x] La position en arrière plan, téléphone éteint par exemple, n'avait pas l'air de fonctionner (une équipe n'avait pas de notif)
-[ ] Aux deux tiers de la partie toutes les équipes ont été déconnectée en même temps mais ont pu se reconnecter. Ça s'est produit
+[x] Aux deux tiers de la partie toutes les équipes ont été déconnectée en même temps mais ont pu se reconnecter. Ça s'est produit
 sans raisons apparentes
-[ ] Une équipe avait deux téléphones connectés sauf que le premier ne marchait pas bien. Par ailleurs, l'équipe disaient n'avoir
+[x] Une équipe avait deux téléphones connectés sauf que le premier ne marchait pas bien. Par ailleurs, l'équipe disaient n'avoir
 qu'un seul téléphone connecté.
-[ ] La photo d'une des équipes ne parvenait pas jusqu'au serveur. Tout semblait normal pour l'équipe.
+[x] Une équipe perdait sans arrêt la connection avec le serveur
+[x] La position en arrière plan, téléphone éteint par exemple, n'avait pas l'air de fonctionner (une équipe n'avait pas de notif)
+[x] La photo d'une des équipes ne parvenait pas jusqu'au serveur. Tout semblait normal pour l'équipe.
 [x] Il y a apparement eu un problème de synchronisation de l'affichage entre admin concernant les zones de départs. Il s'est résolu
 de lui même. Peut être un problème passager de connection.
 [x] Le focus sur une équipe dans la page principale des admins est à revoir. Par exemple, le zoom seul devrait désactiver le focus
@@ -26,7 +26,7 @@ voyants des équipes encore en jeu soit mis en avant.
 
 À faire
 
-[ ] Corriger les problèmes du dessus.
+[x] Corriger les problèmes du dessus.
 [x] Refaire le doc explicatif de la traque.
 [x] Mettre les règles au clair.
 [x] Compléter la doc pour s'occuper de l'exploitation.
