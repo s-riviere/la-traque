@@ -1,0 +1,111 @@
+Ludexplosion
+Distance
+7.2km
+Temps de survie
+76:46
+Vitesse moyenne
+5.6km/h
+Captures
+2
+Observations
+20
+Observé
+48
+
+Dahu
+Distance
+9.9km
+Temps de survie
+76:46
+Vitesse moyenne
+7.8km/h
+Captures
+1
+Observations
+22
+Observé
+19
+
+Les ToutA
+Distance
+2km
+Temps de survie
+28:00
+Vitesse moyenne
+4.4km/h
+Captures
+0
+Observations
+5
+Observé
+5
+
+Binôme de Bordelais n°1
+Distance
+1.1km
+Temps de survie
+17:08
+Vitesse moyenne
+4.1km/h
+Captures
+0
+Observations
+3
+Observé
+2
+
+Ocean's 3
+Distance
+4.8km
+Temps de survie
+52:48
+Vitesse moyenne
+5.5km/h
+Captures
+2
+Observations
+9
+Observé
+9
+
+Les hermines
+Distance
+0.8km
+Temps de survie
+8:48
+Vitesse moyenne
+5.7km/h
+Captures
+0
+Observations
+5
+Observé
+0
+
+Binôme de Bordelais n°2
+Distance
+2.7km
+Temps de survie
+28:24
+Vitesse moyenne
+5.8km/h
+Captures
+0
+Observations
+5
+Observé
+12
+
+Scotland Yard
+Distance
+4.3km
+Temps de survie
+76:46
+Vitesse moyenne
+3.4km/h
+Captures
+1
+Observations
+48
+Observé
+22
