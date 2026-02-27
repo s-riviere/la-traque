@@ -1,4 +1,3 @@
-import { io } from "./index.js";
 import { createHash } from "crypto";
 import { config } from "dotenv";
 import game from "./game.js"
@@ -16,7 +15,7 @@ export function secureAdminBroadcast(event, data) {
 
 let loggedInSockets = [];
 
-export function initAdminSocketHandler() {
+export function initAdminSocketHandler(io) {
     io.of("admin").on("connection", (socket) => {
         console.log("Connection of an admin");
         let loggedIn = false;

@@ -1,23 +1,11 @@
-import { playersBroadcast } from './team_socket.js';
-import { secureAdminBroadcast } from './admin_socket.js';
+import { haversineDistance, EARTH_RADIUS } from "./util.js";
 
 
 /* -------------------------------- Useful functions and constants -------------------------------- */
 
-const zoneTypes = {
-    circle: "circle",
-    polygon: "polygon"
-}
-
-const EARTH_RADIUS = 6_371_000; // Radius of the earth in m
-
-function haversine_distance({ lat: lat1, lng: lon1 }, { lat: lat2, lng: lon2 }) {
-    const degToRad = (deg) => deg * (Math.PI / 180);
-    const dLat = degToRad(lat2 - lat1);
-    const dLon = degToRad(lon2 - lon1);
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(degToRad(lat1)) * Math.cos(degToRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return c * EARTH_RADIUS;
+const ZONE_TYPES = {
+    CIRCLE: "circle",
+    POLYGON: "polygon"
 }
 
 function latlngEqual(latlng1, latlng2, epsilon = 1e-9) {
@@ -27,17 +15,17 @@ function latlngEqual(latlng1, latlng2, epsilon = 1e-9) {
 
 /* -------------------------------- Circle zones -------------------------------- */
 
-const defaultCircleSettings = {type: zoneTypes.circle, min: null, max: null, reductionCount: 4, duration: 10}
+const defaultCircleSettings = {type: ZONE_TYPES.CIRCLE, min: null, max: null, reductionCount: 4, duration: 10}
 
 function circleZone(center, radius, duration) {
     return {
-        type: zoneTypes.circle,
+        type: ZONE_TYPES.CIRCLE,
         center: center,
         radius: radius,
         duration: duration,
 
         isInZone(location) {
-            return haversine_distance(center, location) < this.radius;
+            return haversineDistance(center, location) < this.radius;
         }
     }
 }
@@ -46,7 +34,7 @@ function circleSettingsToZones(settings) {
     const {min, max, reductionCount, duration} = settings;
 
     if (!min || !max) return [];
-    if (haversine_distance(max.center, min.center) > max.radius - min.radius) return [];
+    if (haversineDistance(max.center, min.center) > max.radius - min.radius) return [];
 
     const zones = [circleZone(max.center, max.radius, duration)];
     const radiusReductionLength = (max.radius - min.radius) / reductionCount;
@@ -56,7 +44,7 @@ function circleSettingsToZones(settings) {
     for (let i = 1; i < reductionCount; i++) {
         radius -= radiusReductionLength;
         let new_center = null;
-        while (!new_center || haversine_distance(new_center, min.center) > radius - min.radius) {
+        while (!new_center || haversineDistance(new_center, min.center) > radius - min.radius) {
             const angle = Math.random() * 2 * Math.PI;
             const angularDistance = Math.sqrt(Math.random()) * radiusReductionLength / EARTH_RADIUS;
             const lat0Rad = center.lat * Math.PI / 180;
@@ -83,11 +71,11 @@ function circleSettingsToZones(settings) {
 
 /* -------------------------------- Polygon zones -------------------------------- */
 
-const defaultPolygonSettings = {type: zoneTypes.polygon, polygons: []}
+const defaultPolygonSettings = {type: ZONE_TYPES.POLYGON, polygons: []}
 
 function polygonZone(polygon, duration) {
     return {
-        type: zoneTypes.polygon,
+        type: ZONE_TYPES.POLYGON,
         polygon: polygon,
         duration: duration,
 
@@ -227,10 +215,10 @@ export default {
 
     changeSettings(settings) {
         switch (settings.type) {
-            case zoneTypes.circle:
+            case ZONE_TYPES.CIRCLE:
                 this.zones = circleSettingsToZones(settings);
                 break;
-            case zoneTypes.polygon:
+            case ZONE_TYPES.POLYGON:
                 this.zones = polygonSettingsToZones(settings);
                 break;
             default:
@@ -250,7 +238,5 @@ export default {
             end: this.getNextZone(),
             endDate:this.currentZone.endDate,
         };
-        playersBroadcast("current_zone", zone);
-        secureAdminBroadcast("current_zone", zone);
     },
 }

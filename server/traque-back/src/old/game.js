@@ -409,11 +409,9 @@ export default {
         // Update of currentLocation
         team.currentLocation = location;
         team.lastCurrentLocationDate = dateNow;
+        // If hasHandicap
         if (this.state == GameState.PLAYING && team.hasHandicap) {
             team.lastSentLocation = team.currentLocation;
-        }
-        // Update of enemyLocation
-        if (this.state == GameState.PLAYING && enemyTeam.hasHandicap) {
             team.enemyLocation = enemyTeam.currentLocation;
         }
         // Update of ready

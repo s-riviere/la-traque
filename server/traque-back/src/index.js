@@ -1,30 +1,24 @@
 import { createServer } from "http";
 import express from "express";
 import { Server } from "socket.io";
-import { config } from "dotenv";
-import { initAdminSocketHandler } from "./admin_socket.js";
-import { initTeamSocket } from "./team_socket.js";
-import { initPhotoUpload } from "./photo.js";
+import { initAdminSocketHandler } from "@/socket/adminHandler.js";
+import { initPlayerSocketHandler } from "@/socket/playerHandler.js";
+import { initPhotoUpload } from "./services/photo.js";
+import { PORT, HOST } from "@/util/util.js";
 
-config();
-const HOST = process.env.HOST;
-const PORT = process.env.PORT;
+// --- Configuration ---
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: { origin: "*", methods: ["GET", "POST"] }
+});
 
-export const app = express();
+// --- Initialization ---
+initPhotoUpload(app);
+initAdminSocketHandler(io);
+initPlayerSocketHandler(io);
 
-const httpServer = createServer({}, app);
-
+// --- Server Start ---
 httpServer.listen(PORT, HOST, () => {
-  console.log("Server running on http://" + HOST + ":" + PORT);
+    console.log(`Server running on http://${HOST}:${PORT}`);
 });
-
-export const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
-});
-
-initAdminSocketHandler();
-initTeamSocket();
-initPhotoUpload();

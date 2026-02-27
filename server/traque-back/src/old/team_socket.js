@@ -3,7 +3,6 @@ This file manages team access to the server via websocket.
 It receives messages, checks permissions, manages authentication and performs actions by calling functions from other modules.
 This module also exposes functions to send messages via socket to all teams
 */
-import { io } from "./index.js";
 import game from "./game.js";
 import zoneManager from "./zone_manager.js";
 
@@ -63,7 +62,7 @@ export function sendUpdatedTeamInformations(teamId) {
     });
 }
 
-export function initTeamSocket() {
+export function initTeamSocket(io) {
     io.of("player").on("connection", (socket) => {
         console.log("Connection of a player");
         let teamId = null;

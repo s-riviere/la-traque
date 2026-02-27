@@ -12,6 +12,8 @@
 - [x] Indiquer que l'équipe est hors zone.
 - [x] Mettre les stats dans le tiroir (distance, temps, vitesse moy, nb captures, nb envoi)
 - [x] Traduction anglaise
+- [ ] Rajouter un service dans le manifest (voir comment font les apps de sport)
+- [ ] Ajouter des timers à la notif
 - [ ] Implémenter des notifs lors du background (hors zone, position envoyée, update zone)
 - [ ] Créer le menu paramètre (idées de section : langue, photo équipe, notifs, mode sombre, unitées)
 - [ ] Afficher la trajectoire passée sur la carte (désactivable)
