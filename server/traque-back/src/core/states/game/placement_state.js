@@ -1,13 +1,15 @@
-import { PlacementTeam } from "@/core/states/teams/placement_team.js";
+import { PlacementTeam } from "#core/states/teams/placement_team.js";
 
 export class PlacementState {
+    static name = "placement";
+
+    get name () {
+        return this.constructor.name;
+    }
+
     constructor(teams, zoneManager) {
         this.teams = teams;
         this.zoneManager = zoneManager;
-    }
-
-    static get name () {
-        return "placement";
     }
     
 

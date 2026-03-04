@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
-import { ZoneManager } from "@/core/managers/zone_manager.js";
-import { TeamManager } from '@/core/managers/team_manager.js';
-import { GAME_MANAGER_EVENTS } from "@/config/events.js";
+import { ZoneManager } from "#core/managers/zone_manager.js";
+import { TeamManager } from '#core/managers/team_manager.js';
+import { GAME_MANAGER_EVENTS } from "#config/events.js";
 
 
 export class GameManager extends EventEmitter {

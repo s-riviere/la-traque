@@ -1,4 +1,4 @@
-import { settingsToZone } from "@/core/factories/placement_zone_factory.js";
+import { settingsToZone } from "#core/factories/placement_zone_factory.js";
 
 export class PlacementTeam {
     constructor(team) {

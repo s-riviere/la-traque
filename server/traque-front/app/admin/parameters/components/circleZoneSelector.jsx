@@ -46,9 +46,9 @@ function Drawings({ minZone, setMinZone, maxZone, setMaxZone, editMode }) {
 }
 
 export default function CircleZoneSelector({ display }) {
-    const {zoneSettings, outOfZoneDelay, updateSettings} = useAdmin();
-    const [localZoneSettings, setLocalZoneSettings, applyLocalZoneSettings] = useLocalVariable(zoneSettings, (e) => updateSettings({zone: e}));
-    const [localOutOfZoneDelay, setLocalOutOfZoneDelay, applyLocalOutOfZoneDelay] = useLocalVariable(outOfZoneDelay, (e) => updateSettings({outOfZoneDelay: e}));
+    const {settings, updateSettings} = useAdmin();
+    const [localZoneSettings, setLocalZoneSettings, applyLocalZoneSettings] = useLocalVariable(settings.playingZones, (e) => updateSettings({playingZones: e}));
+    const [localOutOfZoneDelay, setLocalOutOfZoneDelay, applyLocalOutOfZoneDelay] = useLocalVariable(settings.outOfZoneDelay, (e) => updateSettings({outOfZoneDelay: e}));
     const [editMode, setEditMode] = useState(EditMode.MAX);
 
     useEffect(() => {

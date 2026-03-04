@@ -1,6 +1,6 @@
-import { GAME_MANAGER_EVENTS, PLAYER_SYNCHRONIZER_EVENTS } from "@/config/events.js";
-import { PlayerMapper } from "@/externals/mappers/player_mapper.js";
-import { StateTracker } from "@/util/state_tracker.js";
+import { GAME_MANAGER_EVENTS, PLAYER_SYNCHRONIZER_EVENTS } from "#config/events.js";
+import { PlayerMapper } from "#externals/mappers/player_mapper.js";
+import { StateTracker } from "#util/state_tracker.js";
 
 export class PlayerSynchronizer {
     constructor(gameManager) {

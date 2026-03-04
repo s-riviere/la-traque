@@ -54,9 +54,9 @@ function Drawings({ localZoneSettings, addZone, removeZone }) {
 
 export default function PolygonZoneSelector({ display }) {
     const defaultDuration = 10;
-    const {zoneSettings, outOfZoneDelay, updateSettings} = useAdmin();
-    const [localZoneSettings, setLocalZoneSettings, applyLocalZoneSettings] = useLocalVariable(zoneSettings, (e) => updateSettings({zone: e}));
-    const [localOutOfZoneDelay, setLocalOutOfZoneDelay, applyLocalOutOfZoneDelay] = useLocalVariable(outOfZoneDelay, (e) => updateSettings({outOfZoneDelay: e}));
+    const {settings, updateSettings} = useAdmin();
+    const [localZoneSettings, setLocalZoneSettings, applyLocalZoneSettings] = useLocalVariable(settings.zones, (e) => updateSettings({zone: e}));
+    const [localOutOfZoneDelay, setLocalOutOfZoneDelay, applyLocalOutOfZoneDelay] = useLocalVariable(settings.outOfZoneDelay, (e) => updateSettings({outOfZoneDelay: e}));
 
     useEffect(() => {
         if (!localZoneSettings || localZoneSettings.type != ZoneTypes.POLYGON) {

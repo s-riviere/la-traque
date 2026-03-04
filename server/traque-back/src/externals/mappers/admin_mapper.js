@@ -1,4 +1,4 @@
-import { DefaultState, PlacementState, PlayingState, FinishedState } from "@/core/states/game/index.js";
+import { DefaultState, PlacementState, PlayingState, FinishedState } from "#core/states/game/index.js";
 
 const TEAM_STATE_MAP = {
     [DefaultState.name]: (_team, _gameState) => ({}),
@@ -55,9 +55,8 @@ export class AdminMapper {
         }
 
         return {
-            stateName: stateName,
-            teams: teamsDto,
-            teamsOrder: this.gameManager.teams.order,
+            gameState: stateName,
+            teams: this.gameManager.teams.order.map(teamId => teamsDto[teamId]),
             zones: zonesDto,
             settings: this.gameManager.settings
         }

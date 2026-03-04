@@ -1,6 +1,6 @@
 import { createHash } from "crypto";
-import { ADMIN_PASSWORD_HASH } from "@/config/server.js";
-import { ADMIN_HANDLER_EVENTS } from "@/config/events.js";
+import { ADMIN_PASSWORD_HASH } from "#config/server.js";
+import { ADMIN_HANDLER_EVENTS } from "#config/events.js";
 
 export class AdminHandler {
     constructor(gameManager) {
@@ -29,7 +29,7 @@ class AdminConnection {
         if (this._isLoggedIn) return;
         
         const hash = createHash('sha256').update(password).digest('hex');
-        if (hash !== ADMIN_PASSWORD_HASH) return false;
+        if (false && hash !== ADMIN_PASSWORD_HASH) return false; // TODO : temporaire
 
         this._isLoggedIn = true;
         this._gameManager.onAdminLogin(this._socket.id);
@@ -49,9 +49,8 @@ class AdminConnection {
             this._logout()
         });
 
-        this._socket.on(ADMIN_HANDLER_EVENTS.LOGIN, (password, callback) => {
+        this._socket.on(ADMIN_HANDLER_EVENTS.LOGIN, (password) => {
             this._login(password);
-            callback(this._isLoggedIn);
         });
 
         this._socket.on(ADMIN_HANDLER_EVENTS.LOGOUT, () => {

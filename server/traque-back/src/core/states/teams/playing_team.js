@@ -1,6 +1,6 @@
-import { Team } from "@/core/models/team.js";
-import { ScheduledTask } from "@/util/scheduler.js";
-import { RESTART_TIMERS } from "@/config/game.js";
+import { Team } from "#core/models/team.js";
+import { ScheduledTask } from "#util/scheduler.js";
+import { RESTART_TIMERS } from "#config/game.js";
 
 export class PlayingTeam {
     constructor(team, zoneManager) {

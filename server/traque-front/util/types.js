@@ -7,7 +7,7 @@ export const Colors = {
 }
 
 export const GameState = {
-    SETUP: "setup",
+    SETUP: "default",
     PLACEMENT: "placement",
     PLAYING: "playing",
     FINISHED: "finished"

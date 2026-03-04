@@ -29,7 +29,7 @@ function IconValue({ color, icon, value }) {
 }
 
 export default function TeamSidePanel({ selectedTeamId, onClose }) {
-    const { getTeam, startDate, gameState } = useAdmin();
+    const { getTeam, gameState } = useAdmin();
     const [imgSrc, setImgSrc] = useState("");
     const [_, setRefreshKey] = useState(0);
     const team = getTeam(selectedTeamId);
@@ -106,11 +106,11 @@ export default function TeamSidePanel({ selectedTeamId, onClose }) {
                     <DotLine label="Chassé par" value={getTeam(team.chased)?.name ?? NO_VALUE} />
                 </div>
             }
-            { (gameState == GameState.PLAYING || gameState == GameState.FINISHED) &&
+            { (gameState == GameState.PLAYING || gameState == GameState.FINISHED) && false &&
                 <div>
                     <DotLine label="Distance" value={formatDistance(team.distance)} />
-                    <DotLine label="Temps de survie" value={formatTime(startDate, team.finishDate || Date.now())} />
-                    <DotLine label="Vitesse moyenne" value={formatSpeed(team.distance, startDate, team.finishDate || Date.now())} />
+                    <DotLine label="Temps de survie" value={formatTime(0, team.finishDate || Date.now())} />
+                    <DotLine label="Vitesse moyenne" value={formatSpeed(team.distance, 0, team.finishDate || Date.now())} />
                     <DotLine label="Captures" value={team.nCaptures ?? NO_VALUE} />
                     <DotLine label="Observations" value={team.nSentLocation ?? NO_VALUE} />
                     <DotLine label="Observé" value={team.nObserved ?? NO_VALUE} />

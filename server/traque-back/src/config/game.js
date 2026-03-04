@@ -1,5 +1,5 @@
-import { DEFAULT_ZONES_SETTINGS } from "@/config/zone.js";
-import { DefaultState, PlacementState, PlayingState, FinishedState } from '@/core/states/game/index.js';
+import { DEFAULT_ZONES_SETTINGS } from "#config/zone.js";
+import { DefaultState, PlacementState, PlayingState, FinishedState } from '#core/states/game/index.js';
 
 export const STATE_SETTINGS = {
     ENTRY_STATE_CLASS: DefaultState,

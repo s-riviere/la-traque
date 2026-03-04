@@ -1,13 +1,15 @@
-import { PlayingTeam } from "@/core/states/teams/playing_team.js";
+import { PlayingTeam } from "#core/states/teams/playing_team.js";
 
 export class PlayingState {
+    static name = "playing";
+
+    get name () {
+        return this.constructor.name;
+    }
+
     constructor(teams, zoneManager) {
         this.teams = teams;
         this.zoneManager = zoneManager;
-    }
-
-    static get name () {
-        return "playing";
     }
     
 

@@ -12,15 +12,15 @@ export default function useAdmin() {
     }
 
     function addTeam(teamName) {
-        adminSocket.emit("add_team", teamName);
+        adminSocket.emit("add-team", teamName);
     }
 
     function removeTeam(teamId) {
-        adminSocket.emit("remove_team", teamId);
+        adminSocket.emit("remove-team", teamId);
     }
 
     function reorderTeams(newOrder) {
-        adminSocket.emit("reorder_teams", newOrder);
+        adminSocket.emit("reorder-teams", newOrder);
     }
 
     function captureTeam(teamId) {
@@ -32,11 +32,11 @@ export default function useAdmin() {
     }
 
     function changeState(state) {
-        adminSocket.emit("change_state", state);
+        adminSocket.emit("state", state);
     }
 
     function updateSettings(settings) {
-        adminSocket.emit("update_settings", settings);
+        adminSocket.emit("settings", settings);
     }
 
     return { ...adminContext, getTeam, reorderTeams, addTeam, removeTeam, captureTeam, placementTeam, changeState, updateSettings };

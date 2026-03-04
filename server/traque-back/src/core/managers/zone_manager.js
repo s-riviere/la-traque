@@ -1,5 +1,5 @@
-import { Scheduler } from "@/util/scheduler.js";
-import { settingsToZoneList } from "@/core/factories/game_zone_factory.js";
+import { Scheduler } from "#util/scheduler.js";
+import { settingsToZoneList } from "#core/factories/game_zone_factory.js";
 
 export class ZoneManager {
     constructor() {

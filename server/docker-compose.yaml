@@ -1,22 +1,25 @@
 services:
   proxy:
-    image: git.rezel.net/ludotech/traque-proxy:latest
+    restart: always
     ports:
       - "80:80"
-    restart: always
+    networks:
+      - traque-net
 
   front:
-    image: git.rezel.net/ludotech/traque-front:latest
     restart: always
-    environment:
-      NEXT_PUBLIC_SOCKET_HOST: 'traque.rezel.net'
+    networks:
+      - traque-net
 
   back:
-    image: git.rezel.net/ludotech/traque-back:latest
     restart: always
-    ports:
-      - "3001:3001"
     environment:
       ADMIN_PASSWORD_HASH: '23e3c6886ff8fcba302deac05c46612ed3af99e40a2a14252810f540f3c186aa'
       HOST: '0.0.0.0'
       PORT: 3001
+    networks:
+      - traque-net
+
+networks:
+  traque-net:
+    driver: bridge

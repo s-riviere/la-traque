@@ -1,4 +1,4 @@
-import { DefaultState, PlacementState, PlayingState, FinishedState } from "@/core/states/game/index.js";
+import { DefaultState, PlacementState, PlayingState, FinishedState } from "#core/states/game/index.js";
 
 const TEAM_STATE_MAP = {
     [DefaultState.name]: (_team, _gameState) => ({}),

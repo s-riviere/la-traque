@@ -1,13 +1,15 @@
-import { DefaultTeam } from "@/core/states/teams/default_team.js";
+import { DefaultTeam } from "#core/states/teams/default_team.js";
 
 export class DefaultState {
+    static name = "default";
+
+    get name () {
+        return this.constructor.name;
+    }
+
     constructor(teams, zoneManager) {
         this.teams = teams;
         this.zoneManager = zoneManager;
-    }
-
-    static get name () {
-        return "default";
     }
     
 

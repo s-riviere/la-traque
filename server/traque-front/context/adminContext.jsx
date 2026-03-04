@@ -8,44 +8,21 @@ const adminContext = createContext();
 
 export function AdminProvider({ children }) {
     const { adminSocket } = useSocket();
-    // teams
-    const [teams, setTeams] = useState([]);
-    // game_state
     const [gameState, setGameState] = useState(GameState.SETUP);
-    const [startDate, setStartDate] = useState(null);
-    // current_zone
-    const [zoneType, setZoneType] = useState(null);
-    const [zoneExtremities, setZoneExtremities] = useState(null);
-    const [nextZoneDate, setNextZoneDate] = useState(null);
-    // settings
-    const [messages, setMessages] = useState(null);
-    const [zoneSettings, setZoneSettings] = useState(null)
-    const [sendPositionDelay, setSendPositionDelay] = useState(null);
-    const [outOfZoneDelay, setOutOfZoneDelay] = useState(null);
-
-    useSocketListener(adminSocket, "teams", setTeams);
-
-    useSocketListener(adminSocket, "game_state", (data) => {
-        setGameState(data.state);
-        setStartDate(data.date);
-    });
-
-    useSocketListener(adminSocket, "current_zone", (data) => {
-        setZoneExtremities({begin: data.begin, end: data.end});
-        setNextZoneDate(data.endDate);
-    });
-
-    useSocketListener(adminSocket, "settings", (data) => {
-        setMessages(data.messages);
-        setZoneSettings(data.zone);
-        setZoneType(data.zone.type);
-        setSendPositionDelay(data.sendPositionDelay);
-        setOutOfZoneDelay(data.outOfZoneDelay);
+    const [teams, setTeams] = useState([]);
+    const [zones, setZones] = useState(null);
+    const [settings, setSettings] = useState(null);
+    
+    useSocketListener(adminSocket, "update-full", ({ gameState, teams, zones, settings }) => {
+        setGameState(gameState);
+        setTeams(teams);
+        setZones(zones);
+        setSettings(settings);
     });
 
     const value = useMemo(() => (
-        { zoneSettings, teams, gameState, zoneType, zoneExtremities, sendPositionDelay, outOfZoneDelay, messages, nextZoneDate, startDate }
-    ), [zoneSettings, teams, gameState, zoneType, zoneExtremities, sendPositionDelay, outOfZoneDelay, messages, nextZoneDate, startDate]);
+        { gameState, teams, zones, settings }
+    ), [gameState, teams, zones, settings]);
 
     return (
         <adminContext.Provider value={value}>

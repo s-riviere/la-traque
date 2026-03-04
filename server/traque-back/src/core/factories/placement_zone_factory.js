@@ -1,6 +1,6 @@
 import * as turf from '@turf/turf';
-import { Zone } from '@/core/models/zone.js';
-import { TURF_CIRCLE_STEPS, TURF_DISTANCE_UNIT } from '@/config/zone.js';
+import { Zone } from '#core/models/zone.js';
+import { TURF_CIRCLE_STEPS, TURF_DISTANCE_UNIT } from '#config/zone.js';
 
 export const settingsToZone = (settings) => {
     if (!settings) return null;

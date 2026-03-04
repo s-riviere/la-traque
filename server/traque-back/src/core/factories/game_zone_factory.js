@@ -1,6 +1,6 @@
 import * as turf from '@turf/turf';
-import { ZoneWithDuration } from '@/core/models/zone.js';
-import { TURF_BUFFER_SIZE, TURF_CIRCLE_STEPS, TURF_DISTANCE_UNIT, ZONE_TYPES } from '@/config/zone.js';
+import { ZoneWithDuration } from '#core/models/zone.js';
+import { TURF_BUFFER_SIZE, TURF_CIRCLE_STEPS, TURF_DISTANCE_UNIT, ZONE_TYPES } from '#config/zone.js';
 
 export const settingsToZoneList = (settings) => {
     if (!settings) return [];

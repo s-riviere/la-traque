@@ -1,5 +1,5 @@
-import { CAPTURE_CODE_LENGTH, TEAM_ID_LENGTH } from "@/config/game.js";
-import { randint } from "@/util/random.js";
+import { CAPTURE_CODE_LENGTH, TEAM_ID_LENGTH } from "#config/game.js";
+import { randint } from "#util/random.js";
 
 export class Team {
     constructor(id, teamName) {

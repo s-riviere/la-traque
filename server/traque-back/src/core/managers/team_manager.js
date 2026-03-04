@@ -1,4 +1,4 @@
-import { Team } from "@/core/models/team.js";
+import { Team } from "#core/models/team.js";
 
 export class TeamManager {
     constructor() {
@@ -36,7 +36,7 @@ export class TeamManager {
         const team = new Team(id, teamName);
         if (!this.has(id)) this.order.push(id);
         this._map.set(id, team);
-        return id;
+        return team;
     }
 
     delete(id) {

@@ -1,4 +1,4 @@
-import { PLAYER_HANDLER_EVENTS } from "@/config/events.js";
+import { PLAYER_HANDLER_EVENTS } from "#config/events.js";
 
 export class PlayerHandler {
     constructor(gameManager) {

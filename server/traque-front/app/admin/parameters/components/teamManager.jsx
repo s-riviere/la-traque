@@ -21,9 +21,9 @@ function TeamManagerItem({ team }) {
 }
 
 export default function TeamManager() {
-    const { teams, addTeam, reorderTeams, sendPositionDelay, updateSettings } = useAdmin();
+    const { teams, addTeam, reorderTeams, settings, updateSettings } = useAdmin();
     const [teamName, setTeamName] = useState('');
-    const [localSendPositionDelay, setLocalSendPositionDelay, applyLocalSendPositionDelay] = useLocalVariable(sendPositionDelay, (e) => updateSettings({sendPositionDelay: e}));
+    const [localSendPositionDelay, setLocalSendPositionDelay, applyLocalSendPositionDelay] = useLocalVariable(settings.scanDelay, (e) => updateSettings({scanDelay: e}));
     
     function handleTeamSubmit(e) {
         e.preventDefault();

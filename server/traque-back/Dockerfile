@@ -1,24 +1,29 @@
-# Use Node 22 alpine as parent image
-FROM node:22-alpine
-
-# Change the working directory on the Docker image to /app
+# Étape commune
+FROM node:22-slim AS base
 WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Copy package.json and package-lock.json to the /app directory
-COPY package.json package-lock.json* ./
-
-# Install dependencies
-RUN npm install
-
-# Copy the rest of project files into this image
+# Étape développement
+FROM base AS dev
+ENV NODE_ENV=development
 COPY . .
-
-# Create those folders if they don't already exist
-RUN if [ ! -d uploads ]; then mkdir uploads; fi
-RUN if [ ! -d trajectories ]; then mkdir trajectories; fi
-
-# Expose the port
 EXPOSE 3001
+CMD ["npm", "run", "dev"]
 
-# Start the application
-CMD ["npm", "run", "start"]
+# Étape builder
+FROM base AS builder
+ENV NODE_ENV=production
+COPY . .
+RUN npm run build && npm prune --omit=dev
+
+# Étape production
+FROM node:22-slim AS prod
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder --chown=node:node /app/node_modules ./node_modules
+COPY --from=builder --chown=node:node /app/dist ./dist
+COPY --from=builder --chown=node:node /app/package.json ./package.json
+USER node
+EXPOSE 3001
+CMD ["node", "dist/index.js"]

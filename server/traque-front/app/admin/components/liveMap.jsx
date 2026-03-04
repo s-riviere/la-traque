@@ -2,18 +2,18 @@ import { Fragment, useEffect, useState } from "react";
 import { Arrow, CircleZone, PolygonZone, Position, Tag } from "@/components/layer";
 import { CustomMapContainer, MapEventListener, MapPan } from "@/components/map";
 import useAdmin from "@/hook/useAdmin";
-import { GameState, ZoneTypes } from "@/util/types";
+import { GameState } from "@/util/types";
 import { mapZooms } from "@/util/configurations";
 
 export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsFocusing, mapStyle, showZones, showNames, showArrows }) {
-    const { zoneType, zoneExtremities, teams, nextZoneDate, getTeam, gameState } = useAdmin();
+    const { zones, teams, getTeam, gameState } = useAdmin();
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
     const [isFullScreen, setIsFullScreen] = useState(false);
 
     useEffect(() => {
-        if (nextZoneDate) {
+        if (zones?.zoneTransitionDate) {
             const updateTime = () => {
-                setTimeLeftNextZone(Math.max(0, Math.floor((nextZoneDate - Date.now()) / 1000)));
+                setTimeLeftNextZone(Math.max(0, Math.floor((zones.zoneTransitionDate - Date.now()) / 1000)));
             };
         
             updateTime();
@@ -21,7 +21,7 @@ export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsF
         
             return () => clearInterval(interval);
         }
-    }, [nextZoneDate]);
+    }, [zones?.zoneTransitionDate]);
 
     function formatTime(time) {
         // time is in seconds
@@ -34,20 +34,10 @@ export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsF
     function Zones() {
         if (!(showZones && gameState == GameState.PLAYING)) return null;
 
-        switch (zoneType) {
-            case ZoneTypes.CIRCLE:
-                return (<>
-                    <CircleZone circle={zoneExtremities.begin} color={mapStyle.currentZoneColor} />
-                    <CircleZone circle={zoneExtremities.end} color={mapStyle.nextZoneColor} />
-                </>);
-            case ZoneTypes.POLYGON:
-                return (<>
-                    <PolygonZone polygon={zoneExtremities.begin?.polygon} color={mapStyle.currentZoneColor} />
-                    <PolygonZone polygon={zoneExtremities.end?.polygon} color={mapStyle.nextZoneColor} />
-                </>);
-            default:
-                return null;
-        }
+        return (<>
+            <PolygonZone polygon={zones.currentZone} color={mapStyle.currentZoneColor} />
+            <PolygonZone polygon={zones.nextZone} color={mapStyle.nextZoneColor} />
+        </>);
     }
 
     return (

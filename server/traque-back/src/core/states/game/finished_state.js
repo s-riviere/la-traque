@@ -1,13 +1,15 @@
-import { FinishedTeam } from "@/core/states/teams/finished_team.js";
+import { FinishedTeam } from "#core/states/teams/finished_team.js";
 
 export class FinishedState {
+    static name = "finished";
+
+    get name () {
+        return this.constructor.name;
+    }
+
     constructor(teams, zoneManager) {
         this.teams = teams;
         this.zoneManager = zoneManager;
-    }
-
-    static get name () {
-        return "finished";
     }
     
 
