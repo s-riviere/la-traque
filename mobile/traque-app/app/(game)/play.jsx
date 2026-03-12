@@ -15,6 +15,7 @@ import { GameZone, StartZone } from '@/components/game/MapLayers';
 // Contexts
 import { useTeam } from '@/contexts/teamContext';
 // Hooks
+import { useLocation } from '@/hooks/useLocation';
 import { useUserState } from '@/hooks/useUserState';
 // Services
 import { emitSendPosition } from '@/services/socket/emitters';
@@ -25,6 +26,7 @@ const Play = () => {
     const { t } = useTranslation();
     const { teamInfos, nextZoneDate } = useTeam();
     const { locationSendDeadline, hasHandicap, enemyLocation, lastSentLocation } = teamInfos;
+    const { location } = useLocation();
     const userState = useUserState();
     const [bottomContainerHeight, setBottomContainerHeight] = useState(0);
 
@@ -40,7 +42,7 @@ const Play = () => {
                 </View>
             </Show>
             <View style={styles.mapContainer} onLayout={(event) => setBottomContainerHeight(event.nativeEvent.layout.height)}>
-                <Map>
+                <Map location={location}>
                     <Show when={userState == USER_STATE.PLACEMENT}>
                         <StartZone/>
                     </Show>
@@ -54,7 +56,7 @@ const Play = () => {
                 </Map>
                 <LinearGradient colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0)']} style={styles.gradient}/>
                 <Show when={userState == USER_STATE.PLAYING && !hasHandicap}>
-                    <IconButton style={styles.updatePosition} source={require("@/assets/images/update_position.png")} onPress={emitSendPosition} />
+                    <IconButton style={styles.updatePosition} source={require("@/assets/images/update_position.png")} onPress={() => location && emitSendPosition(location)} />
                 </Show>
                 <Toasts/>
             </View>

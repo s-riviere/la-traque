@@ -402,9 +402,12 @@ export default {
         const team = this.getTeam(teamId);
         const enemyTeam = this.getTeam(team.chasing);
         const dateNow = Date.now();
-        // Update distance
+        // Verify coherence of the new location and update the distance
         if (this.state == GameState.PLAYING && team.currentLocation) {
-            team.distance += Math.floor(getDistanceFromLatLon({lat: location[0], lng: location[1]}, {lat: team.currentLocation[0], lng: team.currentLocation[1]}));
+            const traveledDistance = Math.floor(getDistanceFromLatLon({lat: location[0], lng: location[1]}, {lat: team.currentLocation[0], lng: team.currentLocation[1]}));
+            const timeSinceLastCurrentLocation = (dateNow - team.lastCurrentLocationDate) / 1000;
+            if (traveledDistance / timeSinceLastCurrentLocation > 8) return false; // Reject the location if it implies a speed > 8m/s (28km/h)
+            team.distance += traveledDistance;
         }
         // Update of currentLocation
         team.currentLocation = location;

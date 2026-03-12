@@ -6,13 +6,10 @@ import MapView from 'react-native-maps';
 import { PositionMarker } from '@/components/common/Layers';
 import { IconButton } from '@/components/common/IconButton';
 import { Show } from '@/components/common/Show';
-// Hook
-import { useLocation } from '@/hooks/useLocation';
 // Util
 import { INITIAL_REGIONS } from '@/constants';
 
-export const Map = ({ children }) => {
-    const { location } = useLocation();
+export const Map = ({ location, children }) => {
     const [centerMap, setCenterMap] = useState(true);
     const mapRef = useRef(null);
 

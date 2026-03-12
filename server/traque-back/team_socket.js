@@ -116,8 +116,9 @@ export function initTeamSocket() {
             }
         });
 
-        socket.on("send_position", () => {
+        socket.on("send_position", (position) => {
             if (!teamId) return;
+            game.updateLocation(teamId, position);
             game.sendLocation(teamId);
         });
 

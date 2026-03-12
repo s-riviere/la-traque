@@ -35,8 +35,8 @@ export const emitLogout = () => {
     return customEmit("logout");
 };
 
-export const emitSendPosition = () => {
-    return customEmit("send_position");
+export const emitSendPosition = (location) => {
+    return customEmit("send_position", location);
 };
 
 export const emitUpdatePosition = (location) => {
