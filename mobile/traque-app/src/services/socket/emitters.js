@@ -35,22 +35,14 @@ export const emitLogout = () => {
     return customEmit("logout");
 };
 
-export const emitSendPosition = () => {
-    return customEmit("send_position");
+export const emitLocation = (location) => {
+    return customEmit("scan", location);
 };
 
-export const emitUpdatePosition = (location) => {
-    return customEmit("update_position", location);
+export const emitScan = (location) => {
+    return customEmit("location", location);
 };
 
 export const emitCapture = (captureCode) => {
     return customEmitCallback("capture", captureCode);
-};
-
-export const emitBattery = (level) => {
-    return customEmit("battery_update", level);
-};
-
-export const emitDeviceInfo = (infos) => {
-    return customEmit("device_info", infos);
 };

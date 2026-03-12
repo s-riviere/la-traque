@@ -2,30 +2,22 @@
 import { useState, useEffect } from 'react';
 
 export const useCountdownSeconds = (date) => {
-    const [time, setTime] = useState(0);
+    const getSecondsTo = (newDate) => !newDate ? 0 : Math.max(0, Math.floor((newDate - Date.now()) / 1000));
+    const [time, setTime] = useState(() => getSecondsTo(date));
+    const [prevDate, setPrevDate] = useState(date);
+
+    if (date !== prevDate) {
+        setPrevDate(date);
+        setTime(getSecondsTo(date));
+    }
 
     useEffect(() => {
-        if (!date) {
-            setTime(0);
-            return;
-        }
+        const interval = setInterval(() => {
+            const seconds = getSecondsTo(date);
+            setTime(seconds);
+            if (seconds === 0) clearInterval(interval);
+        }, 1000);
 
-        let interval;
-
-        const updateTime = () => {
-            const timeLeft = Math.floor((date - Date.now()) / 1000);
-            
-            if (timeLeft <= 0) {
-                setTime(0);
-                clearInterval(interval);
-            } else {
-                setTime(timeLeft);
-            }
-        };
-
-        updateTime();
-        interval = setInterval(updateTime, 1000);
-    
         return () => clearInterval(interval);
     }, [date]);
 
@@ -33,27 +25,18 @@ export const useCountdownSeconds = (date) => {
 };
 
 export const useTimeSinceSeconds = (date) => {
-    const [time, setTime] = useState(0);
+    const getSecondsTo = (newDate) => !newDate ? 0 : Math.max(0, Math.floor((Date.now() - newDate) / 1000));
+    const [time, setTime] = useState(() => getSecondsTo(date));
+    const [prevDate, setPrevDate] = useState(date);
+
+    if (date !== prevDate) {
+        setPrevDate(date);
+        setTime(getSecondsTo(date));
+    }
 
     useEffect(() => {
-        if (!date) {
-            setTime(0);
-            return;
-        }
+        const interval = setInterval(() => setTime(getSecondsTo(date)), 1000);
 
-        const updateTime = () => {
-            const timeSince = Math.floor((Date.now() - date) / 1000);
-            
-            if (timeSince <= 0) {
-                setTime(0);
-            } else {
-                setTime(timeSince);
-            }
-        };
-
-        updateTime();
-        const interval = setInterval(updateTime, 1000);
-    
         return () => clearInterval(interval);
     }, [date]);
 

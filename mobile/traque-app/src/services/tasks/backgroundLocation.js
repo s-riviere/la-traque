@@ -2,9 +2,9 @@
 import { defineTask, isTaskRegisteredAsync } from "expo-task-manager";
 import * as Location from 'expo-location';
 // Services
-import { emitUpdatePosition } from "@/services/socket/emitters";
+import { emitScan } from "@/services/socket/emitters";
 // Constants
-import { TASKS, LOCATION_PARAMETERS } from "@/constants";
+import { TASKS, LOCATION_PARAMETERS } from "@/config";
 
 
 // Task
@@ -22,7 +22,7 @@ defineTask(TASKS.BACKGROUND_LOCATION, async ({ data, error }) => {
             return;
         }
         const { latitude, longitude } = locations[0].coords;
-        emitUpdatePosition([latitude, longitude]);
+        emitScan([latitude, longitude]);
     }
 });
 

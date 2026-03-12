@@ -32,7 +32,7 @@ export class TeamManager {
 
     add(teamName) {
         if (!Team.isTeamNameValid(teamName)) return null;
-        let id; do { id = Team.getNewTeamId() } while (this.has(id));
+        let id; do { id = Team.getNewTeamId(); } while (this.has(id));
         const team = new Team(id, teamName);
         if (!this.has(id)) this.order.push(id);
         this._map.set(id, team);

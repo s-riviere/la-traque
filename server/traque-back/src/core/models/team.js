@@ -9,15 +9,15 @@ export class Team {
         this.state = null;
     }
 
-    static isTeamNameValid = (teamName) => {
+    static isTeamNameValid(teamName) {
         return typeof teamName === 'string' && teamName.length > 0;
     }
     
-    static getNewTeamId = () => {
+    static getNewTeamId() {
         return randint(10 ** TEAM_ID_LENGTH).toString().padStart(TEAM_ID_LENGTH, '0');
     }
 
-    static getNewCaptureCode = () => {
+    static getNewCaptureCode() {
         return randint(10 ** CAPTURE_CODE_LENGTH).toString().padStart(CAPTURE_CODE_LENGTH, '0');
     }
 

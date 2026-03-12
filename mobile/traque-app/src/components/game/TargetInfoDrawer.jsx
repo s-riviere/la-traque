@@ -7,7 +7,6 @@ import { ExpandableImage } from '@/components/common/Image';
 import { CustomTextInput } from '@/components/common/Input';
 import { Drawer } from '@/components/common/Drawer';
 import { Show } from '@/components/common/Show';
-import { TeamStats } from '@/components/game/TeamStats';
 // Contexts
 import { useAuth } from '@/contexts/authContext';
 import { useTeam } from '@/contexts/teamContext';
@@ -19,8 +18,8 @@ import { IconButton } from '../common/IconButton';
 export const TargetInfoDrawer = ({ height }) => {
     const { t } = useTranslation();
     const { teamId } = useAuth();
-    const { teamInfos } = useTeam();
-    const { enemyName, captureCode, name, hasHandicap } = teamInfos;
+    const { teamName, teamStateData } = useTeam();
+    const { targetName, captureCode, hasHandicap } = teamStateData;
     const [enemyCaptureCode, setEnemyCaptureCode] = useState("");
     const [isCapturing, setIsCapturing] = useState(false);
     
@@ -49,10 +48,10 @@ export const TargetInfoDrawer = ({ height }) => {
 
     return (
         <Drawer contentContainerStyle={styles.drawer} height={height}>
-            <Text style={styles.teamCode}>{t("play.drawer.capture_code", {name: name ?? t("common.no_value"), code: String(captureCode).padStart(4,"0")})}</Text>
+            <Text style={styles.teamCode}>{t("play.drawer.capture_code", {name: teamName ?? t("common.no_value"), code: String(captureCode).padStart(4,"0")})}</Text>
             <Show when={!hasHandicap}>
                 <View style={styles.targetContainer}>
-                    <Text style={styles.targetName}>{t("play.drawer.target_name", {name: enemyName ?? t("common.no_value")})}</Text>
+                    <Text style={styles.targetName}>{t("play.drawer.target_name", {name: targetName ?? t("common.no_value")})}</Text>
                     <ExpandableImage source={enemyImage(teamId)}/>
                 </View>
                 <View style={styles.captureContainer}>
@@ -60,7 +59,6 @@ export const TargetInfoDrawer = ({ height }) => {
                     <IconButton style={styles.captureButton} source={require("@/assets/images/target/white.png")} onPress={handleCapture} />
                 </View>
             </Show>
-            <TeamStats/>
         </Drawer>
     );
 };

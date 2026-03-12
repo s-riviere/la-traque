@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { DEFAULT_ZONES_SETTINGS } from "#config/zone.js";
 import { DefaultState, PlacementState, PlayingState, FinishedState } from '#core/states/game/index.js';
 
@@ -36,7 +37,7 @@ export const DEFAULT_GAME_SETTINGS = {
     placementZones: {},
     scanDelay: 10 * 60 * 1000, // ms
     outOfZoneDelay: 5 * 60 * 1000 // ms
-}
+};
 
 export const TEAM_ID_LENGTH = 6;
 export const CAPTURE_CODE_LENGTH = 4;

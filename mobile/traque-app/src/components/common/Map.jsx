@@ -9,7 +9,7 @@ import { Show } from '@/components/common/Show';
 // Hook
 import { useLocation } from '@/hooks/useLocation';
 // Util
-import { INITIAL_REGIONS } from '@/constants';
+import { INITIAL_REGIONS } from '@/config';
 
 export const Map = ({ children }) => {
     const { location } = useLocation();

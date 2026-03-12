@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 // Expo
 import * as Location from 'expo-location';
 // Constants
-import { LOCATION_PARAMETERS } from '@/constants';
+import { LOCATION_PARAMETERS } from '@/config';
 
 export const useLocation = () => {
     const [location, setLocation] = useState(null);

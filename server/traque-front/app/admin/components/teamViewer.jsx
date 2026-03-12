@@ -1,20 +1,28 @@
+import Image from 'next/image';
 import { List } from '@/components/list';
-import useAdmin from '@/hook/useAdmin';
 import { getStatus } from '@/util/functions';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useAdmin } from '@/context/adminContext';
 
 function TeamViewerItem({ team }) {
     const { gameState } = useAdmin();
+    const [dateNow, setDateNow] = useState(0);
     const status = getStatus(team, gameState);
     const NO_VALUE = "XX";
+    
+    useEffect(() => {
+        const interval = setInterval(() => setDateNow(Date.now()), 1000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <div className={`w-full flex flex-row gap-3 p-2 ${team.captured ? 'bg-gray-200' : 'bg-white'} justify-between`}>
             <div className='flex flex-row items-center gap-3'>
                 <div className='flex flex-row gap-1'>
-                    <img src={`/icons/user/${team.sockets.length > 0 ? "green" : "red"}.png`} className="w-4 h-4" />
-                    <img src={`/icons/battery/${team.battery >= 20 ? "green" : "red"}.png`} className="w-4 h-4" />
-                    <img src={`/icons/location/${team.lastCurrentLocationDate && (Date.now() - team.lastCurrentLocationDate <= 30000) ? "green" : "red"}.png`} className="w-4 h-4" />
+                    <Image src={`/icons/user/${team.sockets.length > 0 ? "green" : "red"}.png`} alt="icon" className="w-4 h-4" />
+                    <Image src={`/icons/battery/${team.battery >= 20 ? "green" : "red"}.png`} alt="icon" className="w-4 h-4" />
+                    <Image src={`/icons/location/${team.lastCurrentLocationDate && (dateNow - team.lastCurrentLocationDate <= 30000) ? "green" : "red"}.png`} alt="icon" className="w-4 h-4" />
                 </div>
                 <p className="text-xl font-bold">{team.name ?? NO_VALUE}</p>
             </div>

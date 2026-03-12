@@ -2,37 +2,22 @@ import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import { CustomMapContainer, MapEventListener } from "@/components/map";
 import { NumberInput } from "@/components/input";
-import useAdmin from "@/hook/useAdmin";
 import useMapCircleDraw from "@/hook/useCircleDraw";
 import useLocalVariable from "@/hook/useLocalVariable";
-import { defaultZoneSettings } from "@/util/configurations";
-import { ZoneTypes } from "@/util/types";
+import { defaultZoneSettings } from "@/config/configurations";
+import { ZoneTypes } from "@/config/types";
 import { CircleZone } from "@/components/layer";
+import { useAdmin } from "@/context/adminContext";
+import { emitSettings } from "@/services/socket/emitters";
 
 const EditMode = {
     MIN: 0,
     MAX: 1
-}
+};
 
 function Drawings({ minZone, setMinZone, maxZone, setMaxZone, editMode }) {
     const { drawingCircle: drawingMaxCircle, handleLeftClick: maxLeftClick, handleRightClick: maxRightClick, handleMouseMove: maxHover } = useMapCircleDraw(maxZone, setMaxZone);
     const { drawingCircle: drawingMinCircle, handleLeftClick: minLeftClick, handleRightClick: minRightClick, handleMouseMove: minHover } = useMapCircleDraw(minZone, setMinZone);
-
-    function MaxCircleZone() {
-        return (
-            drawingMaxCircle
-            ? <CircleZone circle={drawingMaxCircle} color="blue" />
-            : <CircleZone circle={maxZone} color="blue" />
-        );
-    }
-
-    function MinCircleZone() {
-        return (
-            drawingMinCircle
-            ? <CircleZone circle={drawingMinCircle} color="red" />
-            : <CircleZone circle={minZone} color="red" />
-        );
-    }
 
     return (<>
         <MapEventListener
@@ -40,22 +25,30 @@ function Drawings({ minZone, setMinZone, maxZone, setMaxZone, editMode }) {
             onRightClick={editMode == EditMode.MAX ? maxRightClick : minRightClick}
             onMouseMove={editMode == EditMode.MAX ? maxHover : minHover}
         />
-        <MaxCircleZone/>
-        <MinCircleZone/>
+        {
+            drawingMaxCircle
+            ? <CircleZone circle={drawingMaxCircle} color="blue" />
+            : <CircleZone circle={maxZone} color="blue" />
+        }
+        {
+            drawingMinCircle
+            ? <CircleZone circle={drawingMinCircle} color="red" />
+            : <CircleZone circle={minZone} color="red" />
+        }
     </>);
 }
 
 export default function CircleZoneSelector({ display }) {
-    const {settings, updateSettings} = useAdmin();
-    const [localZoneSettings, setLocalZoneSettings, applyLocalZoneSettings] = useLocalVariable(settings.playingZones, (e) => updateSettings({playingZones: e}));
-    const [localOutOfZoneDelay, setLocalOutOfZoneDelay, applyLocalOutOfZoneDelay] = useLocalVariable(settings.outOfZoneDelay, (e) => updateSettings({outOfZoneDelay: e}));
+    const { settings } = useAdmin();
+    const [localZoneSettings, setLocalZoneSettings, applyLocalZoneSettings] = useLocalVariable(settings.playingZones, (e) => emitSettings({...settings, playingZones: e}));
+    const [localOutOfZoneDelay, setLocalOutOfZoneDelay, applyLocalOutOfZoneDelay] = useLocalVariable(settings.outOfZoneDelay, (e) => emitSettings({...settings, outOfZoneDelay: e}));
     const [editMode, setEditMode] = useState(EditMode.MAX);
 
     useEffect(() => {
         if (!localZoneSettings || localZoneSettings.type != ZoneTypes.CIRCLE) {
             setLocalZoneSettings(defaultZoneSettings.circle);
         }
-    }, [localZoneSettings]);
+    }, [localZoneSettings, setLocalZoneSettings]);
 
     function setMinZone(minZone) {
         setLocalZoneSettings({...localZoneSettings, min: minZone});
@@ -96,7 +89,7 @@ export default function CircleZoneSelector({ display }) {
                         <NumberInput id="reduction-number" value={localZoneSettings.reductionCount ?? ""} onChange={updateReductionCount} />
                     </div>
                     <div className="w-full flex flex-row gap-2 items-center justify-between">
-                        <p>Durée d'une zone</p>
+                        <p>{"Durée d'une zone"}</p>
                         <NumberInput id="duration" value={localZoneSettings.duration ?? ""} onChange={updateDuration} />
                     </div>
                     <div className="w-full flex flex-row gap-2 items-center justify-between">

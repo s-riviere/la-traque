@@ -9,13 +9,12 @@ import { useTeam } from '@/contexts/teamContext';
 // Components
 import { IconButton } from '@/components/common/IconButton';
 // Constants
-import { COLORS } from '@/constants';
+import { COLORS } from '@/config';
 
 const GameLayout = () => {
     const { t, i18n } = useTranslation();
     const { logout } = useAuth();
-    const { teamInfos } = useTeam();
-    const { name } = teamInfos;
+    const { teamName } = useTeam();
 
     const toggleLanguage = () => {
         i18n.changeLanguage(i18n.language === 'fr' ? 'en' : 'fr');
@@ -31,13 +30,11 @@ const GameLayout = () => {
         }
     };
 
-    formatText("les minions du bds qui gagne");
-
     return (
         <View style={styles.globalContainer}>
             <View style={styles.headerContainer}>
                 <IconButton style={styles.logoutIcon} source={require('@/assets/images/logout.png')} onPress={logout} />
-                <Text style={styles.name} numberOfLines={1} adjustsFontSizeToFit>{formatText(name, 22)}</Text>
+                <Text style={styles.name} numberOfLines={1} adjustsFontSizeToFit>{formatText(teamName, 22)}</Text>
                 <IconButton style={styles.traductionIcon} source={require('@/assets/images/language.png')} onPress={toggleLanguage} />
             </View>
             <Slot/>

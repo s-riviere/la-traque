@@ -2,12 +2,11 @@
 import { Text, StyleSheet, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 // Components
-import { TeamStats } from '@/components/game/TeamStats';
 import { Show } from '@/components/common/Show';
 // Hook
 import { useUserState } from '@/hooks/useUserState';
 // Constants
-import { USER_STATE } from '@/constants';
+import { USER_STATE } from '@/config';
 
 /*
 const Leaderboard = ({ teams }) => {
@@ -91,7 +90,6 @@ const End = () => {
                 <Text style={styles.title}>{t("end.title_win")}</Text>
             </Show>
             <Text style={styles.subtitle}>{t("end.paragraph")}</Text>
-            <TeamStats/>
         </ScrollView>
     );
 };

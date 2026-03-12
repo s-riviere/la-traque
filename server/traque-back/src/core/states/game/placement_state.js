@@ -23,6 +23,7 @@ export class PlacementState {
         this.teams.forEach(team => this.initTeam(team, settings));
     }
 
+    // eslint-disable-next-line no-unused-vars
     clearTeam(_team) {}
 
     exit() {

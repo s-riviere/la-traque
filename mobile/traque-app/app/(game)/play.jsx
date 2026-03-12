@@ -17,14 +17,14 @@ import { useTeam } from '@/contexts/teamContext';
 // Hooks
 import { useUserState } from '@/hooks/useUserState';
 // Services
-import { emitSendPosition } from '@/services/socket/emitters';
+import { emitLocation } from '@/services/socket/emitters';
 // Constants
-import { USER_STATE } from '@/constants';
+import { USER_STATE } from '@/config';
 
 const Play = () => {
     const { t } = useTranslation();
-    const { teamInfos, nextZoneDate } = useTeam();
-    const { locationSendDeadline, hasHandicap, enemyLocation, lastSentLocation } = teamInfos;
+    const { teamStateData } = useTeam();
+    const { zoneTransitionDate, scanDate, hasHandicap, scanLocation, targetScanLocation } = teamStateData;
     const userState = useUserState();
     const [bottomContainerHeight, setBottomContainerHeight] = useState(0);
 
@@ -35,8 +35,8 @@ const Play = () => {
             </Show>
             <Show when={userState == USER_STATE.PLAYING}>
                 <View style={styles.timerContainer}>
-                    <TimerMMSS style={styles.timer} title={t("play.info.zone_reduction_label")} date={nextZoneDate} />
-                    <TimerMMSS style={styles.timer} title={t("play.info.send_position_label")} date={locationSendDeadline} />
+                    <TimerMMSS style={styles.timer} title={t("play.info.zone_reduction_label")} date={zoneTransitionDate} />
+                    <TimerMMSS style={styles.timer} title={t("play.info.send_position_label")} date={scanDate} />
                 </View>
             </Show>
             <View style={styles.mapContainer} onLayout={(event) => setBottomContainerHeight(event.nativeEvent.layout.height)}>
@@ -48,13 +48,13 @@ const Play = () => {
                         <GameZone/>
                     </Show>
                     <Show when={userState == USER_STATE.PLAYING && !hasHandicap}>
-                        <PositionMarker position={lastSentLocation} color={"grey"} onPress={() => Alert.alert(t("play.map.previous_marker_title"), t("play.map.previous_marker_description"))} />
-                        <PositionMarker position={enemyLocation} color={"red"} onPress={() => Alert.alert(t("play.map.enemy_marker_title"), t("play.map.enemy_marker_description"))} />
+                        <PositionMarker position={scanLocation} color={"grey"} onPress={() => Alert.alert(t("play.map.previous_marker_title"), t("play.map.previous_marker_description"))} />
+                        <PositionMarker position={targetScanLocation} color={"red"} onPress={() => Alert.alert(t("play.map.enemy_marker_title"), t("play.map.enemy_marker_description"))} />
                     </Show>
                 </Map>
                 <LinearGradient colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0)']} style={styles.gradient}/>
                 <Show when={userState == USER_STATE.PLAYING && !hasHandicap}>
-                    <IconButton style={styles.updatePosition} source={require("@/assets/images/update_position.png")} onPress={emitSendPosition} />
+                    <IconButton style={styles.updatePosition} source={require("@/assets/images/update_position.png")} onPress={emitLocation} />
                 </Show>
                 <Toasts/>
             </View>

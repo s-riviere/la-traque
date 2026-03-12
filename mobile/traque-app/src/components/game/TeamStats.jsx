@@ -22,8 +22,8 @@ const Stat = ({ children, source, description }) => {
 
 export const TeamStats = () => {
     const { t } = useTranslation();
-    const { teamInfos, startDate } = useTeam();
-    const { distance, finishDate, nCaptures, nSentLocation } = teamInfos;
+    const { teamInfos, startDate } = useTeam(); // TODO : outdated variables
+    const { distance, finishDate, nCaptures, nSentLocation } = teamInfos; // TODO : outdated variables
     const timeSinceGameStart = useTimeSinceSeconds(startDate);
 
     const avgSpeed = useMemo(() => {

@@ -7,10 +7,10 @@ const nextConfig = {
     return [
       {
         source: '/',
-        destination: '/admin',
+        destination: '/login',
         permanent: false,
       },
-    ]
+    ];
   },
   
 };

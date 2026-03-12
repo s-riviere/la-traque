@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { DefaultState, PlacementState, PlayingState, FinishedState } from "#core/states/game/index.js";
 
 const TEAM_STATE_MAP = {
@@ -43,7 +44,7 @@ export class AdminMapper {
                 id: team.id,
                 name: team.name,
                 location: team.location,
-                state: TEAM_STATE_MAP[stateName](team, this.gameManager.state)
+                stateData: TEAM_STATE_MAP[stateName](team, this.gameManager.state)
             };
         });
 
@@ -52,14 +53,14 @@ export class AdminMapper {
             currentZone: this.gameManager.zoneManager.currentZonePolygon,
             nextZone: this.gameManager.zoneManager.nextZonePolygon,
             zoneTransitionDate: this.gameManager.zoneManager.dateOfZoneTransition
-        }
+        };
 
         return {
             gameState: stateName,
             teams: this.gameManager.teams.order.map(teamId => teamsDto[teamId]),
             zones: zonesDto,
             settings: this.gameManager.settings
-        }
+        };
     }
 
     hash(dto) {

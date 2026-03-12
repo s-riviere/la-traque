@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { DefaultState, PlacementState, PlayingState, FinishedState } from "#core/states/game/index.js";
 
 const TEAM_STATE_MAP = {
@@ -43,8 +44,8 @@ export class PlayerMapper {
         return {
             id: this.team.id,
             name: this.team.name,
-            stateName: this.gameState.name,
-            state: TEAM_STATE_MAP[this.gameState.name](this.team, this.gameState)
+            gameState: this.gameState.name,
+            stateData: TEAM_STATE_MAP[this.gameState.name](this.team, this.gameState)
         };
     }
 

@@ -1,25 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { ReorderList } from "@/components/list";
 import { CustomMapContainer, MapEventListener } from "@/components/map";
 import { NumberInput } from "@/components/input";
 import { Node, PolygonZone, Label } from "@/components/layer";
-import useAdmin from "@/hook/useAdmin";
 import useMapPolygonDraw from "@/hook/usePolygonDraw";
 import useLocalVariable from "@/hook/useLocalVariable";
-import { defaultZoneSettings } from "@/util/configurations";
-import { ZoneTypes } from "@/util/types";
+import { defaultZoneSettings } from "@/config/configurations";
+import { ZoneTypes } from "@/config/types";
+import { emitSettings } from "@/services/socket/emitters";
+import { useAdmin } from "@/context/adminContext";
 
 function Drawings({ localZoneSettings, addZone, removeZone }) {
-    const [polygons, setPolygons] = useState([]);
-    const { currentPolygon, highlightNodes, handleLeftClick, handleRightClick, handleMouseMove } = useMapPolygonDraw(polygons, addZone, removeZone);
-
-    useEffect(() => {
-        if (localZoneSettings.type == ZoneTypes.POLYGON) {
-            setPolygons(localZoneSettings.polygons.map(zone => zone.polygon));
-        }
+    const polygons = useMemo(() => {
+        return localZoneSettings.type == ZoneTypes.POLYGON ? localZoneSettings.polygons.map(zone => zone.polygon) : [];
     }, [localZoneSettings]);
+
+    const { currentPolygon, highlightNodes, handleLeftClick, handleRightClick, handleMouseMove } = useMapPolygonDraw(polygons, addZone, removeZone);
 
     function getLabelPosition(polygon) {
         const sum = polygon.reduce(
@@ -38,7 +36,7 @@ function Drawings({ localZoneSettings, addZone, removeZone }) {
     return (<>
         <MapEventListener onLeftClick={handleLeftClick}  onRightClick={handleRightClick} onMouseMove={handleMouseMove} />
         {localZoneSettings.polygons.map(zone =>
-            <PolygonZone key={zone.id} polygon={zone.polygon} color="black" opacity='0.5' >
+            <PolygonZone key={zone.id} polygon={zone.polygon} color="black" >
                 <Label position={getLabelPosition(zone.polygon)} label={zone.id} color="white" />
             </PolygonZone>
         )}
@@ -54,15 +52,15 @@ function Drawings({ localZoneSettings, addZone, removeZone }) {
 
 export default function PolygonZoneSelector({ display }) {
     const defaultDuration = 10;
-    const {settings, updateSettings} = useAdmin();
-    const [localZoneSettings, setLocalZoneSettings, applyLocalZoneSettings] = useLocalVariable(settings.zones, (e) => updateSettings({zone: e}));
-    const [localOutOfZoneDelay, setLocalOutOfZoneDelay, applyLocalOutOfZoneDelay] = useLocalVariable(settings.outOfZoneDelay, (e) => updateSettings({outOfZoneDelay: e}));
+    const { settings } = useAdmin();
+    const [localZoneSettings, setLocalZoneSettings, applyLocalZoneSettings] = useLocalVariable(settings.zones, (e) => emitSettings({...settings, zone: e}));
+    const [localOutOfZoneDelay, setLocalOutOfZoneDelay, applyLocalOutOfZoneDelay] = useLocalVariable(settings.outOfZoneDelay, (e) => emitSettings({...settings, outOfZoneDelay: e}));
 
     useEffect(() => {
         if (!localZoneSettings || localZoneSettings.type != ZoneTypes.POLYGON) {
             setLocalZoneSettings(defaultZoneSettings.polygon);
         }
-    }, [localZoneSettings]);
+    }, [localZoneSettings, setLocalZoneSettings]);
 
     function getNewPolygonName() {
         const existingIds = new Set(localZoneSettings.polygons.map(zone => zone.id));

@@ -1,30 +1,24 @@
 // React
 import { useMemo } from 'react';
-import { Circle, Polygon } from 'react-native-maps';
+import { Polygon } from 'react-native-maps';
 // Components
 import { DashedCircle, InvertedCircle, InvertedPolygon } from '@/components/common/Layers';
 // Contexts
 import { useTeam } from '@/contexts/teamContext';
 // Constants
-import { ZONE_TYPES } from '@/constants';
+import { ZONE_TYPES } from '@/config';
 
 export const StartZone = () => {
-    const { teamInfos } = useTeam();
-    const { startingArea } = teamInfos;
+    const { teamStateData } = useTeam();
+    const { placementZone } = teamStateData;
 
     return useMemo(() => {
-        if (!startingArea) return null;
+        if (!placementZone) return null;
 
         return (
-            <Circle
-                center={{ latitude: startingArea.center.lat, longitude: startingArea.center.lng }}
-                radius={startingArea.radius}
-                strokeWidth={2}
-                strokeColor={`rgba(0, 0, 255, 1)`}
-                fillColor={`rgba(0, 0, 255, 0.2)`}
-            />
+            <Polygon coordinates={placementZone} strokeWidth={2} strokeColor={`rgba(0, 0, 255, 1)`} fillColor={`rgba(0, 0, 255, 0.2)`} />
         );
-    }, [startingArea]);
+    }, [placementZone]);
 };
 
 const latToLatitude = (pos) => ({latitude: pos.lat, longitude: pos.lng});

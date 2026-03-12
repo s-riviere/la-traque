@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { List } from "@/components/list";
 import { CustomMapContainer, MapEventListener } from "@/components/map";
-import useAdmin from '@/hook/useAdmin';
 import useMultipleCircleDraw from "@/hook/useMultipleCircleDraw";
 import { CircleZone, Tag } from "@/components/layer";
+import { useAdmin } from "@/context/adminContext";
 
 function Drawings({ placementZones, addZone, removeZone, handleRightClick }) {
     const { handleLeftClick, handleRightClick: handleRightClickDrawing } = useMultipleCircleDraw(placementZones, addZone, removeZone, 30);
@@ -24,9 +24,11 @@ function Drawings({ placementZones, addZone, removeZone, handleRightClick }) {
 }
 
 export default function PlacementZoneSelector({ display }) {
-    const { teams, getTeam, placementTeam } = useAdmin();
+    const { teams, getTeam } = useAdmin();
     const [selectedTeamId, setSelectedTeamId] = useState(null);
     const [placementZones, setPlacementZones] = useState([]);
+
+    // TODO replace old function placementTeam
 
     useEffect(() => {
         setPlacementZones(teams.filter(team => team.startingArea).map(team => ({id: team.id, name: team.name, center: team.startingArea.center, radius: team.startingArea.radius})));

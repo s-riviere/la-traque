@@ -6,6 +6,7 @@ export class DefaultTeam {
 
     // --------------- LIFE CYCLE --------------- //
 
+    // eslint-disable-next-line no-unused-vars
     init(_settings) {
         return this;
     }

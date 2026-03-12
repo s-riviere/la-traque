@@ -1,51 +1,45 @@
 // React
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
-import DeviceInfo from 'react-native-device-info';
+import { createContext, useContext, useState, useCallback, useMemo } from "react";
 // Hook
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 // Services
-import { emitLogin, emitLogout, emitBattery, emitDeviceInfo } from "@/services/socket/emitters";
+import { emitLogin, emitLogout } from "@/services/socket/emitters";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const [loggedIn, setLoggedIn] = useState(false);
-    const [teamId, setTeamId] = useLocalStorage("team_id", null);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [savedTeamId, setSavedTeamId] = useLocalStorage("team_id", null);
 
-    const login = useCallback(async (password) => {
-        if (loggedIn != false) return;
-
-        try {
-            const response = await emitLogin(password);
-            setLoggedIn(response.isLoggedIn); 
-            if (response.isLoggedIn) setTeamId(password);
-            return response.isLoggedIn;
-        } catch (error) {
-            setLoggedIn(false); 
-            throw error;
+    const login = useCallback(async (teamId) => {
+        if (isLoggedIn) return;
+        if (await emitLogin(teamId)) {
+            setIsLoggedIn(true); 
+            setSavedTeamId(teamId);
+            return true;
+        } else {
+            return false;
         }
-    }, [loggedIn, setTeamId]);
+    }, [isLoggedIn, setSavedTeamId]);
 
     const logout = useCallback(() => {
-        if (loggedIn != true) return;
-
-        setLoggedIn(false);
-        setTeamId(null);
+        if (!isLoggedIn) return;
+        setIsLoggedIn(false);
+        setSavedTeamId(null);
         emitLogout();
-    }, [loggedIn, setTeamId]);
+    }, [isLoggedIn, setSavedTeamId]);
 
     /*
-    // Try to log in with saved teamId
+    // Try to log in with saved savedTeamId
     useEffect(() => {
-        if (!loggedIn && teamId) {
-            login(teamId);
+        if (!isLoggedIn && savedTeamId) {
+            login(savedTeamId);
         }
-    }, [loggedIn, teamId, login]);
-    */
+    }, [isLoggedIn, savedTeamId, login]);
 
     // Emit battery level and phone model at log in
     useEffect(() => {
-        if (!loggedIn) return;
+        if (!isLoggedIn) return;
 
         const sendInfo = async () => {
             const [brand, model, name] = await Promise.all([
@@ -66,9 +60,10 @@ export const AuthProvider = ({ children }) => {
         const batteryCheckInterval = setInterval(() => sendBattery(), 5*60*1000); // 5 minutes
         
         return () => clearInterval(batteryCheckInterval);
-    }, [loggedIn]);
+    }, [isLoggedIn]);
+    */
 
-    const value = useMemo(() => ({ teamId, loggedIn, login, logout}), [teamId, loggedIn, login, logout]);
+    const value = useMemo(() => ({ savedTeamId, isLoggedIn, login, logout }), [savedTeamId, isLoggedIn, login, logout]);
 
     return (
         <AuthContext.Provider value={value}>

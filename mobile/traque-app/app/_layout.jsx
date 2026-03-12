@@ -11,7 +11,7 @@ import { useUserState } from '@/hooks/useUserState';
 // Services
 import { startLocationTracking , stopLocationTracking } from '@/services/tasks/backgroundLocation';
 // Constants
-import { USER_STATE, COLORS } from '@/constants';
+import { USER_STATE, COLORS } from '@/config';
 // Traduction
 import '@/i18n/config';
 

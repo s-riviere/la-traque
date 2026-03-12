@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/authContext";
 // Services
 import { socket } from "@/services/socket/connection";
 // Constants
-import { GAME_STATE } from "@/constants";
+import { GAME_STATE } from "@/config";
 
 const TeamContext = createContext(null);
 
@@ -18,47 +18,25 @@ const useOnEvent = (event, callback) => {
     }, [event, callback]);
 };
 
-export const TeamProvider = ({children}) => {
+export const TeamProvider = ({ children }) => {
     const { logout } = useAuth();
-    // update_team
-    const [teamInfos, setTeamInfos] = useState({});
-    // game_state
-    const [gameState, setGAME_STATE] = useState(GAME_STATE.SETUP);
-    const [startDate, setStartDate] = useState(null);
-    // current_zone
-    const [zoneExtremities, setZoneExtremities] = useState(null);
-    const [nextZoneDate, setNextZoneDate] = useState(null);
-    // settings
-    const [messages, setMessages] = useState(null);
-    const [zoneType, setZoneType] = useState(null);
+    const [teamId, setTeamId] = useState(null);
+    const [teamName, setTeamName] = useState(null);
+    const [gameState, setGameState] = useState(GAME_STATE.SETUP);
+    const [teamStateData, setTeamStateData] = useState({});
 
-    useOnEvent("update_team", (data) => {
-        setTeamInfos(teamInfos => ({...teamInfos, ...data}));
-    });
-
-    useOnEvent("game_state", (data) => {
-        setGAME_STATE(data.state);
-        setStartDate(data.date);
-    });
-
-    useOnEvent("settings", (data) => {
-        setMessages(data.messages);
-        setZoneType(data.zone.type);
-        //TODO
-        //setSendPositionDelay(data.sendPositionDelay);
-        //setOutOfZoneDelay(data.outOfZoneDelay);
-    });
-
-    useOnEvent("current_zone", (data) => {
-        setZoneExtremities({begin: data.begin, end: data.end});
-        setNextZoneDate(data.endDate);
+    useOnEvent("update-full", ({ id, name, gameState, stateData }) => {
+        setTeamId(id);
+        setTeamName(name);
+        setGameState(gameState);
+        setTeamStateData(stateData);
     });
 
     useOnEvent("logout", logout);
 
     const value = useMemo(() => (
-        {teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages}
-    ), [teamInfos, gameState, startDate, zoneType, zoneExtremities, nextZoneDate, messages]);
+        { teamId, teamName, gameState, teamStateData }
+    ), [teamId, teamName, gameState, teamStateData]);
 
     return (
         <TeamContext.Provider value={value}>

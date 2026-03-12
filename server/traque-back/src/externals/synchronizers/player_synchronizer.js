@@ -18,7 +18,7 @@ export class PlayerSynchronizer {
             this.gameManager.teams.forEach((team, teamId) => {
                 const { dto, hasChanged } = this._getSyncDtoOfTeam(team);
                 if (hasChanged) io.to(teamId).emit(PLAYER_SYNCHRONIZER_EVENTS.UPDATE_FULL, dto);
-            })
+            });
         });
 
         this.gameManager.on(GAME_MANAGER_EVENTS.DELETE_TEAM, (teamId) => {

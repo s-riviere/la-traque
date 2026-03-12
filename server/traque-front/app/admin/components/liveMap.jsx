@@ -1,12 +1,14 @@
 import { Fragment, useEffect, useState } from "react";
+import Image from 'next/image';
 import { Arrow, CircleZone, PolygonZone, Position, Tag } from "@/components/layer";
 import { CustomMapContainer, MapEventListener, MapPan } from "@/components/map";
-import useAdmin from "@/hook/useAdmin";
-import { GameState } from "@/util/types";
-import { mapZooms } from "@/util/configurations";
+import { Show } from "@/components/Show";
+import { useAdmin } from "@/context/adminContext";
+import { GameState } from "@/config/types";
+import { mapZooms } from "@/config/configurations";
 
 export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsFocusing, mapStyle, showZones, showNames, showArrows }) {
-    const { zones, teams, getTeam, gameState } = useAdmin();
+    const { gameState, teams, zones, getTeam } = useAdmin();
     const [timeLeftNextZone, setTimeLeftNextZone] = useState(null);
     const [isFullScreen, setIsFullScreen] = useState(false);
 
@@ -31,21 +33,15 @@ export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsF
         return String(minutes).padStart(2,"0") + ":" + String(seconds).padStart(2,"0");
     }
 
-    function Zones() {
-        if (!(showZones && gameState == GameState.PLAYING)) return null;
-
-        return (<>
-            <PolygonZone polygon={zones.currentZone} color={mapStyle.currentZoneColor} />
-            <PolygonZone polygon={zones.nextZone} color={mapStyle.nextZoneColor} />
-        </>);
-    }
-
     return (
         <div className={`${isFullScreen ? "fixed inset-0 z-[9999]" : "relative h-full w-full"}`}>
             <CustomMapContainer mapStyle={mapStyle}>
                 {isFocusing && <MapPan center={getTeam(selectedTeamId)?.currentLocation} zoom={mapZooms.high} animate />}
                 <MapEventListener onDragStart={() => setIsFocusing(false)} onWheel={() => setIsFocusing(false)} />
-                <Zones/>
+                <Show when={showZones && gameState == GameState.PLAYING}>
+                    <PolygonZone polygon={zones.currentZone} color={mapStyle.currentZoneColor} />
+                    <PolygonZone polygon={zones.nextZone} color={mapStyle.nextZoneColor} />
+                </Show>
                 {teams.map((team) => team && <Fragment key={team.id}>
                     <CircleZone circle={team.startingArea} color={mapStyle.placementZoneColor} display={gameState == GameState.PLACEMENT && showZones}>
                         <Tag text={team.name} display={showNames} />
@@ -63,8 +59,8 @@ export default function LiveMap({ selectedTeamId, onSelected, isFocusing, setIsF
                 </div>
             }
             <button className="absolute top-4 right-4 z-[1000] cursor-pointer bg-white p-3 rounded-full shadow-lg drop-shadow" onClick={() => setIsFullScreen(!isFullScreen)}>
-                <img src={`/icons/fullscreen.png`} className="w-8 h-8" />
+                <Image src={`/icons/fullscreen.png`} alt="full-screen" className="w-8 h-8" />
             </button>
         </div>
-    )
+    );
 }

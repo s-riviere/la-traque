@@ -8,40 +8,40 @@ import { useUserState } from '@/hooks/useUserState';
 // Util
 import { secondsToMMSS } from '@/utils/functions';
 // Constants
-import { USER_STATE } from '@/constants';
+import { USER_STATE } from '@/config';
 import { useCountdownSeconds } from '@/hooks/useTimeDelta';
 
 export const Toasts = () => {
     const { t } = useTranslation();
-    const { teamInfos } = useTeam();
-    const { outOfZone, outOfZoneDeadline, hasHandicap, enemyHasHandicap, ready } = teamInfos;
+    const { teamStateData } = useTeam();
+    const { isOutOfZone, handicapDate, hasHandicap, targetHasHandicap, isInPlacementZone } = teamStateData;
     const userState = useUserState();
-    const outOfZoneTimeLeft = useCountdownSeconds(outOfZoneDeadline);
+    const outOfZoneTimeLeft = useCountdownSeconds(handicapDate);
 
     const toastData = [
         {
             condition: userState === USER_STATE.PLACEMENT,
             id: 'placement',
-            text: ready ? t("play.toast.placed") : t("play.toast.not_placed"),
-            toastColor: ready ? "rgb(25, 165, 25)" : "rgb(204, 51, 51)" ,
+            text: isInPlacementZone ? t("play.toast.placed") : t("play.toast.not_placed"),
+            toastColor: isInPlacementZone ? "rgb(25, 165, 25)" : "rgb(204, 51, 51)" ,
             textColor: "white"
         },
         {
-            condition: userState === USER_STATE.PLAYING && !outOfZone && enemyHasHandicap,
+            condition: userState === USER_STATE.PLAYING && !isOutOfZone && targetHasHandicap,
             id: 'enemy_revealed',
             text: t("play.toast.enemy_position_revealed"),
             toastColor: "white",
             textColor: "black"
         },
         {
-            condition: userState === USER_STATE.PLAYING && outOfZone && hasHandicap,
+            condition: userState === USER_STATE.PLAYING && isOutOfZone && hasHandicap,
             id: 'out_of_zone',
             text: `${t("play.toast.go_in_zone")}\n${t("play.toast.team_position_revealed")}`,
             toastColor: "white",
             textColor: "black"
         },
         {
-            condition: userState === USER_STATE.PLAYING && outOfZone && !hasHandicap,
+            condition: userState === USER_STATE.PLAYING && isOutOfZone && !hasHandicap,
             id: 'has_handicap',
             text: `${t("play.toast.go_in_zone")}\n${t("play.toast.out_of_zone_message", {time: secondsToMMSS(outOfZoneTimeLeft)})}`,
             toastColor: "white",

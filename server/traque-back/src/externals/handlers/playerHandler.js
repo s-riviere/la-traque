@@ -47,7 +47,7 @@ class PlayerConnection {
 
         this._socket.on("disconnect", () => {
             console.log("Disconnection of a player");
-            this._logout()
+            this._logout();
         });
 
         this._socket.on(PLAYER_HANDLER_EVENTS.LOGIN, (loginTeamId, callback) => {
@@ -56,7 +56,7 @@ class PlayerConnection {
         });
 
         this._socket.on(PLAYER_HANDLER_EVENTS.LOGOUT, () => {
-            this._logout()
+            this._logout();
         });
 
         // Actions

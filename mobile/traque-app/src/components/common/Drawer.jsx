@@ -4,7 +4,7 @@ import { ScrollView, View, Image, StyleSheet, TouchableHighlight } from 'react-n
 import Collapsible from 'react-native-collapsible';
 import LinearGradient from 'react-native-linear-gradient';
 // Constants
-import { COLORS } from '@/constants';
+import { COLORS } from '@/config';
 
 export const Drawer = ({ contentContainerStyle = {}, height, children }) => {
     const [collapsibleState, setCollapsibleState] = useState(true);

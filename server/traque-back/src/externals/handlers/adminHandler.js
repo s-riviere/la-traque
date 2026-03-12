@@ -29,7 +29,7 @@ class AdminConnection {
         if (this._isLoggedIn) return;
         
         const hash = createHash('sha256').update(password).digest('hex');
-        if (false && hash !== ADMIN_PASSWORD_HASH) return false; // TODO : temporaire
+        if (hash !== ADMIN_PASSWORD_HASH) return false;
 
         this._isLoggedIn = true;
         this._gameManager.onAdminLogin(this._socket.id);
@@ -46,7 +46,7 @@ class AdminConnection {
 
         this._socket.on("disconnect", () => {
             console.log("Disconnection of an admin");
-            this._logout()
+            this._logout();
         });
 
         this._socket.on(ADMIN_HANDLER_EVENTS.LOGIN, (password) => {
@@ -54,17 +54,17 @@ class AdminConnection {
         });
 
         this._socket.on(ADMIN_HANDLER_EVENTS.LOGOUT, () => {
-            this._logout()
+            this._logout();
         });
 
         // Actions
 
         const protectedActions = {
-            [ADMIN_HANDLER_EVENTS.ADD_TEAM]: (id) => this._gameManager.addTeam(id),
-            [ADMIN_HANDLER_EVENTS.REMOVE_TEAM]: (id) => this._gameManager.removeTeam(id),
-            [ADMIN_HANDLER_EVENTS.REORDER_TEAM]: (id) => this._gameManager.reorderTeam(id),
-            [ADMIN_HANDLER_EVENTS.ELIMINATE_TEAM]: (id) => this._gameManager.eliminate(id),
-            [ADMIN_HANDLER_EVENTS.REVIVE_TEAM]: (id) => this._gameManager.revive(id),
+            [ADMIN_HANDLER_EVENTS.ADD_TEAM]: (teamName) => this._gameManager.addTeam(teamName),
+            [ADMIN_HANDLER_EVENTS.REMOVE_TEAM]: (teamId) => this._gameManager.removeTeam(teamId),
+            [ADMIN_HANDLER_EVENTS.REORDER_TEAM]: (newTeamsOrder) => this._gameManager.reorderTeam(newTeamsOrder),
+            [ADMIN_HANDLER_EVENTS.ELIMINATE_TEAM]: (teamId) => this._gameManager.eliminate(teamId),
+            [ADMIN_HANDLER_EVENTS.REVIVE_TEAM]: (teamId) => this._gameManager.revive(teamId),
             [ADMIN_HANDLER_EVENTS.STATE]: (state) => this._gameManager.setState(state),
             [ADMIN_HANDLER_EVENTS.SETTINGS]: (settings) => this._gameManager.setSettings(settings),
         };

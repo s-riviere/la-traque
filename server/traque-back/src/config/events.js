@@ -4,7 +4,6 @@ export const PLAYER_HANDLER_EVENTS = {
     LOCATION: "location",
     SCAN: "scan",
     CAPTURE: "capture",
-    DEVICE: "device",
 };
 
 export const ADMIN_HANDLER_EVENTS = {
