@@ -17,12 +17,23 @@ const errorFile = (err) => {
     if (err) console.error("Error appending to file:", err);
 };
 
+
+function addLineToFile(teamID, line) {
+    // Insert the line at the end of the file named teamID
+    try {
+        fs.appendFileSync(teamIDToPath(teamID), line + '\n');
+    } catch (err) {
+        console.error("Error appending to file:", err);
+    }
+}
+
+/*
 function addLineToFile(teamID, line) {
     // Insert the line in the file of teamID depending on the date (lines are sorted by date)
     if (!fs.existsSync(teamIDToPath(teamID))) {
-        fs.writeFile(teamIDToPath(teamID), line + '\n', errorFile);
+        fs.writeFileSync(teamIDToPath(teamID), line + '\n', errorFile);
     } else {
-        fs.readFile(teamIDToPath(teamID), 'utf8', (err, data) => {
+        fs.readFileSync(teamIDToPath(teamID), 'utf8', (err, data) => {
             if (err) {
                 errorFile(err);
                 return;
@@ -38,10 +49,11 @@ function addLineToFile(teamID, line) {
                 }
             }
             lines.splice(insertIndex, 0, line);
-            fs.writeFile(teamIDToPath(teamID), lines.join('\n') + '\n', errorFile);
+            fs.writeFileSync(teamIDToPath(teamID), lines.join('\n') + '\n', errorFile);
         });
     }
 }
+*/
 
 function initTrajectories() {
     const files = fs.readdirSync(UPLOAD_DIR);

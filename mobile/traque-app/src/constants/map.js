@@ -26,9 +26,9 @@ export const LOCATION_PARAMETERS = {
         showsBackgroundLocationIndicator: true, // iOS only
         pausesUpdatesAutomatically: false, // (iOS) Prevents auto-pausing of location updates
         foregroundService: {
-            notificationTitle: "Enregistrement de votre position.",
+            notificationTitle: "La Traque",
             notificationBody: "L'application utilise votre position en arrière plan.",
-            notificationColor: "#FF0000", // (Android) Notification icon color
+            notificationColor: "#FF0000",
         },
     }
 };

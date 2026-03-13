@@ -11,7 +11,19 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "locationAlwaysPermission": "L'application a besoin de votre position pour suivre votre activité sportive en continu.",
+          "isAndroidForegroundServiceEnabled": true,
+          "foregroundService": {
+            "notificationTitle": "La Traque",
+            "notificationBody": "L'application utilise votre position en arrière plan.",
+            "notificationColor": "#FF0000"
+          }
+        }
+      ]
     ],
     "newArchEnabled": true,
     "name": "La Traque",

@@ -34,14 +34,12 @@ export const AuthProvider = ({ children }) => {
         emitLogout();
     }, [loggedIn, setTeamId]);
 
-    /*
     // Try to log in with saved teamId
     useEffect(() => {
         if (!loggedIn && teamId) {
             login(teamId);
         }
     }, [loggedIn, teamId, login]);
-    */
 
     // Emit battery level and phone model at log in
     useEffect(() => {

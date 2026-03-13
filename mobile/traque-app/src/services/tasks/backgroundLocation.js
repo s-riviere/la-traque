@@ -22,7 +22,11 @@ defineTask(TASKS.BACKGROUND_LOCATION, async ({ data, error }) => {
             return;
         }
         const { latitude, longitude } = locations[0].coords;
-        emitUpdatePosition([latitude, longitude]);
+        try {
+            emitUpdatePosition([latitude, longitude]);
+        } catch (e) {
+            console.log(e);
+        }
     }
 });
 
