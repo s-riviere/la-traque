@@ -155,7 +155,6 @@ export function CustomMapContainer({mapStyle = mapStyles.default, children = nul
     }, []);
 
     return (
-        // @ts-ignore
         <MapContainer className='w-full h-full' center={mapLocations.paris} zoom={mapZooms.low} scrollWheelZoom={true}>
             <TileLayer url={mapStyle.url} attribution={mapStyle.attribution}/>
             <MapPan center={location} zoom={mapZooms.high}/>

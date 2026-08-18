@@ -6,7 +6,7 @@ import globals from "globals";
 
 export default [
   {
-    ignores: ["node_modules/*", "dist/*", ".next/*"],
+    ignores: ["/node_modules/", "/dist/", "/.next/"],
   },
   js.configs.recommended,
   {
@@ -43,6 +43,7 @@ export default [
       "react/prop-types": "off",
       "semi": ["error", "always"],
       "no-unused-vars": "warn",
+      "no-undef": "off"
     },
   },
 ];

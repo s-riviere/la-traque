@@ -5,7 +5,6 @@ export const uploadTeamImage = async (id, imageUri) => {
     if (!imageUri || !id) return;
 
     const data = new FormData();
-    // @ts-ignore
     data.append('file', {
         uri: imageUri,
         name: 'photo.jpg',

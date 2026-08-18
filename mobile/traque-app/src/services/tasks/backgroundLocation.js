@@ -15,7 +15,6 @@ defineTask(TASKS.BACKGROUND_LOCATION, async ({ data, error }) => {
         return;
     }
     if (data) {
-        // @ts-ignore
         const { locations } = data;
         if (locations.length == 0) {
             console.log("No location measured.");

@@ -95,7 +95,7 @@ export default function useMapPolygonDraw(polygons, addPolygon, removePolygon) {
             sum += (next.lng - curr.lng) * (next.lat + curr.lat);
         }
         return sum > 0;
-    };
+    }
     
     function getPolygonIndex(latlng) {
         // Return the index of the polygon where latlng is according to isInPolygon
